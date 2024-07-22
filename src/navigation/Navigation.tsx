@@ -6,11 +6,12 @@ import { useTheme } from '../context/ThemeContext';
 import HomeScreen from '../screens/HomeScreen';
 import DetailScreen from '../screens/DetailScreen';
 import IntroScreen from '../screens/IntroScreen';
-import { RootStackParamList } from './types';
+import { RootStackParamList } from '../navigation/types';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LoginScreen from '../screens/LoginScreen';
 import SignUpScreen from '../screens/SignUpScreen';
 import SignInScreen from '../screens/SignInScreen';
+import { useAuth } from '../utils/auth.ts';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -18,90 +19,71 @@ const Navigation: React.FC = () => {
   const { colors } = useTheme();
   const scheme = useColorScheme();
   const [isFirstTime, setIsFirstTime] = useState<boolean | null>(null);
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
+  const { user,isEmailVerified } = useAuth();
 
   const navigationTheme = scheme === 'dark' ? DarkTheme : DefaultTheme;
 
   useEffect(() => {
-    const checkFirstTimeAndLoginStatus = async () => {
+    const checkFirstTime = async () => {
       try {
         const hasOpenedBefore = await AsyncStorage.getItem('hasOpenedBefore');
-        const userToken = await AsyncStorage.getItem('userToken');
-
-        if (hasOpenedBefore === null) {
-          // First time opening app
-          await AsyncStorage.setItem('hasOpenedBefore', 'true');
-          setIsFirstTime(true);
-        } else {
-          setIsFirstTime(false);
-        }
-
-        setIsLoggedIn(!!userToken);
+        setIsFirstTime(hasOpenedBefore === null);
       } catch (error) {
-        console.error('Error checking first time and login status:', error);
-        // Handle error case
+        console.error('Error checking first time status:', error);
+        setIsFirstTime(false); // Assume it's not first time in case of error
       }
     };
 
-    checkFirstTimeAndLoginStatus();
+    checkFirstTime();
   }, []);
 
-  if (isFirstTime === null || isLoggedIn === null) {
+  if (isFirstTime === null) {
     // Show a loading screen while checking the status
     return null;
   }
 
+  const getInitialRouteName = () => {
+    if (isFirstTime) return 'Intro';
+    if (!user || !isEmailVerified) return 'Login';
+    return 'Home';
+  };
+
   return (
     <NavigationContainer theme={navigationTheme}>
-      <Stack.Navigator>
-        {isFirstTime ? (
-          <Stack.Screen
-            name="Intro"
-            component={IntroScreen}
-            options={{ headerShown: false }}
-          />
-        ) : !isLoggedIn ? (
-          <>
-            <Stack.Screen
-              name="Login"
-              component={LoginScreen}
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen
-              name="SignUp"
-              component={SignUpScreen}
-              options={{
-                headerShown: false
-              }}
-            />
-            <Stack.Screen
-              name="SignIn"
-              component={SignInScreen}
-              options={{
-                headerShown: false
-              }}
-            />
-          </>
-        ) : (
-          <>
-            <Stack.Screen
-              name="Home"
-              component={HomeScreen}
-              options={{
-                headerStyle: { backgroundColor: colors.background },
-                headerTintColor: colors.text,
-              }}
-            />
-            <Stack.Screen
-              name="Detail"
-              component={DetailScreen}
-              options={{
-                headerStyle: { backgroundColor: colors.background },
-                headerTintColor: colors.text,
-              }}
-            />
-          </>
-        )}
+      <Stack.Navigator initialRouteName={getInitialRouteName()}>
+        <Stack.Screen
+          name="Intro"
+          component={IntroScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Login"
+          component={LoginScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="SignUp"
+          component={SignUpScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="SignIn"
+          component={SignInScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Home"
+          component={HomeScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Detail"
+          component={DetailScreen}
+          options={{
+            headerStyle: { backgroundColor: colors.background },
+            headerTintColor: colors.text,
+          }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );

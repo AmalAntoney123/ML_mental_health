@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Button } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-
+import { logout } from '../utils/auth';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from 'react-native-screens/lib/typescript/native-stack/types';
+import { RootStackParamList } from '../navigation/types';
 type CounterProps = {
   icon: string;
   count: number;
@@ -35,10 +38,25 @@ const BottomNavItem: React.FC<BottomNavItemProps> = ({ icon, label, isActive, on
   </TouchableOpacity>
 );
 
+type HomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Login'>;
+
 const HomeContent: React.FC = () => {
+  const navigation = useNavigation<HomeScreenNavigationProp>();
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigation.navigate('Login');
+    } catch (error) {
+      console.error('Logout failed:', error);
+      // Handle logout error (e.g., show an error message to the user)
+    }
+  };
+
   return (
     <View>
       <Text style={styles.welcomeText}>Welcome back, User</Text>
+      <Button onPress={handleLogout} title='Logout'/>
       <DailyStreak />
       <Text style={styles.challengesHeader}>Daily Challenges</Text>
       <ChallengeItem title="Breathing Exercise" isCompleted={true} />

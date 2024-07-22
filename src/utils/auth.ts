@@ -1,14 +1,19 @@
 
 import { useState,useEffect } from 'react';
-import auth from '@react-native-firebase/auth';
+import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import { NativeStackNavigationProp } from 'react-native-screens/lib/typescript/native-stack/types';
+import { RootStackParamList } from '../navigation/types';
 
 // Types
 type ValidationResult = {
     isValid: boolean;
     error: string;
 };
-
+type LoginScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Login'>;
+type Props = {
+    navigation: LoginScreenNavigationProp;
+};
 // Validation functions
 export const validateEmail = (email: string): ValidationResult => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -80,7 +85,7 @@ export const login = async (email: string, password: string) => {
     try {
         const userCredential = await auth().signInWithEmailAndPassword(email, password);
         if (!userCredential.user.emailVerified) {
-            throw new Error('Please verify your email before logging in.');
+            throw new Error('email-not-verified');
         }
         return userCredential.user;
     } catch (error) {
@@ -98,7 +103,6 @@ export const logout = async () => {
 
 export const googleSignIn = async () => {
     try {
-        console.log('errre');
         await GoogleSignin.hasPlayServices();
         const { idToken } = await GoogleSignin.signIn();
         const googleCredential = auth.GoogleAuthProvider.credential(idToken);
@@ -130,18 +134,19 @@ export const resetPassword = async (email: string) => {
     }
 };
 
-// Custom hook for authentication state
 export const useAuth = () => {
-    const [user, setUser] = useState(auth().currentUser);
+    const [user, setUser] = useState<FirebaseAuthTypes.User | null>(null);
+    const [isEmailVerified, setIsEmailVerified] = useState<boolean>(false);
 
     useEffect(() => {
         const unsubscribe = auth().onAuthStateChanged((user) => {
             setUser(user);
+            setIsEmailVerified(user?.emailVerified ?? false);
         });
 
         // Cleanup subscription on unmount
         return () => unsubscribe();
     }, []);
 
-    return { user };
+    return { user, isEmailVerified };
 };
