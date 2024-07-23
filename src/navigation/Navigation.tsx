@@ -11,7 +11,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import LoginScreen from '../screens/LoginScreen';
 import SignUpScreen from '../screens/SignUpScreen';
 import SignInScreen from '../screens/SignInScreen';
-import { useAuth } from '../utils/auth.ts';
+import { useAuth } from '../utils/auth';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -19,7 +19,7 @@ const Navigation: React.FC = () => {
   const { colors } = useTheme();
   const scheme = useColorScheme();
   const [isFirstTime, setIsFirstTime] = useState<boolean | null>(null);
-  const { user,isEmailVerified } = useAuth();
+  const { user, isEmailVerified } = useAuth();
 
   const navigationTheme = scheme === 'dark' ? DarkTheme : DefaultTheme;
 

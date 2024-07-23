@@ -1,10 +1,22 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Button } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Switch } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { logout } from '../utils/auth';
-import { useNavigation } from '@react-navigation/native';
+import { DrawerActions, useNavigation } from '@react-navigation/native';
+import { createDrawerNavigator } from '@react-navigation/drawer';
+import { DrawerNavigationProp } from '@react-navigation/drawer';
 import { NativeStackNavigationProp } from 'react-native-screens/lib/typescript/native-stack/types';
 import { RootStackParamList } from '../navigation/types';
+import { useTheme } from '../context/ThemeContext';
+import { logout } from '../utils/auth';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+
+import DashboardScreen from './home/DashboardScreen';
+import LeaderboardScreen from './home/LeaderboardScreen';
+import JournalScreen from './home/JournalScreen';
+import TherapyScreen from './home/TherapyScreen';
+import SupportScreen from './home/SupportScreen';
+
+
 type CounterProps = {
   icon: string;
   count: number;
@@ -18,135 +30,148 @@ type BottomNavItemProps = {
   onPress: () => void;
 };
 
-type ChallengeItemProps = {
-  title: string;
-  isCompleted?: boolean;
-  isLocked?: boolean;
+const Counter: React.FC<CounterProps> = ({ icon, count, color }) => {
+  const { colors } = useTheme();
+  return (
+    <View style={styles.counter}>
+      <Icon name={icon} size={20} color={color} />
+      <Text style={{ ...styles.counterText, color: colors.text }}>{count}</Text>
+    </View>
+  );
 };
 
-const Counter: React.FC<CounterProps> = ({ icon, count, color }) => (
-  <View style={styles.counter}>
-    <Icon name={icon} size={20} color={color} />
-    <Text style={styles.counterText}>{count}</Text>
-  </View>
-);
-
-const BottomNavItem: React.FC<BottomNavItemProps> = ({ icon, label, isActive, onPress }) => (
-  <TouchableOpacity style={styles.navItem} onPress={onPress}>
-    <Icon name={icon} size={24} color={isActive ? '#000' : '#666'} />
-    <Text style={[styles.navLabel, isActive && styles.activeNavLabel]}>{label}</Text>
-  </TouchableOpacity>
-);
+const BottomNavItem: React.FC<BottomNavItemProps> = ({ icon, label, isActive, onPress }) => {
+  const { colors } = useTheme();
+  return (
+    <TouchableOpacity style={styles.navItem} onPress={onPress}>
+      <Icon name={icon} size={24} color={isActive ? colors.primary : colors.gray} />
+      <Text style={[styles.navLabel, { color: isActive ? colors.primary : colors.gray }]}>{label}</Text>
+    </TouchableOpacity>
+  );
+};
 
 type HomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Login'>;
 
-const HomeContent: React.FC = () => {
+const Drawer = createDrawerNavigator();
+
+const DrawerContent: React.FC = () => {
+  const { colors, toggleTheme, isDarkMode } = useTheme();
   const navigation = useNavigation<HomeScreenNavigationProp>();
 
   const handleLogout = async () => {
     try {
       await logout();
+      navigation.dispatch(DrawerActions.closeDrawer());
+
       navigation.navigate('Login');
     } catch (error) {
       console.error('Logout failed:', error);
-      // Handle logout error (e.g., show an error message to the user)
     }
   };
 
   return (
-    <View>
-      <Text style={styles.welcomeText}>Welcome back, User</Text>
-      <Button onPress={handleLogout} title='Logout'/>
-      <DailyStreak />
-      <Text style={styles.challengesHeader}>Daily Challenges</Text>
-      <ChallengeItem title="Breathing Exercise" isCompleted={true} />
-      <ChallengeItem title="Gratitude Journaling" />
-      <ChallengeItem title="Guided Meditation" isLocked={true} />
+    <View style={[styles.drawer, { backgroundColor: colors.surface }]}>
+      <TouchableOpacity style={styles.drawerItem}>
+        <Icon name="settings" size={24} color={colors.text} />
+        <Text style={[styles.drawerText, { color: colors.text }]}>Settings</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.drawerItem}>
+        <Icon name="help" size={24} color={colors.text} />
+        <Text style={[styles.drawerText, { color: colors.text }]}>Help</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.drawerItem} onPress={handleLogout}>
+        <Icon name="logout" size={24} color={colors.text} />
+        <Text style={[styles.drawerText, { color: colors.text }]}>Logout</Text>
+      </TouchableOpacity>
+      <View style={styles.drawerItem}>
+        <Icon name="brightness-6" size={24} color={colors.text} />
+        <Text style={[styles.drawerText, { color: colors.text }]}>Dark Mode</Text>
+        <Switch
+          value={isDarkMode}
+          onValueChange={toggleTheme}
+          trackColor={{ false: colors.gray, true: colors.primary }}
+          thumbColor={isDarkMode ? colors.primary : colors.gray}
+        />
+      </View>
+    </View>
+  );
+};
+const Header: React.FC = () => {
+  const { colors } = useTheme();
+  const navigation = useNavigation();
+
+  return (
+    <View style={[styles.header, { backgroundColor: colors.surface }]}>
+      <TouchableOpacity onPress={() => navigation.dispatch(DrawerActions.openDrawer())}>
+        <Icon name="menu" size={24} color={colors.onSurface} />
+      </TouchableOpacity>
+      <View style={styles.counterContainer}>
+        <Counter icon="local-fire-department" count={5} color={colors.primary} />
+        <Counter icon="play-arrow" count={100} color={colors.secondary} />
+      </View>
+      <TouchableOpacity>
+        <Icon name="person" size={24} color={colors.onSurface} />
+      </TouchableOpacity>
     </View>
   );
 };
 
-const DailyStreak: React.FC = () => (
-  <View style={styles.streakCard}>
-    <Text style={styles.streakText}>Daily Streak</Text>
-    <View style={styles.streakCount}>
-      <Icon name="local-fire-department" size={24} color="orange" />
-      <Text style={styles.streakCountText}>5 days</Text>
-    </View>
-  </View>
-);
+const Tab = createBottomTabNavigator();
 
-const ChallengeItem: React.FC<ChallengeItemProps> = ({ title, isCompleted = false, isLocked = false }) => (
-  <TouchableOpacity style={[styles.challengeCard, isCompleted && styles.completedCard, isLocked && styles.lockedCard]}>
-    <View style={styles.challengeIcon}>
-      <Icon name={isCompleted ? 'check' : isLocked ? 'lock' : 'play-arrow'} size={24} color="#fff" />
-    </View>
-    <View style={styles.challengeContent}>
-      <Text style={styles.challengeTitle}>{isLocked ? 'Challenge' : title}</Text>
-      <Text style={styles.challengeSubtitle}>{isLocked ? 'Locked' : 'Complete this challenge'}</Text>
-    </View>
-  </TouchableOpacity>
-);
+const TabNavigator = () => {
+  const { colors } = useTheme();
+
+  return (
+    <Tab.Navigator
+      screenOptions={({ route }) => ({
+        header: () => <Header />,
+        tabBarIcon: ({ color, size }) => {
+          let iconName: string = 'circle';
+
+          if (route.name === 'Dashboard') {
+            iconName = 'dashboard';
+          } else if (route.name === 'Leaderboard') {
+            iconName = 'leaderboard';
+          } else if (route.name === 'Journal') {
+            iconName = 'book';
+          } else if (route.name === 'Therapy') {
+            iconName = 'healing';
+          } else if (route.name === 'Support') {
+            iconName = 'group';
+          }
+
+          return <Icon name={iconName} size={size} color={color} />;
+        },
+        tabBarActiveTintColor: colors.primary,
+        tabBarInactiveTintColor: colors.text,
+        tabBarStyle: { backgroundColor: colors.background },
+      })}
+    >
+      <Tab.Screen name="Dashboard" component={DashboardScreen} />
+      <Tab.Screen name="Leaderboard" component={LeaderboardScreen} />
+      <Tab.Screen name="Journal" component={JournalScreen} />
+      <Tab.Screen name="Therapy" component={TherapyScreen} />
+      <Tab.Screen name="Support" component={SupportScreen} />
+    </Tab.Navigator>
+  );
+};
 
 const HomeScreen: React.FC = () => {
-  const [currentTab, setCurrentTab] = useState<string>('Home');
-
-  const renderContent = () => {
-    switch (currentTab) {
-      case 'Home':
-        return <HomeContent />;
-      case 'Leaderboard':
-        return <Text>Leaderboard Screen</Text>;
-      case 'Journal':
-        return <Text>Journal Screen</Text>;
-      case 'Therapy':
-        return <Text>Therapy Screen</Text>;
-      case 'Support':
-        return <Text>Support Group Screen</Text>;
-      default:
-        return null;
-    }
-  };
-
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity>
-          <Icon name="menu" size={24} color="#000" />
-        </TouchableOpacity>
-        <View style={styles.counterContainer}>
-          <Counter icon="local-fire-department" count={5} color="orange" />
-          <Counter icon="play-arrow" count={100} color="blue" />
-        </View>
-        <TouchableOpacity>
-          <Icon name="person" size={24} color="#000" />
-        </TouchableOpacity>
-      </View>
-      <ScrollView style={styles.content}>
-        {renderContent()}
-      </ScrollView>
-      <View style={styles.bottomNav}>
-        <BottomNavItem icon="home" label="Home" isActive={currentTab === 'Home'} onPress={() => setCurrentTab('Home')} />
-        <BottomNavItem icon="leaderboard" label="Leaderboard" isActive={currentTab === 'Leaderboard'} onPress={() => setCurrentTab('Leaderboard')} />
-        <BottomNavItem icon="book" label="Journal" isActive={currentTab === 'Journal'} onPress={() => setCurrentTab('Journal')} />
-        <BottomNavItem icon="healing" label="Therapy" isActive={currentTab === 'Therapy'} onPress={() => setCurrentTab('Therapy')} />
-        <BottomNavItem icon="group" label="Support" isActive={currentTab === 'Support'} onPress={() => setCurrentTab('Support')} />
-      </View>
-    </View>
+    <Drawer.Navigator drawerContent={() => <DrawerContent />}>
+      <Drawer.Screen name="Home" component={TabNavigator} options={{ headerShown: false }} />
+    </Drawer.Navigator>
   );
 };
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: 16,
-    backgroundColor: '#fff',
   },
   counterContainer: {
     flexDirection: 'row',
@@ -167,7 +192,6 @@ const styles = StyleSheet.create({
   bottomNav: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    backgroundColor: '#fff',
     paddingVertical: 8,
   },
   navItem: {
@@ -175,78 +199,35 @@ const styles = StyleSheet.create({
   },
   navLabel: {
     fontSize: 12,
-    color: '#666',
   },
-  activeNavLabel: {
-    color: '#000',
+  sidebar: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: 250,
+    height: '100%',
+    paddingTop: 50,
+    paddingLeft: 20,
+    paddingRight: 20,
   },
-  welcomeText: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 16,
+  closeButton: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
   },
-  streakCard: {
-    backgroundColor: '#4a90e2',
-    borderRadius: 8,
-    padding: 16,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  streakText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  streakCount: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  streakCountText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginLeft: 8,
-  },
-  challengesHeader: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 16,
-  },
-  challengeCard: {
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    padding: 16,
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 16,
-    elevation: 2,
-  },
-  completedCard: {
-    backgroundColor: '#e0f2f1',
-  },
-  lockedCard: {
-    backgroundColor: '#f5f5f5',
-  },
-  challengeIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#4a90e2',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 16,
-  },
-  challengeContent: {
+  drawer: {
     flex: 1,
+    paddingTop: 50,
+    paddingHorizontal: 20,
   },
-  challengeTitle: {
+  drawerItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  drawerText: {
+    marginLeft: 10,
     fontSize: 18,
-    fontWeight: 'bold',
-  },
-  challengeSubtitle: {
-    color: '#666',
   },
 });
 

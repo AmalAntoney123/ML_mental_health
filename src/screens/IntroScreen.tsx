@@ -5,6 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/types';
 import { useTheme } from '../context/ThemeContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { width, height } = Dimensions.get('window');
 
@@ -13,6 +14,15 @@ type IntroScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, '
 const IntroScreen: React.FC = () => {
   const navigation = useNavigation<IntroScreenNavigationProp>();
   const { colors } = useTheme();
+
+  const handleFinishIntro = async () => {
+    try {
+      await AsyncStorage.setItem('hasOpenedBefore', 'true');
+      navigation.replace('Login');
+    } catch (error) {
+      console.error('Error setting first time status:', error);
+    }
+  };
 
   const styles = StyleSheet.create({
     logoContainer: {
@@ -84,8 +94,8 @@ const IntroScreen: React.FC = () => {
 
   return (
     <Onboarding
-      onSkip={() => navigation.replace('Login')}
-      onDone={() => navigation.replace('Login')}
+      onSkip={handleFinishIntro}
+      onDone={handleFinishIntro}
       pages={[
         {
           backgroundColor: colors.background,
