@@ -107,7 +107,7 @@ const Header: React.FC = () => {
       </TouchableOpacity>
       <View style={styles.counterContainer}>
         <Counter icon="local-fire-department" count={5} color={colors.primary} />
-        <Counter icon="play-arrow" count={100} color={colors.secondary} />
+        <Counter icon="money" count={100} color={colors.secondary} />
       </View>
       <TouchableOpacity>
         <Icon name="person" size={24} color={colors.onSurface} />

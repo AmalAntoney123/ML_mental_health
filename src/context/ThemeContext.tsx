@@ -5,6 +5,7 @@ interface ThemeColors {
   primary: string;
   primaryLight: string;
   background: string;
+  secondaryBackground: string; // Add this line
   text: string;
   secondary: string;
   accent: string;
@@ -19,7 +20,11 @@ interface ThemeColors {
   onError: string;
   gray: string;
   border: string;
+  disabledBackground: string;
+  disabledLight: string;
+  disabled: string;
 }
+
 
 interface ThemeContextType {
   isDarkMode: boolean;
@@ -31,9 +36,10 @@ const lightTheme: ThemeColors = {
   primary: 'rgb(151, 147, 235)',
   primaryLight: 'rgb(203, 224, 242)',
   background: '#FFFFFF',
+  secondaryBackground: '#F0F0F0', // Add this line
   text: '#333333',
   secondary: 'rgb(235, 147, 151)',
-  accent: 'rgb(100, 181, 246)', // Light blue for light mode
+  accent: 'rgb(100, 181, 246)',
   error: 'rgb(235, 87, 87)',
   warning: 'rgb(235, 187, 87)',
   success: 'rgb(87, 235, 151)',
@@ -45,15 +51,19 @@ const lightTheme: ThemeColors = {
   onError: '#FFFFFF',
   gray: 'rgb(160, 160, 160)',
   border: 'rgba(0, 0, 0, 0.1)',
+  disabledBackground: 'rgb(230, 230, 230)',
+  disabledLight: 'rgb(200, 200, 200)',
+  disabled: 'rgb(180, 180, 180)',
 };
 
 const darkTheme: ThemeColors = {
   primary: 'rgb(151, 147, 235)',
   primaryLight: '#FFF9FF',
   background: '#121215',
+  secondaryBackground: '#1E1E23', // Add this line
   text: '#FFFFFF',
   secondary: 'rgb(235, 147, 151)',
-  accent: 'rgb(66, 165, 245)', // Slightly darker blue for dark mode
+  accent: 'rgb(66, 165, 245)',
   error: 'rgb(235, 87, 87)',
   warning: 'rgb(235, 187, 87)',
   success: 'rgb(87, 235, 151)',
@@ -65,7 +75,11 @@ const darkTheme: ThemeColors = {
   onError: '#FFFFFF',
   gray: 'rgb(200, 200, 200)',
   border: 'rgba(255, 255, 255, 0.1)',
+  disabledBackground: 'rgb(50, 50, 50)',
+  disabledLight: 'rgb(70, 70, 70)',
+  disabled: 'rgb(100, 100, 100)',
 };
+
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
