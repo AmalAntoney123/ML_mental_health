@@ -134,11 +134,6 @@ const DashboardScreen: React.FC = () => {
             ))}
           </View>
         </View>
-        {allChallengesCompleted && index < levels.length - 1 && (
-          <View style={styles.nextLevelArrow}>
-            <Icon name="arrow-downward" size={40} color={colors.primary} />
-          </View>
-        )}
       </View>
     );
   };
@@ -279,11 +274,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
     paddingVertical: 4,
     borderRadius: 20
-  },
-  nextLevelArrow: {
-    alignSelf: 'center',
-    marginTop: 20,
-  },
+  }
 
 });
 
