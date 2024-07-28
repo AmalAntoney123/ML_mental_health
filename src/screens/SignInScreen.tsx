@@ -8,6 +8,7 @@ import { TextInput, Provider as PaperProvider, DefaultTheme } from 'react-native
 import { useFormValidation, login, resendVerificationEmail, resetPassword } from '../utils/auth';
 import Snackbar from 'react-native-snackbar';
 import CustomAlert from '../props/Alert';
+import database from '@react-native-firebase/database';
 
 const { width, height } = Dimensions.get('window');
 
@@ -119,7 +120,16 @@ const SignInScreen: React.FC<Props> = ({ navigation }) => {
             fontSize: 14,
         },
     });
-
+    async function checkUserDataExists(userId: string): Promise<boolean> {
+        try {
+            const snapshot = await database().ref(`users/${userId}`).once('value');
+            return snapshot.exists();
+        } catch (error) {
+            console.error('Error checking user data:', error);
+            // You might want to handle this error differently depending on your app's needs
+            return false;
+        }
+    }
     const handleSignIn = async () => {
         if (!email || !password) {
             Alert.alert('Error', 'Please fill in both email and password');
@@ -127,12 +137,25 @@ const SignInScreen: React.FC<Props> = ({ navigation }) => {
         }
         setIsLoading(true);
         try {
-            await login(email, password);
-            navigation.navigate('Home');
+            // Assuming login function returns the user or user credentials
+            const user = await login(email, password);
+            
+            if (user) {
+                const userDataExists = await checkUserDataExists(user.uid);
+                
+                if (userDataExists) {
+                    navigation.navigate('Home');
+                } else {
+                    navigation.navigate('Onboarding');
+                }
+            } else {
+                throw new Error('Login successful but no user returned');
+            }
         } catch (error) {
-            setIsLoading(false);
             console.error('SignIn failed:', error);
             handleSignInError(error);
+        } finally {
+            setIsLoading(false);
         }
     };
 

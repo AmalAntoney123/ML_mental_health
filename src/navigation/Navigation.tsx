@@ -12,6 +12,7 @@ import LoginScreen from '../screens/LoginScreen';
 import SignUpScreen from '../screens/SignUpScreen';
 import SignInScreen from '../screens/SignInScreen';
 import { useAuth } from '../utils/auth';
+import OnboardingScreen from '../screens/onboardingScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -74,6 +75,11 @@ const Navigation: React.FC = () => {
         <Stack.Screen
           name="Home"
           component={HomeScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Onboarding"
+          component={OnboardingScreen}
           options={{ headerShown: false }}
         />
         <Stack.Screen

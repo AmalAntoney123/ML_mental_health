@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import { googleSignIn } from '../utils/auth';
-import { View, Text, Image, StyleSheet, Dimensions, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, Image, StyleSheet, Dimensions, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/types';
 import { useTheme } from '../context/ThemeContext';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import auth from '@react-native-firebase/auth';
+import database from '@react-native-firebase/database';
+import CustomAlert from '../props/Alert';
 
 const { width, height } = Dimensions.get('window');
 
@@ -15,21 +18,39 @@ type Props = {
 const LoginScreen: React.FC<Props> = ({ navigation }) => {
   const { colors, toggleTheme } = useTheme();
   const [isLoading, setIsLoading] = useState(false);
-
+  async function checkUserDataExists(userId: string): Promise<boolean> {
+    try {
+      const snapshot = await database().ref(`users/${userId}`).once('value');
+      return snapshot.exists();
+    } catch (error) {
+      console.error('Error checking user data:', error);
+      // You might want to handle this error differently depending on your app's needs
+      return false;
+    }
+  }
   const handleGoogleSignIn = async () => {
     setIsLoading(true);
     try {
       await googleSignIn();
-      // Navigate to the appropriate screen after successful sign-in
-      navigation.navigate('Home'); // Or wherever you want to navigate after login
+      const user = auth().currentUser;
+      if (user) {
+        const userDataExists = await checkUserDataExists(user.uid);
+        if (userDataExists) {
+          navigation.navigate('Home');
+        } else {
+          navigation.navigate('Onboarding');
+        }
+      } else {
+        throw new Error('Google Sign-In successful but no user returned');
+      }
     } catch (error) {
       console.error('Google Sign-In failed:', error);
       // Handle the error (e.g., show an error message to the user)
+      Alert.alert('Error', 'Google Sign-In failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
   };
-
 
   const styles = StyleSheet.create({
     container: {

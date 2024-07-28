@@ -141,7 +141,7 @@ const DashboardScreen: React.FC = () => {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={styles.header}>
-        <Text style={styles.headerText}>Welcome Back, User</Text>
+        <Text style={[styles.headerText ,{color: colors.onBackground}]}>Welcome Back, User</Text>
       </View>
       <FlatList
         ref={flatListRef}

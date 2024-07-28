@@ -32,6 +32,7 @@ interface ThemeContextType {
   colors: ThemeColors;
 }
 
+
 const lightTheme: ThemeColors = {
   primary: 'rgb(151, 147, 235)',
   primaryLight: 'rgb(203, 224, 242)',
