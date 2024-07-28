@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, FlatList, TouchableOpacity, Dimensions, SafeAre
 import { useTheme } from '../../context/ThemeContext';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useNavigation } from '@react-navigation/native';
+import { RootStackParamList } from '../../navigation/types';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const CHALLENGE_SIZE = SCREEN_WIDTH * 0.25;
@@ -13,6 +14,7 @@ type Challenge = {
   title: string;
   icon: string;
   completed: boolean;
+  screen: string;
 };
 
 type LevelData = {
@@ -30,14 +32,16 @@ const DashboardScreen: React.FC = () => {
   const flatListRef = useRef<FlatList>(null);
 
   const baseChallenges: Omit<Challenge, 'id' | 'completed'>[] = [
-    { title: 'Mindfulness', icon: 'self-improvement' },
-    { title: 'Gratitude', icon: 'favorite' },
-    { title: 'Exercise', icon: 'fitness-center' },
-    { title: 'Social', icon: 'people' },
-    { title: 'Nutrition', icon: 'restaurant' },
-    { title: 'Sleep', icon: 'nightlight' },
-    { title: 'Hydration', icon: 'local-drink' },
+    { title: 'Mindfulness', icon: 'self-improvement', screen: 'Breathing' },
+    { title: 'Gratitude', icon: 'favorite', screen: 'Gratitude' },
+    { title: 'Exercise', icon: 'fitness-center', screen: 'Exercise' },
+    { title: 'Social', icon: 'people', screen: 'Social' },
+    { title: 'Nutrition', icon: 'restaurant', screen: 'Nutrition' },
+    { title: 'Sleep', icon: 'nightlight', screen: 'Sleep' },
+    { title: 'Hydration', icon: 'local-drink', screen: 'Hydration' },
   ];
+  
+  
 
   const generateLevels = useCallback((numLevels: number): LevelData[] => {
     return Array.from({ length: numLevels }, (_, levelIndex) => ({
@@ -76,7 +80,7 @@ const DashboardScreen: React.FC = () => {
           ]}
           onPress={() => {
             if (!isLocked) {
-              // navigation.navigate('ChallengeDetails', { challengeId: item.id });
+              navigation.navigate(item.screen);
             }
           }}
           disabled={isLocked}
@@ -93,6 +97,8 @@ const DashboardScreen: React.FC = () => {
       </View>
     );
   };
+  
+  
   
 
   const renderLevel = ({ item, index }: { item: LevelData; index: number }) => {

@@ -1,4 +1,9 @@
 {
   "name": "Emo",
-  "displayName": "Emo"
+  "displayName": "Emo",
+  "expo": {
+    "plugins": [
+      ["expo-av"]
+    ]
+  }
 }

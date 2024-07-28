@@ -13,6 +13,14 @@ import SignUpScreen from '../screens/SignUpScreen';
 import SignInScreen from '../screens/SignInScreen';
 import { useAuth } from '../utils/auth';
 import OnboardingScreen from '../screens/onboardingScreen';
+import BreathingScreen from '../screens/challenges/BreathingScreen';
+import MeditationScreen from '../screens/challenges/MeditationScreen';
+import GratitudeScreen from '../screens/challenges/GratitudeScreen';
+import ExerciseScreen from '../screens/challenges/ExerciseScreen';
+import NutritionScreen from '../screens/challenges/NutritionScreen';
+import SocialScreen from '../screens/challenges/SocialScreen';
+import SleepScreen from '../screens/challenges/SleepScreen';
+import HydrationScreen from '../screens/challenges/HydrationScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -82,14 +90,14 @@ const Navigation: React.FC = () => {
           component={OnboardingScreen}
           options={{ headerShown: false }}
         />
-        <Stack.Screen
-          name="Detail"
-          component={DetailScreen}
-          options={{
-            headerStyle: { backgroundColor: colors.background },
-            headerTintColor: colors.text,
-          }}
-        />
+        <Stack.Screen name="Breathing" component={BreathingScreen} />
+        <Stack.Screen name="Meditation" component={MeditationScreen} />
+        <Stack.Screen name="Gratitude" component={GratitudeScreen} />
+        <Stack.Screen name="Exercise" component={ExerciseScreen} />
+        <Stack.Screen name="Social" component={SocialScreen} />
+        <Stack.Screen name="Nutrition" component={NutritionScreen} />
+        <Stack.Screen name="Sleep" component={SleepScreen} />
+        <Stack.Screen name="Hydration" component={HydrationScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
