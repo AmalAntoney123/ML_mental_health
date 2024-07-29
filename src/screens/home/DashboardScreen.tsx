@@ -2,8 +2,8 @@ import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Dimensions, SafeAreaView } from 'react-native';
 import { useTheme } from '../../context/ThemeContext';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../../navigation/types';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const CHALLENGE_SIZE = SCREEN_WIDTH * 0.25;
@@ -14,7 +14,7 @@ type Challenge = {
   title: string;
   icon: string;
   completed: boolean;
-  screen: string;
+  screen: keyof RootStackParamList;
 };
 
 type LevelData = {
@@ -22,9 +22,14 @@ type LevelData = {
   challenges: Challenge[];
 };
 
-const DashboardScreen: React.FC = () => {
+type DashboardNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Detail'>;
+
+type Props = {
+  navigation: DashboardNavigationProp;
+};
+
+const DashboardScreen: React.FC<Props> = ({navigation}) => {
   const { colors } = useTheme();
-  const navigation = useNavigation();
 
   const [userStreak, setUserStreak] = useState(7);
   const [userLevel, setUserLevel] = useState(3);

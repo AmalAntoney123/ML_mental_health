@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
 import { useTheme } from '../../context/ThemeContext';
 import LottieView from 'lottie-react-native';
+import SoundPlayer from 'react-native-sound-player';
+import { useFocusEffect } from '@react-navigation/native';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -16,7 +18,7 @@ const BreathingScreen: React.FC = () => {
     const [timer, setTimer] = useState(EXERCISE_DURATION);
     const [showFinishButton, setShowFinishButton] = useState(false);
     const [breathPhase, setBreathPhase] = useState<'inhale' | 'hold' | 'exhale'>('inhale');
-    const [phaseTimer, setPhaseTimer] = useState(INHALE_DURATION);
+    const [captionVisible, setCaptionVisible] = useState(true);
     const { colors } = useTheme();
 
     const instructions = "Take a comfortable position. We'll guide you through a series of deep breaths to help you relax and focus.";
@@ -43,7 +45,7 @@ const BreathingScreen: React.FC = () => {
 
                 setCycleTimer((prevCycleTimer) => {
                     const newCycleTimer = (prevCycleTimer + 1) % TOTAL_CYCLE_DURATION;
-                    
+
                     if (newCycleTimer === 0) {
                         setBreathPhase('inhale');
                     } else if (newCycleTimer === INHALE_DURATION) {
@@ -51,13 +53,51 @@ const BreathingScreen: React.FC = () => {
                     } else if (newCycleTimer === INHALE_DURATION + HOLD_DURATION) {
                         setBreathPhase('exhale');
                     }
-                    
+
                     return newCycleTimer;
                 });
             }, 1000);
         }
         return () => clearInterval(interval);
     }, [stage, timer]);
+
+    useEffect(() => {
+        const onFinishedPlayingSubscription = SoundPlayer.addEventListener('FinishedPlaying', ({ success }) => {
+            if (success) {
+                playBackgroundMusic();
+            }
+        });
+
+        return () => {
+            onFinishedPlayingSubscription.remove();
+        };
+    }, []);
+    useFocusEffect(
+        React.useCallback(() => {
+            return () => {
+                stopBackgroundMusic();
+            };
+        }, [])
+    );
+    useEffect(() => {
+        if (stage === 'exercise') {
+            const captionTimer = setTimeout(() => {
+                setCaptionVisible(false);
+            }, 20000);
+            return () => clearTimeout(captionTimer);
+        }
+    }, [stage]);
+
+    const playBackgroundMusic = () => {
+        try {
+            SoundPlayer.playAsset(require('../../assets/breathing-music.mp3'));
+        } catch (e) {
+            console.log('Cannot play the sound file', e);
+        }
+    };
+    const stopBackgroundMusic = () => {
+        SoundPlayer.stop();
+    };
 
     const getPhaseTime = () => {
         switch (breathPhase) {
@@ -72,9 +112,14 @@ const BreathingScreen: React.FC = () => {
         setTimer(EXERCISE_DURATION);
         setShowFinishButton(false);
         setBreathPhase('inhale');
-        setPhaseTimer(INHALE_DURATION);
+        setCaptionVisible(true);
+        playBackgroundMusic();
     };
-    const handleFinish = () => setStage('finished');
+
+    const handleFinish = () => {
+        setStage('finished');
+        stopBackgroundMusic();
+    };
 
     const formatTime = (seconds: number) => {
         const mins = Math.floor(seconds / 60);
@@ -104,9 +149,11 @@ const BreathingScreen: React.FC = () => {
                                 loop
                                 style={styles.lottieAnimation}
                             />
-                            <View style={styles.breathTextContainer}>
-                                <Text style={[styles.breathPhaseText, { color: colors.text }]}>{breathPhase.toUpperCase()}</Text>
-                            </View>
+                            {captionVisible && (
+                                <View style={styles.breathTextContainer}>
+                                    <Text style={[styles.breathPhaseText, { color: colors.text }]}>{breathPhase.toUpperCase()}</Text>
+                                </View>
+                            )}
                         </View>
                         {showFinishButton && (
                             <TouchableOpacity style={[styles.finishButton, { backgroundColor: colors.accent }]} onPress={handleFinish}>
