@@ -14,5 +14,5 @@ export type RootStackParamList = {
     Sleep: undefined;
     Hydration: undefined;    
     Detail: { itemId: number } | undefined;
-    
+    Profile : undefined;
   };

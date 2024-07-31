@@ -4,6 +4,8 @@ import { useTheme } from '../../context/ThemeContext';
 import LottieView from 'lottie-react-native';
 import SoundPlayer from 'react-native-sound-player';
 import { useFocusEffect } from '@react-navigation/native';
+import { useAuth } from '../../utils/auth';
+import database, { FirebaseDatabaseTypes } from '@react-native-firebase/database';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -20,6 +22,7 @@ const BreathingScreen: React.FC = () => {
     const [breathPhase, setBreathPhase] = useState<'inhale' | 'hold' | 'exhale'>('inhale');
     const [captionVisible, setCaptionVisible] = useState(true);
     const { colors } = useTheme();
+    const { user } = useAuth();
 
     const instructions = "Take a comfortable position. We'll guide you through a series of deep breaths to help you relax and focus.";
     const quotes = [
@@ -116,9 +119,36 @@ const BreathingScreen: React.FC = () => {
         playBackgroundMusic();
     };
 
-    const handleFinish = () => {
+    const handleFinish = async () => {
         setStage('finished');
         stopBackgroundMusic();
+
+        if (user) {
+            const userId = user.uid;
+            const userRef = database().ref(`users/${userId}`);
+
+            try {
+                // Get the current user data
+                const userSnapshot = await userRef.once('value');
+                const userData = userSnapshot.val();
+
+                // Calculate the current level
+                const currentLevel = Math.floor(userData.completedChallenges / 7) + 1;
+
+                // Check if the mindfulness challenge for the current level is already completed
+                if (userData.challenges.mindfulness < currentLevel) {
+                    // Increment mindfulness count
+                    const newMindfulnessCount = userData.challenges.mindfulness + 1;
+                    await userRef.child('challenges/mindfulness').set(newMindfulnessCount);
+
+                    // Increment completed challenges count
+                    const newCompletedChallengesCount = userData.completedChallenges + 1;
+                    await userRef.child('completedChallenges').set(newCompletedChallengesCount);
+                }
+            } catch (error) {
+                console.error('Error updating mindfulness and completed challenges count:', error);
+            }
+        }
     };
 
     const formatTime = (seconds: number) => {

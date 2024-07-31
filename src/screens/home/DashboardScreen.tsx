@@ -4,6 +4,8 @@ import { useTheme } from '../../context/ThemeContext';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { RootStackParamList } from '../../navigation/types';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import database, { FirebaseDatabaseTypes } from '@react-native-firebase/database';
+import { useAuth } from '../../utils/auth';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const CHALLENGE_SIZE = SCREEN_WIDTH * 0.25;
@@ -30,10 +32,19 @@ type Props = {
 
 const DashboardScreen: React.FC<Props> = ({navigation}) => {
   const { colors } = useTheme();
+  const { user } = useAuth();
 
-  const [userStreak, setUserStreak] = useState(7);
-  const [userLevel, setUserLevel] = useState(3);
-  const [userPoints, setUserPoints] = useState(100);
+  const [userLevel, setUserLevel] = useState(1);
+  const [completedChallenges, setCompletedChallenges] = useState(0);
+  const [challengeData, setChallengeData] = useState({
+    mindfulness: 0,
+    gratitude: 0,
+    exercise: 0,
+    social: 0,
+    nutrition: 0,
+    sleep: 0,
+    hydration: 0
+  });
   const flatListRef = useRef<FlatList>(null);
 
   const baseChallenges: Omit<Challenge, 'id' | 'completed'>[] = [
@@ -45,8 +56,88 @@ const DashboardScreen: React.FC<Props> = ({navigation}) => {
     { title: 'Sleep', icon: 'nightlight', screen: 'Sleep' },
     { title: 'Hydration', icon: 'local-drink', screen: 'Hydration' },
   ];
+
+  const initializeUserChallenges = async (userId: string) => {
+    const challengesRef = database().ref(`users/${userId}/challenges`);
+    const initialChallenges = {
+      mindfulness: 0,
+      gratitude: 0,
+      exercise: 0,
+      social: 0,
+      nutrition: 0,
+      sleep: 0,
+      hydration: 0,
+      
+    };
+
+    try {
+      await challengesRef.set(initialChallenges);
+      setChallengeData(initialChallenges);
+    } catch (error) {
+      console.error('Error initializing challenges:', error);
+    }
+  };
+
+  useEffect(() => {
+    if (!user) return; // Early return if no user is logged in
   
+    const userId = user.uid; // Get the user ID from the authenticated user
+    const userRef = database().ref(`users/${userId}`);
+    
+    const fetchUserData = async () => {
+      try {
+        const snapshot = await userRef.once('value');
+        const userData = snapshot.val();
+        
+        if (userData) {
+          if (!userData.challenges) {
+            // Initialize challenges if they don't exist
+            await initializeUserChallenges(userId);
+          } else {
+            setChallengeData(userData.challenges);
+          }
+          
+          if (userData.completedChallenges !== undefined) {
+            setCompletedChallenges(userData.completedChallenges);
+          } else {
+            // Initialize completedChallenges if it doesn't exist
+            await userRef.child('completedChallenges').set(0);
+            setCompletedChallenges(0);
+          }
+        } else {
+          console.error('User data not found');
+        }
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
+    };
   
+    fetchUserData();
+  
+    // Set up a listener for real-time updates
+    const onDataChange = (snapshot: FirebaseDatabaseTypes.DataSnapshot) => {
+      const userData = snapshot.val();
+      if (userData) {
+        if (userData.challenges) {
+          setChallengeData(userData.challenges);
+        }
+        if (userData.completedChallenges !== undefined) {
+          setCompletedChallenges(userData.completedChallenges);
+        }
+      }
+    };
+  
+    userRef.on('value', onDataChange);
+  
+    // Clean up the listener
+    return () => userRef.off('value', onDataChange);
+  }, [user]); // Add user as a dependency
+
+  useEffect(() => {
+    // Update user level based on completed challenges
+    // Ensure the user is at least Level 1
+    setUserLevel(Math.max(1, Math.floor(completedChallenges / 7) + 1));
+  }, [completedChallenges]);
 
   const generateLevels = useCallback((numLevels: number): LevelData[] => {
     return Array.from({ length: numLevels }, (_, levelIndex) => ({
@@ -54,13 +145,13 @@ const DashboardScreen: React.FC<Props> = ({navigation}) => {
       challenges: baseChallenges.map((challenge, index) => ({
         ...challenge,
         id: `${levelIndex + 1}-${index + 1}`,
-        completed: levelIndex + 1 < userLevel || (levelIndex + 1 === userLevel && index < userStreak % baseChallenges.length),
+        completed: challengeData[challenge.title.toLowerCase() as keyof typeof challengeData] > levelIndex,
       })),
     }));
-  }, [userLevel, userStreak]);
+  }, [challengeData]);
 
   const levels = generateLevels(10);
-  const lastCompletedLevelIndex = levels.findIndex(level => level.level === userLevel) - 1;
+  const lastCompletedLevelIndex = Math.max(0, userLevel - 2);
 
   useEffect(() => {
     if (flatListRef.current && lastCompletedLevelIndex >= 0) {
@@ -69,10 +160,13 @@ const DashboardScreen: React.FC<Props> = ({navigation}) => {
         animated: false,
       });
     }
-  }, []);
+  }, [lastCompletedLevelIndex]);
 
-  const renderChallenge = ({ item, index }: { item: Challenge; index: number }) => {
-    const isLocked = !item.completed;
+  const renderChallenge = ({ item, index, levelIndex }: { item: Challenge; index: number; levelIndex: number }) => {
+    const isLevelOne = levelIndex === 0;
+    const challengeCount = challengeData[item.title.toLowerCase() as keyof typeof challengeData];
+    const isCompleted = challengeCount > levelIndex;
+    const isLocked = !isLevelOne && (levelIndex + 1 > userLevel);
   
     return (
       <View style={styles.challengeWrapper}>
@@ -84,17 +178,26 @@ const DashboardScreen: React.FC<Props> = ({navigation}) => {
             },
           ]}
           onPress={() => {
-            if (!isLocked) {
-              navigation.navigate(item.screen);
-            }
+            navigation.navigate(item.screen);
           }}
           disabled={isLocked}
         >
-          <Icon name={item.icon} size={36} color={isLocked ? colors.disabled : colors.onPrimary} />
+          <Icon 
+            name={item.icon} 
+            size={36} 
+            color={isLocked ? colors.disabled : colors.onPrimary} 
+          />
           {isLocked && <Icon name="lock" size={24} color={colors.disabled} style={styles.lockIcon} />}
         </TouchableOpacity>
-        <Text style={[styles.challengeText, { color: isLocked ? colors.disabled : colors.text }]}>{item.title}</Text>
-        {!isLocked && (
+        <Text 
+          style={[
+            styles.challengeText, 
+            { color: isLocked ? colors.disabled : colors.text }
+          ]}
+        >
+          {item.title}
+        </Text>
+        {isCompleted && (
           <View style={[styles.banner, { backgroundColor: colors.onBackground }]}>
             <Icon name="check" size={16} color={colors.secondary} />
           </View>
@@ -103,44 +206,51 @@ const DashboardScreen: React.FC<Props> = ({navigation}) => {
     );
   };
   
-  
-  
-
   const renderLevel = ({ item, index }: { item: LevelData; index: number }) => {
-    const isLocked = item.level > userLevel;
-    const allChallengesCompleted = item.challenges.every(challenge => challenge.completed);
+    const isLocked = item.level > userLevel && item.level !== 1;
     const levelWrapperStyle = [
       styles.levelWrapper,
       { marginTop: index === 0 ? 20 : 5 }
     ];
-
+  
     return (
       <View style={levelWrapperStyle}>
         <View style={[styles.levelContainer, { backgroundColor: colors.secondaryBackground }]}>
           <View style={styles.levelHeaderContainer}>
-            {index === 0 ? (
-              <View style={[styles.levelTextContainer, { backgroundColor: isLocked ? colors.disabledBackground : colors.secondary }]}>
-                <Text style={[styles.levelText, { color: isLocked ? colors.disabled : colors.onPrimary }]}>Level {item.level}</Text>
+            <View 
+              style={[
+                styles.levelTextContainer, 
+                { backgroundColor: isLocked ? colors.disabledBackground : colors.secondary }
+              ]}
+            >
+              <Text 
+                style={[
+                  styles.levelText, 
+                  { color: isLocked ? colors.disabled : colors.onPrimary }
+                ]}
+              >
+                Level {item.level}
+              </Text>
+            </View>
+            {index !== 0 && (
+              <View 
+                style={[
+                  styles.levelIconContainer, 
+                  { backgroundColor: isLocked ? colors.disabledBackground : colors.background }
+                ]}
+              >
+                <Icon
+                  name="emoji-events"
+                  size={40}
+                  color={isLocked ? colors.disabled : colors.primary}
+                />
               </View>
-            ) : (
-              <>
-                <View style={[styles.levelIconContainer, { backgroundColor: isLocked ? colors.disabledBackground : colors.background }]}>
-                  <Icon
-                    name="emoji-events"
-                    size={40}
-                    color={isLocked ? colors.disabled : colors.primary}
-                  />
-                </View>
-                <View style={[styles.levelTextContainer, { backgroundColor: isLocked ? colors.disabledBackground : colors.secondary }]}>
-                  <Text style={[styles.levelText, { color: isLocked ? colors.disabled : colors.onPrimary }]}>Level {item.level}</Text>
-                </View>
-              </>
             )}
           </View>
           <View style={styles.challengesContainer}>
             {item.challenges.map((challenge, challengeIndex) => (
               <View key={challenge.id} style={styles.challengeWrapper}>
-                {renderChallenge({ item: challenge, index: challengeIndex })}
+                {renderChallenge({ item: challenge, index: challengeIndex, levelIndex: index })}
               </View>
             ))}
           </View>
@@ -184,26 +294,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 16,
   },
-  streakContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
   headerText: {
     fontSize: 24,
     fontWeight: 'bold',
     marginLeft: 4,
-  },
-  pointsText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  userLevelContainer: {
-    padding: 8,
-    borderRadius: 20,
-  },
-  userLevelText: {
-    fontSize: 16,
-    fontWeight: 'bold',
   },
   listContent: {
     paddingBottom: CHALLENGE_SIZE,
@@ -225,10 +319,10 @@ const styles = StyleSheet.create({
   },
   levelIconContainer: {
     position: 'absolute',
-    top: -90,  // Adjust this value to control how much the icon overlaps
-    width: 100,  // Adjust size as needed
-    height: 100,  // Adjust size as needed
-    borderRadius: 100,  // Half of width/height to make it circular
+    top: -90,
+    width: 100,
+    height: 100,
+    borderRadius: 100,
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 0,
@@ -237,13 +331,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingVertical: 2,
     borderRadius: 20,
-    marginTop: -6,  // Adjust this to fine-tune vertical position
+    marginTop: -6,
+    zIndex: 3,
   },
   levelText: {
     fontSize: 20,
     fontWeight: 'bold',
     textAlign: 'center',
-    elevation: 3,
+    zIndex: 3,
   },
   challengesContainer: {
     flexDirection: 'row',
@@ -254,11 +349,6 @@ const styles = StyleSheet.create({
     width: '50%',
     alignItems: 'center',
     marginVertical: 10,
-  },
-  fullWidthChallenge: {
-    width: '100%',
-    alignItems: 'center',
-    marginBottom: 10,
   },
   challengeItem: {
     width: CHALLENGE_SIZE,
@@ -286,7 +376,6 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     borderRadius: 20
   }
-
 });
 
 export default DashboardScreen;

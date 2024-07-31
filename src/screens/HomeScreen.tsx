@@ -51,6 +51,7 @@ const BottomNavItem: React.FC<BottomNavItemProps> = ({ icon, label, isActive, on
 };
 
 type HomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Login'>;
+type ProfileNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Profile'>;
 
 const Drawer = createDrawerNavigator();
 
@@ -99,6 +100,7 @@ const DrawerContent: React.FC = () => {
 const Header: React.FC = () => {
   const { colors } = useTheme();
   const navigation = useNavigation();
+  const profileNavigation = useNavigation<ProfileNavigationProp>();
 
   return (
     <View style={[styles.header, { backgroundColor: colors.surface }]}>
@@ -109,7 +111,7 @@ const Header: React.FC = () => {
         <Counter icon="local-fire-department" count={5} color={colors.primary} />
         <Counter icon="money" count={100} color={colors.secondary} />
       </View>
-      <TouchableOpacity>
+      <TouchableOpacity onPress={() => profileNavigation.navigate('Profile')}>
         <Icon name="person" size={24} color={colors.onSurface} />
       </TouchableOpacity>
     </View>

@@ -21,6 +21,7 @@ import NutritionScreen from '../screens/challenges/NutritionScreen';
 import SocialScreen from '../screens/challenges/SocialScreen';
 import SleepScreen from '../screens/challenges/SleepScreen';
 import HydrationScreen from '../screens/challenges/HydrationScreen';
+import ProfileScreen from '../screens/ProfileScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -98,6 +99,10 @@ const Navigation: React.FC = () => {
         <Stack.Screen name="Nutrition" component={NutritionScreen} />
         <Stack.Screen name="Sleep" component={SleepScreen} />
         <Stack.Screen name="Hydration" component={HydrationScreen} />
+        <Stack.Screen
+          name="Profile"
+          component={ProfileScreen}
+          options={{ headerShown: false }} />
       </Stack.Navigator>
     </NavigationContainer>
   );
