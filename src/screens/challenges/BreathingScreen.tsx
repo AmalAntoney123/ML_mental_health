@@ -93,7 +93,7 @@ const BreathingScreen: React.FC = () => {
 
     const playBackgroundMusic = () => {
         try {
-            SoundPlayer.playAsset(require('../../assets/breathing-music.mp3'));
+            SoundPlayer.playAsset(require('../../assets/sounds/breathing-music.mp3'));
         } catch (e) {
             console.log('Cannot play the sound file', e);
         }
@@ -174,7 +174,7 @@ const BreathingScreen: React.FC = () => {
                         <Text style={[styles.timerText, { color: colors.text }]}>{formatTime(timer)}</Text>
                         <View style={styles.lottieContainer}>
                             <LottieView
-                                source={require('../../assets/breathing-animation.json')}
+                                source={require('../../assets/lottie/breathing-animation.json')}
                                 autoPlay
                                 loop
                                 style={styles.lottieAnimation}

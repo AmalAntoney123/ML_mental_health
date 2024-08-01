@@ -48,8 +48,8 @@ const DashboardScreen: React.FC<Props> = ({navigation}) => {
   const flatListRef = useRef<FlatList>(null);
 
   const baseChallenges: Omit<Challenge, 'id' | 'completed'>[] = [
-    { title: 'Mindfulness', icon: 'self-improvement', screen: 'Breathing' },
-    { title: 'Gratitude', icon: 'favorite', screen: 'Gratitude' },
+    { title: 'Mindfulness', icon: 'self-improvement', screen: 'Meditation' },
+    { title: 'Gratitude', icon: 'favorite', screen: 'Breathing' },
     { title: 'Exercise', icon: 'fitness-center', screen: 'Exercise' },
     { title: 'Social', icon: 'people', screen: 'Social' },
     { title: 'Nutrition', icon: 'restaurant', screen: 'Nutrition' },
