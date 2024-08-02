@@ -6,30 +6,30 @@ import { useAuth } from '../../utils/auth';
 import database from '@react-native-firebase/database';
 import { ProgressBar } from 'react-native-paper';
 
-const exercises = [
-  { name: 'Jumping Jacks', duration: 30, animation: require('../../assets/lottie/jumping-jacks.json') },
-  { name: 'Push-ups', duration: 30, animation: require('../../assets/lottie/push-ups.json') },
-  { name: 'Mountain Climbers', duration: 30, animation: require('../../assets/lottie/mountain-climbers.json') },
-  { name: 'Squats', duration: 30, animation: require('../../assets/lottie/squats.json') },
-  { name: 'Burpees', duration: 30, animation: require('../../assets/lottie/burpees.json') },
+const yogaPoses = [
+  { name: 'Mountain Pose', duration: 30, animation: require('../../assets/lottie/mountain-pose.json') },
+  { name: 'Downward Dog', duration: 30, animation: require('../../assets/lottie/downward-dog.json') },
+  { name: 'Warrior I', duration: 30, animation: require('../../assets/lottie/warrior.json') },
+  { name: 'Tree Pose', duration: 30, animation: require('../../assets/lottie/tree-pose.json') },
+  { name: 'Child\'s Pose', duration: 30, animation: require('../../assets/lottie/child-pose.json') },
 ];
 
 const ExerciseScreen: React.FC = () => {
-  const [stage, setStage] = useState<'instructions' | 'workout' | 'finished'>('instructions');
-  const [currentExercise, setCurrentExercise] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(exercises[0].duration);
+  const [stage, setStage] = useState<'instructions' | 'yoga' | 'finished'>('instructions');
+  const [currentPose, setCurrentPose] = useState(0);
+  const [timeLeft, setTimeLeft] = useState(yogaPoses[0].duration);
   const [isActive, setIsActive] = useState(false);
-  const [isResting, setIsResting] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
   const [showReflectionModal, setShowReflectionModal] = useState(false);
   const [showCompleteButton, setShowCompleteButton] = useState(false);
 
   const { colors } = useTheme();
   const { user } = useAuth();
   const animationRef = useRef<LottieView>(null);
-  const exerciseAnimationRef = useRef<LottieView>(null);
+  const poseAnimationRef = useRef<LottieView>(null);
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
-  const totalTime = exercises.reduce((sum, exercise) => sum + exercise.duration, 0) + (exercises.length - 1) * 10;
+  const totalTime = yogaPoses.reduce((sum, pose) => sum + pose.duration, 0) + (yogaPoses.length - 1) * 5;
 
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
@@ -38,24 +38,24 @@ const ExerciseScreen: React.FC = () => {
         setTimeLeft((time) => time - 1);
       }, 1000);
     } else if (timeLeft === 0) {
-      if (!isResting) {
+      if (!isTransitioning) {
         setShowCompleteButton(true);
       } else {
-        moveToNextExercise();
+        moveToNextPose();
       }
     }
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [isActive, timeLeft, isResting]);
+  }, [isActive, timeLeft, isTransitioning]);
 
-  const moveToNextExercise = () => {
-    if (currentExercise < exercises.length - 1) {
-      setCurrentExercise((prev) => prev + 1);
-      setTimeLeft(exercises[currentExercise + 1].duration);
-      setIsResting(false);
+  const moveToNextPose = () => {
+    if (currentPose < yogaPoses.length - 1) {
+      setCurrentPose((prev) => prev + 1);
+      setTimeLeft(yogaPoses[currentPose + 1].duration);
+      setIsTransitioning(false);
       setShowCompleteButton(false);
-      exerciseAnimationRef.current?.play();
+      poseAnimationRef.current?.play();
     } else {
       setIsActive(false);
       setShowReflectionModal(true);
@@ -63,9 +63,9 @@ const ExerciseScreen: React.FC = () => {
   };
 
   const handleStart = () => {
-    setStage('workout');
+    setStage('yoga');
     setIsActive(true);
-    exerciseAnimationRef.current?.play();
+    poseAnimationRef.current?.play();
     Animated.timing(fadeAnim, {
       toValue: 1,
       duration: 500,
@@ -73,10 +73,10 @@ const ExerciseScreen: React.FC = () => {
     }).start();
   };
 
-  const handleCompleteExercise = () => {
+  const handleCompletePose = () => {
     setShowCompleteButton(false);
-    setTimeLeft(10);
-    setIsResting(true);
+    setTimeLeft(5);
+    setIsTransitioning(true);
   };
 
   const handleFinish = async () => {
@@ -94,22 +94,22 @@ const ExerciseScreen: React.FC = () => {
 
         const currentLevel = Math.floor(userData.completedChallenges / 7) + 1;
 
-        if (userData.challenges.exercise < currentLevel) {
-          const newExerciseCount = userData.challenges.exercise + 1;
-          await userRef.child('challenges/exercise').set(newExerciseCount);
+        if (userData.challenges.yoga < currentLevel) {
+          const newYogaCount = userData.challenges.yoga + 1;
+          await userRef.child('challenges/yoga').set(newYogaCount);
 
           const newCompletedChallengesCount = userData.completedChallenges + 1;
           await userRef.child('completedChallenges').set(newCompletedChallengesCount);
         }
 
-        const exerciseRef = userRef.child('exerciseEntries').push();
-        await exerciseRef.set({
+        const yogaRef = userRef.child('yogaEntries').push();
+        await yogaRef.set({
           date: new Date().toISOString(),
           duration: totalTime,
-          type: 'HIIT Workout'
+          type: '5-Minute Yoga Session'
         });
       } catch (error) {
-        console.error('Error updating exercise entry and completed challenges count:', error);
+        console.error('Error updating yoga entry and completed challenges count:', error);
       }
     }
   };
@@ -119,54 +119,56 @@ const ExerciseScreen: React.FC = () => {
       case 'instructions':
         return (
           <>
-            <Text style={[styles.title, { color: colors.text }]}>5-Minute HIIT Workout</Text>
+            <Text style={[styles.title, { color: colors.text }]}>5-Minute Yoga Session</Text>
             <Text style={[styles.text, { color: colors.text }]}>
-              Get ready for a quick and effective workout! Complete 5 exercises, each for 30 seconds, with 10 seconds of rest between.
+              Get ready for a quick and relaxing yoga session! Complete 5 poses, each for 30 seconds, with 5 seconds of transition between.
             </Text>
             <TouchableOpacity style={[styles.button, { backgroundColor: colors.primary }]} onPress={handleStart}>
-              <Text style={styles.buttonText}>Start Workout</Text>
+              <Text style={styles.buttonText}>Start Yoga</Text>
             </TouchableOpacity>
           </>
         );
-        case 'workout':
-          return (
-            <Animated.View style={{ opacity: fadeAnim, width: '100%', alignItems: 'center' }}>
-              <Text style={[styles.timer, { color: colors.text }]}>{timeLeft}s</Text>
-              
-              <Text style={[styles.text, { color: colors.text, marginBottom: 10 }]}>
-                Exercise {currentExercise + 1} of {exercises.length}
-              </Text>
-              
-              {!isResting && (
-                <LottieView
-                  ref={exerciseAnimationRef}
-                  source={exercises[currentExercise].animation}
-                  style={styles.exerciseAnimation}
-                  loop={true}
-                  autoPlay={true}
-                />
-              )}
-              
-              <Text style={[styles.subtitle, { color: colors.text, marginTop: 20 }]}>
-                {isResting ? 'Rest' : exercises[currentExercise].name}
-              </Text>
-              
+      case 'yoga':
+        return (
+          <Animated.View style={{ opacity: fadeAnim, width: '100%', alignItems: 'center' }}>
+            <Text style={[styles.timer, { color: colors.text }]}>{timeLeft}s</Text>
+
+            <Text style={[styles.text, { color: colors.text, marginBottom: 10 }]}>
+              Pose {currentPose + 1} of {yogaPoses.length}
+            </Text>
+
+            {!isTransitioning && (
+              <LottieView
+                ref={poseAnimationRef}
+                source={yogaPoses[currentPose].animation}
+                style={styles.animation}
+                loop={true}
+                autoPlay={true}
+              />
+            )}
+
+            <Text style={[styles.subtitle, { color: colors.text, marginTop: 20 }]}>
+              {isTransitioning ? 'Transition' : yogaPoses[currentPose].name}
+            </Text>
+
+            <View style={{ borderWidth: 1,width: '100%' }}>
               <ProgressBar
-                progress={(currentExercise + (isResting ? 1 : 0)) / exercises.length}
-                color={colors.primary}
+              progress={(currentPose + (isTransitioning ? 1 : 0)) / yogaPoses.length}
+              color={colors.primary}
                 style={styles.progressBar}
               />
-              
-              {showCompleteButton && (
-                <TouchableOpacity
-                  style={[styles.button, { backgroundColor: colors.primary }]}
-                  onPress={handleCompleteExercise}
-                >
-                  <Text style={styles.buttonText}>Complete Exercise</Text>
-                </TouchableOpacity>
-              )}
-            </Animated.View>
-          );
+            </View>
+
+            {showCompleteButton && (
+              <TouchableOpacity
+                style={[styles.button, { backgroundColor: colors.primary }]}
+                onPress={handleCompletePose}
+              >
+                <Text style={styles.buttonText}>Complete Pose</Text>
+              </TouchableOpacity>
+            )}
+          </Animated.View>
+        );
       case 'finished':
         return (
           <>
@@ -177,8 +179,8 @@ const ExerciseScreen: React.FC = () => {
               loop={true}
               style={styles.animation}
             />
-            <Text style={[styles.title, { color: colors.text }]}>Congratulations!</Text>
-            <Text style={[styles.text, { color: colors.text }]}>You've completed the 5-minute HIIT workout. Keep up the great work!</Text>
+            <Text style={[styles.title, { color: colors.text }]}>Namaste!</Text>
+            <Text style={[styles.text, { color: colors.text }]}>You've completed the 5-minute yoga session. Great job on nurturing your mind and body!</Text>
             <TouchableOpacity style={[styles.button, { backgroundColor: colors.primary }]} onPress={() => setStage('instructions')}>
               <Text style={styles.buttonText}>Do it Again</Text>
             </TouchableOpacity>
@@ -198,9 +200,9 @@ const ExerciseScreen: React.FC = () => {
       >
         <View style={styles.modalContainer}>
           <View style={[styles.modalContent, { backgroundColor: colors.background }]}>
-            <Text style={[styles.modalTitle, { color: colors.text }]}>Workout Complete!</Text>
+            <Text style={[styles.modalTitle, { color: colors.text }]}>Yoga Session Complete!</Text>
             <Text style={[styles.modalText, { color: colors.text }]}>
-              Great job on finishing your 5-minute HIIT workout!
+              Great job on finishing your 5-minute yoga session!
             </Text>
             <Text style={[styles.modalText, { color: colors.text, marginTop: 10 }]}>
               How do you feel?
