@@ -186,7 +186,7 @@ const BreathingScreen: React.FC = () => {
                             )}
                         </View>
                         {showFinishButton && (
-                            <TouchableOpacity style={[styles.finishButton, { backgroundColor: colors.accent }]} onPress={handleFinish}>
+                            <TouchableOpacity style={[styles.finishButton, { backgroundColor: colors.primary }]} onPress={handleFinish}>
                                 <Text style={styles.buttonText}>Finish</Text>
                             </TouchableOpacity>
                         )}

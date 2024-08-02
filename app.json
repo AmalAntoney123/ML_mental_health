@@ -2,6 +2,7 @@
   "name": "Emo",
   "displayName": "Emo",
   "expo": {
+    "appKey": "Emo",
     "plugins": [
       ["expo-av"]
     ]

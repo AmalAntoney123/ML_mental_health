@@ -16,7 +16,7 @@ type Challenge = {
   title: string;
   icon: string;
   completed: boolean;
-  screen: keyof RootStackParamList;
+  screens: (keyof RootStackParamList)[];
 };
 
 type LevelData = {
@@ -30,7 +30,7 @@ type Props = {
   navigation: DashboardNavigationProp;
 };
 
-const DashboardScreen: React.FC<Props> = ({navigation}) => {
+const DashboardScreen: React.FC<Props> = ({ navigation }) => {
   const { colors } = useTheme();
   const { user } = useAuth();
 
@@ -47,14 +47,18 @@ const DashboardScreen: React.FC<Props> = ({navigation}) => {
   });
   const flatListRef = useRef<FlatList>(null);
 
-  const baseChallenges: Omit<Challenge, 'id' | 'completed'>[] = [
-    { title: 'Mindfulness', icon: 'self-improvement', screen: 'Meditation' },
-    { title: 'Gratitude', icon: 'favorite', screen: 'Breathing' },
-    { title: 'Exercise', icon: 'fitness-center', screen: 'Exercise' },
-    { title: 'Social', icon: 'people', screen: 'Social' },
-    { title: 'Nutrition', icon: 'restaurant', screen: 'Nutrition' },
-    { title: 'Sleep', icon: 'nightlight', screen: 'Sleep' },
-    { title: 'Hydration', icon: 'local-drink', screen: 'Hydration' },
+  const baseChallenges: Omit<Challenge, 'id' | 'completed' | 'screen'>[] = [
+    {
+      title: 'Mindfulness',
+      icon: 'self-improvement',
+      screens: ['Breathing', 'Meditation']
+    },
+    { title: 'Gratitude', icon: 'favorite', screens: ['Gratitude'] },
+    { title: 'Exercise', icon: 'fitness-center', screens: ['Exercise'] },
+    { title: 'Social', icon: 'people', screens: ['Social'] },
+    { title: 'Nutrition', icon: 'restaurant', screens: ['Nutrition'] },
+    { title: 'Sleep', icon: 'nightlight', screens: ['Sleep'] },
+    { title: 'Hydration', icon: 'local-drink', screens: ['Hydration'] },
   ];
 
   const initializeUserChallenges = async (userId: string) => {
@@ -67,7 +71,7 @@ const DashboardScreen: React.FC<Props> = ({navigation}) => {
       nutrition: 0,
       sleep: 0,
       hydration: 0,
-      
+
     };
 
     try {
@@ -80,15 +84,15 @@ const DashboardScreen: React.FC<Props> = ({navigation}) => {
 
   useEffect(() => {
     if (!user) return; // Early return if no user is logged in
-  
+
     const userId = user.uid; // Get the user ID from the authenticated user
     const userRef = database().ref(`users/${userId}`);
-    
+
     const fetchUserData = async () => {
       try {
         const snapshot = await userRef.once('value');
         const userData = snapshot.val();
-        
+
         if (userData) {
           if (!userData.challenges) {
             // Initialize challenges if they don't exist
@@ -96,7 +100,7 @@ const DashboardScreen: React.FC<Props> = ({navigation}) => {
           } else {
             setChallengeData(userData.challenges);
           }
-          
+
           if (userData.completedChallenges !== undefined) {
             setCompletedChallenges(userData.completedChallenges);
           } else {
@@ -111,9 +115,9 @@ const DashboardScreen: React.FC<Props> = ({navigation}) => {
         console.error('Error fetching user data:', error);
       }
     };
-  
+
     fetchUserData();
-  
+
     // Set up a listener for real-time updates
     const onDataChange = (snapshot: FirebaseDatabaseTypes.DataSnapshot) => {
       const userData = snapshot.val();
@@ -126,9 +130,9 @@ const DashboardScreen: React.FC<Props> = ({navigation}) => {
         }
       }
     };
-  
+
     userRef.on('value', onDataChange);
-  
+
     // Clean up the listener
     return () => userRef.off('value', onDataChange);
   }, [user]); // Add user as a dependency
@@ -162,11 +166,20 @@ const DashboardScreen: React.FC<Props> = ({navigation}) => {
     }
   }, [lastCompletedLevelIndex]);
 
+  const getRandomScreen = (screens: (keyof RootStackParamList)[]) => {
+    return screens[Math.floor(Math.random() * screens.length)];
+  };
+
   const renderChallenge = ({ item, index, levelIndex }: { item: Challenge; index: number; levelIndex: number }) => {
     const isLevelOne = levelIndex === 0;
     const challengeCount = challengeData[item.title.toLowerCase() as keyof typeof challengeData];
     const isCompleted = challengeCount > levelIndex;
     const isLocked = !isLevelOne && (levelIndex + 1 > userLevel);
+  
+    const handleChallengePress = () => {
+      const selectedScreen = getRandomScreen(item.screens);
+      navigation.navigate(selectedScreen);
+    };
   
     return (
       <View style={styles.challengeWrapper}>
@@ -177,21 +190,19 @@ const DashboardScreen: React.FC<Props> = ({navigation}) => {
               backgroundColor: isLocked ? colors.disabledBackground : colors.primary,
             },
           ]}
-          onPress={() => {
-            navigation.navigate(item.screen);
-          }}
+          onPress={handleChallengePress}
           disabled={isLocked}
         >
-          <Icon 
-            name={item.icon} 
-            size={36} 
-            color={isLocked ? colors.disabled : colors.onPrimary} 
+          <Icon
+            name={item.icon}
+            size={36}
+            color={isLocked ? colors.disabled : colors.onPrimary}
           />
           {isLocked && <Icon name="lock" size={24} color={colors.disabled} style={styles.lockIcon} />}
         </TouchableOpacity>
-        <Text 
+        <Text
           style={[
-            styles.challengeText, 
+            styles.challengeText,
             { color: isLocked ? colors.disabled : colors.text }
           ]}
         >
@@ -205,27 +216,27 @@ const DashboardScreen: React.FC<Props> = ({navigation}) => {
       </View>
     );
   };
-  
+
   const renderLevel = ({ item, index }: { item: LevelData; index: number }) => {
     const isLocked = item.level > userLevel && item.level !== 1;
     const levelWrapperStyle = [
       styles.levelWrapper,
       { marginTop: index === 0 ? 20 : 5 }
     ];
-  
+
     return (
       <View style={levelWrapperStyle}>
         <View style={[styles.levelContainer, { backgroundColor: colors.secondaryBackground }]}>
           <View style={styles.levelHeaderContainer}>
-            <View 
+            <View
               style={[
-                styles.levelTextContainer, 
+                styles.levelTextContainer,
                 { backgroundColor: isLocked ? colors.disabledBackground : colors.secondary }
               ]}
             >
-              <Text 
+              <Text
                 style={[
-                  styles.levelText, 
+                  styles.levelText,
                   { color: isLocked ? colors.disabled : colors.onPrimary }
                 ]}
               >
@@ -233,9 +244,9 @@ const DashboardScreen: React.FC<Props> = ({navigation}) => {
               </Text>
             </View>
             {index !== 0 && (
-              <View 
+              <View
                 style={[
-                  styles.levelIconContainer, 
+                  styles.levelIconContainer,
                   { backgroundColor: isLocked ? colors.disabledBackground : colors.background }
                 ]}
               >
@@ -262,7 +273,7 @@ const DashboardScreen: React.FC<Props> = ({navigation}) => {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={styles.header}>
-        <Text style={[styles.headerText ,{color: colors.onBackground}]}>Welcome Back, User</Text>
+        <Text style={[styles.headerText, { color: colors.onBackground }]}>Welcome Back, User</Text>
       </View>
       <FlatList
         ref={flatListRef}

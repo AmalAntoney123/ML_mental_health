@@ -4,6 +4,8 @@ import { useTheme } from '../../context/ThemeContext';
 import SoundPlayer from 'react-native-sound-player';
 import LottieView from 'lottie-react-native';
 import { useFocusEffect } from '@react-navigation/native';
+import { useAuth } from '../../utils/auth';
+import database, { FirebaseDatabaseTypes } from '@react-native-firebase/database';
 
 const { width: screenWidth } = Dimensions.get('window');
 const MEDITATION_DURATION = 300; // 5 minutes
@@ -13,6 +15,7 @@ const GuidedMeditationScreen: React.FC = () => {
     const [timer, setTimer] = useState(MEDITATION_DURATION);
     const [showFinishButton, setShowFinishButton] = useState(false);
     const { colors } = useTheme();
+    const { user } = useAuth();
 
     const instructions = "Find a comfortable place to sit. Close your eyes and relax your body. Focus on the guided meditation and allow yourself to be present in the moment.";
 
@@ -60,10 +63,36 @@ const GuidedMeditationScreen: React.FC = () => {
         playMeditationAudio();
     };
 
-    const handleFinish = () => {
+    const handleFinish = async () => {
         setStage('finished');
         stopMeditationAudio();
-        
+    
+        if (user) {
+            const userId = user.uid;
+            const userRef = database().ref(`users/${userId}`);
+    
+            try {
+                // Get the current user data
+                const userSnapshot = await userRef.once('value');
+                const userData = userSnapshot.val();
+    
+                // Calculate the current level
+                const currentLevel = Math.floor(userData.completedChallenges / 7) + 1;
+    
+                // Check if the mindfulness challenge for the current level is already completed
+                if (userData.challenges.mindfulness < currentLevel) {
+                    // Increment mindfulness count
+                    const newMindfulnessCount = userData.challenges.mindfulness + 1;
+                    await userRef.child('challenges/mindfulness').set(newMindfulnessCount);
+    
+                    // Increment completed challenges count
+                    const newCompletedChallengesCount = userData.completedChallenges + 1;
+                    await userRef.child('completedChallenges').set(newCompletedChallengesCount);
+                }
+            } catch (error) {
+                console.error('Error updating mindfulness and completed challenges count:', error);
+            }
+        }
     };
 
     const formatTime = (seconds: number) => {
@@ -96,7 +125,7 @@ const GuidedMeditationScreen: React.FC = () => {
                             />
                         </View>
                         {showFinishButton && (
-                            <TouchableOpacity style={[styles.finishButton, { backgroundColor: colors.accent }]} onPress={handleFinish}>
+                            <TouchableOpacity style={[styles.finishButton, { backgroundColor: colors.primary }]} onPress={handleFinish}>
                                 <Text style={styles.buttonText}>Finish</Text>
                             </TouchableOpacity>
                         )}
