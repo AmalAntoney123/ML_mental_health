@@ -1,5 +1,3 @@
-# Writing the README content to a readme.md file
-readme_content = """
 # Emo - Mental Health & Wellbeing App
 
 Emo is a comprehensive mental health and wellbeing app designed to help users improve their mental and emotional health through mindfulness, gratitude, social activities, and other gamified challenges. The app provides users with various tools and exercises to enhance their wellbeing and track their progress over time.
