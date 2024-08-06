@@ -4,6 +4,7 @@ import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { NativeStackNavigationProp } from 'react-native-screens/lib/typescript/native-stack/types';
 import { RootStackParamList } from '../navigation/types';
+import database from '@react-native-firebase/database';
 
 // Types
 type ValidationResult = {
@@ -87,6 +88,14 @@ export const login = async (email: string, password: string) => {
         if (!userCredential.user.emailVerified) {
             throw new Error('email-not-verified');
         }
+        
+        // Check if user is active
+        const userSnapshot = await database().ref(`users/${userCredential.user.uid}`).once('value');
+        const userData = userSnapshot.val();
+        if (userData?.isActive === false) {
+            throw new Error('user-disabled');
+        }
+        
         return userCredential.user;
     } catch (error) {
         throw error;
@@ -137,16 +146,39 @@ export const resetPassword = async (email: string) => {
 export const useAuth = () => {
     const [user, setUser] = useState<FirebaseAuthTypes.User | null>(null);
     const [isEmailVerified, setIsEmailVerified] = useState<boolean>(false);
+    const [isAdmin, setIsAdmin] = useState<boolean>(false);
+    const [isActive, setIsActive] = useState<boolean>(true);  // Add this line
 
     useEffect(() => {
-        const unsubscribe = auth().onAuthStateChanged((user) => {
+        const unsubscribe = auth().onAuthStateChanged(async (user) => {
             setUser(user);
             setIsEmailVerified(user?.emailVerified ?? false);
+
+            if (user) {
+                try {
+                    const userSnapshot = await database()
+                        .ref(`/users/${user.uid}`)
+                        .once('value');
+                    
+                    const userData = userSnapshot.val();
+                    console.log(`Fetched user data for ${user.uid}:`, userData); // Debugging line
+
+                    setIsAdmin(userData?.role === 'admin');
+                    setIsActive(userData?.isActive !== false);  // Add this line
+                } catch (error) {
+                    console.error("Failed to fetch user's data:", error);
+                    setIsAdmin(false);
+                    setIsActive(true);  // Default to active in case of error
+                }
+            } else {
+                console.error("No user logged in");
+                setIsAdmin(false);
+                setIsActive(true);  // Reset to default when no user
+            }
         });
 
-        // Cleanup subscription on unmount
         return () => unsubscribe();
     }, []);
 
-    return { user, isEmailVerified };
+    return { user, isEmailVerified, isAdmin, isActive };  // Include isActive in the return
 };

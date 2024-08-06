@@ -178,7 +178,16 @@ const OnboardingScreen: React.FC<Props> = ({ navigation }) => {
             setStep(step - 1);
         }
     };
-
+    const initialChallenges = {
+        mindfulness: 0,
+        gratitude: 0,
+        exercise: 0,
+        social: 0,
+        nutrition: 0,
+        sleep: 0,
+        hydration: 0,
+  
+      };
     const saveUserData = async () => {
         try {
             const user = firebase.auth().currentUser;
@@ -187,6 +196,7 @@ const OnboardingScreen: React.FC<Props> = ({ navigation }) => {
                     name,
                     age,
                     gender,
+                    email : user.email,
                     previousTherapyExperience,
                     sleepHabits,
                     interests,
@@ -194,7 +204,12 @@ const OnboardingScreen: React.FC<Props> = ({ navigation }) => {
                     goals,
                     concerns,
                     preferredTherapyType,
+                    role: 'user',
+                    challenges: initialChallenges,
+                    completedChallenges: 0,
+                    isActive : true,
                 });
+                
                 navigation.navigate('Home');
             } else {
                 Alert.alert('Error', 'User not found. Please sign in again.');

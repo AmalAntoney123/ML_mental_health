@@ -5,7 +5,7 @@ import { RootStackParamList } from '../navigation/types';
 import { useTheme } from '../context/ThemeContext';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { TextInput, Provider as PaperProvider, DefaultTheme } from 'react-native-paper';
-import { useFormValidation, login, resendVerificationEmail, resetPassword } from '../utils/auth';
+import { useFormValidation, login, resendVerificationEmail, resetPassword, logout } from '../utils/auth';
 import Snackbar from 'react-native-snackbar';
 import CustomAlert from '../props/Alert';
 import database from '@react-native-firebase/database';
@@ -176,6 +176,14 @@ const SignInScreen: React.FC<Props> = ({ navigation }) => {
                 ]
             );
             return;
+        } else if (error.message === 'user-disabled') {
+            logout();
+            showCustomAlert(
+                'Account Disabled',
+                'Your account has been disabled. Please contact support for assistance.',
+                [{ text: 'OK', onPress: () => setAlertVisible(false) }]
+            );
+            return;
         } else {
             switch (error.code) {
                 case 'auth/user-not-found':
@@ -195,7 +203,7 @@ const SignInScreen: React.FC<Props> = ({ navigation }) => {
                     break;
             }
         }
-
+    
         Snackbar.show({
             text: errorMessage,
             duration: Snackbar.LENGTH_LONG,

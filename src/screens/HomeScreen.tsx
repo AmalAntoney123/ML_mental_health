@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Switch } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { DrawerActions, useNavigation } from '@react-navigation/native';
@@ -7,8 +7,9 @@ import { DrawerNavigationProp } from '@react-navigation/drawer';
 import { NativeStackNavigationProp } from 'react-native-screens/lib/typescript/native-stack/types';
 import { RootStackParamList } from '../navigation/types';
 import { useTheme } from '../context/ThemeContext';
-import { logout } from '../utils/auth';
+import { logout, useAuth } from '../utils/auth';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { getDatabase, ref, get } from 'firebase/database';
 
 import DashboardScreen from './home/DashboardScreen';
 import LeaderboardScreen from './home/LeaderboardScreen';
@@ -52,26 +53,44 @@ const BottomNavItem: React.FC<BottomNavItemProps> = ({ icon, label, isActive, on
 
 type HomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Login'>;
 type ProfileNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Profile'>;
+type AdminNavigationProp = NativeStackNavigationProp<RootStackParamList, 'AdminPanel'>;
+
+type DrawerContentProps = {
+  navigation: DrawerNavigationProp<any>;
+};
 
 const Drawer = createDrawerNavigator();
 
-const DrawerContent: React.FC = () => {
+const DrawerContent: React.FC<DrawerContentProps> = ({ navigation }) => {
   const { colors, toggleTheme, isDarkMode } = useTheme();
-  const navigation = useNavigation<HomeScreenNavigationProp>();
+  const { user, isAdmin } = useAuth(); // Assuming this provides the current logged-in user
+  const AdminNavigationProp = useNavigation<AdminNavigationProp>();
+  const HomeScreenNavigationProp = useNavigation<HomeScreenNavigationProp>();
 
   const handleLogout = async () => {
     try {
-      await logout();
-      navigation.dispatch(DrawerActions.closeDrawer());
-
-      navigation.navigate('Login');
+      await logout(); // Logout the user
+      // Delay navigation to ensure logout is processed
+      setTimeout(() => {
+        HomeScreenNavigationProp.navigate('Login');
+      }, 100); // Adjust delay if needed
     } catch (error) {
       console.error('Logout failed:', error);
     }
   };
+  
 
   return (
     <View style={[styles.drawer, { backgroundColor: colors.surface }]}>
+      {isAdmin && (
+        <TouchableOpacity
+          style={styles.drawerItem}
+          onPress={() => AdminNavigationProp.navigate('AdminPanel')}
+        >
+          <Icon name="admin-panel-settings" size={24} color={colors.text} />
+          <Text style={[styles.drawerText, { color: colors.text }]}>Admin Panel</Text>
+        </TouchableOpacity>
+      )}
       <TouchableOpacity style={styles.drawerItem}>
         <Icon name="settings" size={24} color={colors.text} />
         <Text style={[styles.drawerText, { color: colors.text }]}>Settings</Text>
@@ -97,6 +116,7 @@ const DrawerContent: React.FC = () => {
     </View>
   );
 };
+
 const Header: React.FC = () => {
   const { colors } = useTheme();
   const navigation = useNavigation();
@@ -160,9 +180,11 @@ const TabNavigator = () => {
 
 const HomeScreen: React.FC = () => {
   return (
-    <Drawer.Navigator drawerContent={() => <DrawerContent />}>
-      <Drawer.Screen name="Home" component={TabNavigator} options={{ headerShown: false }} />
-    </Drawer.Navigator>
+<Drawer.Navigator
+            drawerContent={() => <DrawerContent navigation={useNavigation as any} />} // Pass navigation prop
+        >
+            <Drawer.Screen name="Home" component={TabNavigator} options={{ headerShown: false }} />
+        </Drawer.Navigator>
   );
 };
 const styles = StyleSheet.create({

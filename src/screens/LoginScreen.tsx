@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { googleSignIn } from '../utils/auth';
+import { googleSignIn, logout } from '../utils/auth';
 import { View, Text, Image, StyleSheet, Dimensions, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/types';
@@ -31,26 +31,39 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
   const handleGoogleSignIn = async () => {
     setIsLoading(true);
     try {
-      await googleSignIn();
-      const user = auth().currentUser;
-      if (user) {
-        const userDataExists = await checkUserDataExists(user.uid);
-        if (userDataExists) {
-          navigation.navigate('Home');
+        await googleSignIn();
+        const user = auth().currentUser;
+        if (user) {
+            const userSnapshot = await database().ref(`users/${user.uid}`).once('value');
+            const userData = userSnapshot.val();
+            if (userData?.isActive === false) {
+                logout();
+                throw new Error('user-disabled');
+            }
+            if (userData) {
+                navigation.navigate('Home');
+            } else {
+                navigation.navigate('Onboarding');
+            }
         } else {
-          navigation.navigate('Onboarding');
+            throw new Error('Google Sign-In successful but no user returned');
         }
-      } else {
-        throw new Error('Google Sign-In successful but no user returned');
-      }
-    } catch (error) {
-      console.error('Google Sign-In failed:', error);
-      // Handle the error (e.g., show an error message to the user)
-      Alert.alert('Error', 'Google Sign-In failed. Please try again.');
+    } catch (error: unknown) {
+        console.error('Google Sign-In failed:', error);
+        if (error instanceof Error) {
+            if (error.message === 'user-disabled') {
+                Alert.alert('Account Disabled', 'Your account has been disabled. Please contact support for assistance.');
+            } else {
+                Alert.alert('Error', `Google Sign-In failed: ${error.message}`);
+            }
+        } else {
+            Alert.alert('Error', 'An unexpected error occurred during Google Sign-In. Please try again.');
+        }
     } finally {
-      setIsLoading(false);
+        setIsLoading(false);
     }
-  };
+};
+
 
   const styles = StyleSheet.create({
     container: {

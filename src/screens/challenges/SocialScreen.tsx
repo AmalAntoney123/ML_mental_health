@@ -1,89 +1,89 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, Button, StyleSheet, Alert } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, Button } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
-const scenarios = [
-  { 
-    scenario: "Your friend has had a rough day at work and feels overwhelmed.",
-    options: [
-      "Try to cheer them up with a joke.",
-      "Ask them if they want to talk about it.",
-      "Ignore them and talk about your day instead."
-    ],
-    correctOptionIndex: 1
-  },
-  { 
-    scenario: "A colleague is upset about a project mistake.",
-    options: [
-      "Tell them it's not a big deal.",
-      "Offer to help them fix the mistake.",
-      "Criticize their work and suggest they be more careful."
-    ],
-    correctOptionIndex: 1
-  },
-  // Add more scenarios as needed
-];
+type ConversationOption = {
+  prompt: string;
+  expected: string[] | null;
+};
 
 const SocialScreen: React.FC = () => {
-  const [currentScenario, setCurrentScenario] = useState(0);
-  const [selectedOption, setSelectedOption] = useState<number | null>(null);
-  const [correctCount, setCorrectCount] = useState(0);
-  const [startTime, setStartTime] = useState<number | null>(null);
+  const [step, setStep] = useState(0);
+  const [userInput, setUserInput] = useState('');
+  const [conversation, setConversation] = useState<{ step: number; prompt: string; text: string }[]>([]);
+  const [currentPrompt, setCurrentPrompt] = useState<ConversationOption | null>(null);
 
-  useEffect(() => {
-    setStartTime(Date.now());
-  }, []);
+  const navigation = useNavigation();
 
-  const handleOptionPress = (index: number) => {
-    if (selectedOption !== null) return; // Prevent multiple selections
+  const conversationOptions: ConversationOption[] = [
+    { prompt: 'Greet the app. Say "Hi" or "Hello".', expected: ['hi', 'hello'] },
+    { prompt: 'How are you feeling today?', expected: ['good', 'great', 'okay', 'not so good'] },
+    { prompt: 'What was the highlight of your day?', expected: null },
+    { prompt: 'What is something you’re grateful for today?', expected: null },
+    { prompt: 'Tell me about a hobby you enjoy.', expected: null },
+    { prompt: 'Thank the app for chatting with you.', expected: ['thank you', 'thanks'] },
+    { prompt: 'Share one positive thought you had today.', expected: null },
+    { prompt: 'If you could do anything right now, what would it be?', expected: null },
+  ];
 
-    setSelectedOption(index);
-
-    const isCorrect = index === scenarios[currentScenario].correctOptionIndex;
-
-    if (isCorrect) {
-      setCorrectCount(prev => prev + 1);
-      Alert.alert('Correct!', 'Great job showing empathy!');
-    } else {
-      Alert.alert('Try Again', 'That’s not the best response. Try another option.');
-    }
-
-    // Move to the next scenario after a short delay
-    setTimeout(() => {
-      setSelectedOption(null);
-      setCurrentScenario(prev => prev + 1);
-    }, 1000);
+  const selectRandomPrompt = () => {
+    const remainingPrompts = conversationOptions.filter(
+      (option) => !conversation.some((entry) => entry.prompt === option.prompt)
+    );
+    const randomPrompt = remainingPrompts[Math.floor(Math.random() * remainingPrompts.length)];
+    setCurrentPrompt(randomPrompt);
   };
 
-  const handleFinish = () => {
-    if (currentScenario >= scenarios.length) {
-      const timeTaken = (Date.now() - (startTime || 0)) / 1000; // time in seconds
-      Alert.alert('Completed!', `You answered ${correctCount} out of ${scenarios.length} correctly in ${timeTaken.toFixed(2)} seconds.`);
+  const handleUserInput = () => {
+    if (!currentPrompt) return;
+
+    if (
+      currentPrompt.expected === null ||
+      currentPrompt.expected.some((response) => userInput.toLowerCase().includes(response))
+    ) {
+      setConversation((prev) => [...prev, { step: step + 1, prompt: currentPrompt.prompt, text: userInput }]);
+      setUserInput('');
+      setStep(step + 1);
+      if (step + 1 < conversationOptions.length) {
+        selectRandomPrompt();
+      }
     } else {
-      Alert.alert('Not Finished Yet', 'Please complete all scenarios.');
+      alert('Try responding differently!');
     }
+  };
+
+  const handleFinishConversation = () => {
+    // Logic to update social skills or points
+    navigation.navigate('Home'); // Navigate back to the Dashboard
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>Scenario:</Text>
-      <Text style={styles.scenarioText}>{scenarios[currentScenario]?.scenario}</Text>
+      <Text style={styles.title}>Social Skill Practice</Text>
 
-      {scenarios[currentScenario]?.options.map((option, index) => (
-        <Button
-          key={index}
-          title={option}
-          onPress={() => handleOptionPress(index)}
-          disabled={selectedOption !== null}
-          color={selectedOption === index ? 'lightblue' : undefined}
-        />
+      {conversation.map((entry) => (
+        <View key={entry.step} style={styles.conversationEntry}>
+          <Text style={styles.prompt}>{`Step ${entry.step}: ${entry.prompt}`}</Text>
+          <Text style={styles.response}>{`You: ${entry.text}`}</Text>
+        </View>
       ))}
 
-      <Button
-        title="Finish"
-        onPress={handleFinish}
-        disabled={currentScenario < scenarios.length}
-        color="green"
-      />
+      {step < conversationOptions.length && currentPrompt ? (
+        <>
+          <Text style={styles.prompt}>{currentPrompt.prompt}</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Type your response here"
+            value={userInput}
+            onChangeText={setUserInput}
+          />
+          <TouchableOpacity style={styles.button} onPress={handleUserInput}>
+            <Text style={styles.buttonText}>Submit</Text>
+          </TouchableOpacity>
+        </>
+      ) : (
+        <Button title="Finish Conversation" onPress={handleFinishConversation} />
+      )}
     </View>
   );
 };
@@ -93,17 +93,51 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: '#F5F5F5', // Example background color
   },
-  text: {
+  title: {
     fontSize: 24,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 20,
+    color: '#333', // Example title color
+  },
+  conversationEntry: {
     marginBottom: 10,
   },
-  scenarioText: {
+  prompt: {
     fontSize: 18,
+    marginBottom: 10,
+    color: '#333', // Example prompt color
+  },
+  response: {
+    fontSize: 16,
+    color: '#555', // Example text color
+  },
+  input: {
+    height: 50,
+    borderColor: '#ddd',
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 10,
     marginBottom: 20,
-    textAlign: 'center',
+    backgroundColor: '#fff', // Example input background
+  },
+  button: {
+    backgroundColor: '#007BFF', // Example button color
+    padding: 15,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
 
 export default SocialScreen;
+function alert(arg0: string) {
+  throw new Error('Function not implemented.');
+}
+

@@ -22,6 +22,10 @@ import SocialScreen from '../screens/challenges/SocialScreen';
 import SleepScreen from '../screens/challenges/SleepScreen';
 import HydrationScreen from '../screens/challenges/HydrationScreen';
 import ProfileScreen from '../screens/ProfileScreen';
+import AdminScreen from '../screens/admin/AdminScreen';
+import ManageUsersScreen from '../screens/admin/UserManagementScreen';
+import ChallengeManagementScreen from '../screens/admin/ChallengeManagementScreen';
+import ReportsScreen from '../screens/admin/ReportsScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -55,6 +59,7 @@ const Navigation: React.FC = () => {
   const getInitialRouteName = () => {
     if (isFirstTime) return 'Intro';
     if (!user || !isEmailVerified) return 'Login';
+    
     return 'Home';
   };
 
@@ -102,6 +107,22 @@ const Navigation: React.FC = () => {
         <Stack.Screen
           name="Profile"
           component={ProfileScreen}
+          options={{ headerShown: false }} />
+        <Stack.Screen
+          name="AdminPanel"
+          component={AdminScreen}
+          options={{ headerShown: false }} />
+        <Stack.Screen
+          name="ManageUsers"
+          component={ManageUsersScreen}
+          options={{ headerShown: false }} />
+        <Stack.Screen
+          name="ManageChallenges"
+          component={ChallengeManagementScreen}
+          options={{ headerShown: false }} />
+        <Stack.Screen
+          name="Reports"
+          component={ReportsScreen}
           options={{ headerShown: false }} />
       </Stack.Navigator>
     </NavigationContainer>

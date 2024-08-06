@@ -15,4 +15,8 @@ export type RootStackParamList = {
     Hydration: undefined;    
     Detail: { itemId: number } | undefined;
     Profile : undefined;
+    AdminPanel: undefined;    
+    ManageUsers: undefined;    
+    ManageChallenges: undefined;    
+    Reports: undefined;    
   };

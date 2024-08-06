@@ -83,9 +83,9 @@ const DashboardScreen: React.FC<Props> = ({ navigation }) => {
   };
 
   useEffect(() => {
-    if (!user) return; // Early return if no user is logged in
+    if (!user) return;
 
-    const userId = user.uid; // Get the user ID from the authenticated user
+    const userId = user.uid;
     const userRef = database().ref(`users/${userId}`);
 
     const fetchUserData = async () => {
@@ -95,7 +95,6 @@ const DashboardScreen: React.FC<Props> = ({ navigation }) => {
 
         if (userData) {
           if (!userData.challenges) {
-            // Initialize challenges if they don't exist
             await initializeUserChallenges(userId);
           } else {
             setChallengeData(userData.challenges);

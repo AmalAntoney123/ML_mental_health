@@ -94,20 +94,14 @@ const ExerciseScreen: React.FC = () => {
 
         const currentLevel = Math.floor(userData.completedChallenges / 7) + 1;
 
-        if (userData.challenges.yoga < currentLevel) {
-          const newYogaCount = userData.challenges.yoga + 1;
-          await userRef.child('challenges/yoga').set(newYogaCount);
+        if (userData.challenges.exercise < currentLevel) {
+          const newYogaCount = userData.challenges.exercise + 1;
+          await userRef.child('challenges/exercise').set(newYogaCount);
 
           const newCompletedChallengesCount = userData.completedChallenges + 1;
           await userRef.child('completedChallenges').set(newCompletedChallengesCount);
         }
 
-        const yogaRef = userRef.child('yogaEntries').push();
-        await yogaRef.set({
-          date: new Date().toISOString(),
-          duration: totalTime,
-          type: '5-Minute Yoga Session'
-        });
       } catch (error) {
         console.error('Error updating yoga entry and completed challenges count:', error);
       }
