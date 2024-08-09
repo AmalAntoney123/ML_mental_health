@@ -18,5 +18,6 @@ export type RootStackParamList = {
     AdminPanel: undefined;    
     ManageUsers: undefined;    
     ManageChallenges: undefined;    
-    Reports: undefined;    
+    Reports: undefined;
+        
   };
