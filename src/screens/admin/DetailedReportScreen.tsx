@@ -27,7 +27,6 @@ const DetailedReportScreen: React.FC<Props> = ({ navigation, route }) => {
 
     const renderContent = () => {
         if (typeof reportData.data === 'string' || typeof reportData.data === 'number') {
-            // Handle single value data (like gender)
             return (
                 <Text style={[styles.textData, { color: colors.text }]}>
                     {reportData.title}: {String(reportData.data)}

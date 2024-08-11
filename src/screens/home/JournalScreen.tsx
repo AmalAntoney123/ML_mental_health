@@ -5,6 +5,7 @@ import database from '@react-native-firebase/database';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useAuth, logout } from '../../utils/auth';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import Voice from '@react-native-voice/voice';
 
 const { width, height } = Dimensions.get('window');
 
@@ -27,6 +28,7 @@ const JournalScreen: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
 
   useEffect(() => {
     if (user && isEmailVerified) {
@@ -61,10 +63,34 @@ const JournalScreen: React.FC = () => {
         }
       });
 
-      return () => entriesRef.off();
-    }
-  }, [user, isEmailVerified]);
+      Voice.onSpeechResults = onSpeechResults;
+    return () => {
+      Voice.destroy().then(Voice.removeAllListeners);
+    };
+  }}, [user, isEmailVerified]);
 
+  const onSpeechResults = (e) => {
+    const text = e.value[0];
+    setNewEntry((prevEntry) => prevEntry + ' ' + text);
+  };
+
+  const startVoiceRecording = async () => {
+    try {
+      await Voice.start('en-US');
+      setIsRecording(true);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const stopVoiceRecording = async () => {
+    try {
+      await Voice.stop();
+      setIsRecording(false);
+    } catch (error) {
+      console.error(error);
+    }
+  };
   const addEntry = () => {
     if (newEntry.trim() && user) {
       const entriesRef = database().ref(`users/${user.uid}/entries`);
@@ -137,12 +163,20 @@ const JournalScreen: React.FC = () => {
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <Text style={[styles.title, { color: colors.text }]}>Journal</Text>
       {renderJournalInput()}
-      <TouchableOpacity
-        style={[styles.button, { backgroundColor: colors.primary }]}
-        onPress={addEntry}
-      >
-        <Text style={[styles.buttonText, { color: colors.background }]}>Add Entry</Text>
-      </TouchableOpacity>
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity
+          style={[styles.button, { backgroundColor: colors.primary }]}
+          onPress={addEntry}
+        >
+          <Text style={[styles.buttonText, { color: colors.background }]}>Add Entry</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.voiceButton, { backgroundColor: isRecording ? colors.error : colors.primary }]}
+          onPress={isRecording ? stopVoiceRecording : startVoiceRecording}
+        >
+          <Icon name={isRecording ? "mic-off" : "mic"} size={24} color={colors.background} />
+        </TouchableOpacity>
+      </View>
 
       <FlatList
         data={filterEntries()}
@@ -239,10 +273,11 @@ const styles = StyleSheet.create({
     textAlignVertical: 'top',
   },
   button: {
+    flex: 1,
     padding: 12,
     borderRadius: 8,
     alignItems: 'center',
-    marginBottom: 16,
+    marginRight: 8,
   },
   buttonText: {
     fontSize: 16,
@@ -274,6 +309,18 @@ const styles = StyleSheet.create({
     right: 16,
     fontSize: 14,
     fontStyle: 'italic',
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 16,
+  },
+  voiceButton: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 
