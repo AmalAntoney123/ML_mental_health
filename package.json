@@ -44,6 +44,7 @@
     "react-native-snackbar": "^2.6.2",
     "react-native-sound-player": "^0.14.3",
     "react-native-svg": "^15.4.0",
+    "react-native-swipeable": "^0.6.0",
     "react-native-vector-icons": "^10.1.0"
   },
   "devDependencies": {

@@ -40,8 +40,11 @@ export type RootStackParamList = {
   ManageUsers: undefined;
   ManageChallenges: undefined;
   Reports: undefined;
+  ExpandedJournalEntry: undefined;
   EditProfile: { userData: UserData };
   DetailedReport: {
     reportData: ReportData;
   };
-  ViewUser: { userId: string | undefined };};
+  ViewUser: { userId: string | undefined };
+  
+};

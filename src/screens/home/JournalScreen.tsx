@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, Dimensions, Alert } from 'react-native';
 import { useTheme } from '../../context/ThemeContext';
 import database from '@react-native-firebase/database';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { useAuth, logout } from '../../utils/auth';
+import { useAuth } from '../../utils/auth';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import Voice from '@react-native-voice/voice';
+import Voice, { SpeechResultsEvent } from '@react-native-voice/voice';
+import { RectButton } from 'react-native-gesture-handler';
+import Swipeable from 'react-native-gesture-handler/Swipeable';
 
 const { width, height } = Dimensions.get('window');
 
@@ -29,6 +31,7 @@ const JournalScreen: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
+  const [partialResults, setPartialResults] = useState<string[]>([]);
 
   useEffect(() => {
     if (user && isEmailVerified) {
@@ -64,20 +67,30 @@ const JournalScreen: React.FC = () => {
       });
 
       Voice.onSpeechResults = onSpeechResults;
-    return () => {
-      Voice.destroy().then(Voice.removeAllListeners);
-    };
-  }}, [user, isEmailVerified]);
+      Voice.onSpeechPartialResults = onSpeechPartialResults;
+      return () => {
+        Voice.destroy().then(Voice.removeAllListeners);
+      };
+    }
+  }, [user, isEmailVerified]);
 
-  const onSpeechResults = (e) => {
-    const text = e.value[0];
-    setNewEntry((prevEntry) => prevEntry + ' ' + text);
+  const onSpeechResults = (e: SpeechResultsEvent) => {
+    if (e.value && e.value.length > 0) {
+      const text = e.value[0];
+      setNewEntry((prevEntry) => prevEntry + ' ' + text);
+      setPartialResults([]);
+    }
+  };
+
+  const onSpeechPartialResults = (e: SpeechResultsEvent) => {
+    setPartialResults(e.value ?? []);
   };
 
   const startVoiceRecording = async () => {
     try {
       await Voice.start('en-US');
       setIsRecording(true);
+      setPartialResults([]);
     } catch (error) {
       console.error(error);
     }
@@ -87,10 +100,12 @@ const JournalScreen: React.FC = () => {
     try {
       await Voice.stop();
       setIsRecording(false);
+      setPartialResults([]);
     } catch (error) {
       console.error(error);
     }
   };
+
   const addEntry = () => {
     if (newEntry.trim() && user) {
       const entriesRef = database().ref(`users/${user.uid}/entries`);
@@ -105,6 +120,29 @@ const JournalScreen: React.FC = () => {
     }
   };
 
+  const deleteEntry = (groupDate: string, entryId: string) => {
+    Alert.alert(
+      "Delete Entry",
+      "Are you sure you want to delete this entry?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel"
+        },
+        {
+          text: "Delete",
+          onPress: () => {
+            if (user) {
+              const entryRef = database().ref(`users/${user.uid}/entries/${entryId}`);
+              entryRef.remove();
+            }
+          },
+          style: "destructive"
+        }
+      ]
+    );
+  };
+
   const filterEntries = () => {
     return entries.filter((groupedEntry) => {
       const dateMatch = selectedDate ? groupedEntry.date === selectedDate.toISOString().split('T')[0] : true;
@@ -115,11 +153,29 @@ const JournalScreen: React.FC = () => {
     });
   };
 
+  const SwipeableEntry = ({ item, groupDate }: { item: JournalEntry; groupDate: string }) => {
+    const renderRightActions = (progress: any, dragX: any) => {
+      return (
+        <RectButton style={styles.deleteButton} onPress={() => deleteEntry(groupDate, item.id)}>
+          <Icon name="delete" size={24} color="#fff" />
+        </RectButton>
+      );
+    };
+
+    return (
+      <Swipeable renderRightActions={renderRightActions}>
+        <View style={[styles.entry, { backgroundColor: colors.surface }]}>
+          <Text style={[styles.content, { color: colors.text }]}>{item.content}</Text>
+        </View>
+      </Swipeable>
+    );
+  };
+
   const renderItem = ({ item }: { item: GroupedEntry }) => (
     <View style={[styles.groupedEntry, { backgroundColor: colors.surface }]}>
       <Text style={[styles.date, { color: colors.text }]}>{item.date}</Text>
       {item.entries.map((entry) => (
-        <Text key={entry.id} style={[styles.content, { color: colors.text }]}>{entry.content}</Text>
+        <SwipeableEntry key={entry.id} item={entry} groupDate={item.date} />
       ))}
     </View>
   );
@@ -149,7 +205,7 @@ const JournalScreen: React.FC = () => {
         </View>
         <TextInput
           style={[styles.journalInput, { color: colors.text }]}
-          value={newEntry}
+          value={newEntry + (partialResults.length > 0 ? ' ' + partialResults[0] : '')}
           onChangeText={setNewEntry}
           placeholder="Write your thoughts..."
           placeholderTextColor={colors.text}
@@ -214,6 +270,7 @@ const JournalScreen: React.FC = () => {
     </View>
   );
 };
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -288,12 +345,12 @@ const styles = StyleSheet.create({
   },
   entry: {
     padding: 16,
-    marginVertical: 8,
+    marginVertical: 1,
     borderRadius: 8,
   },
   date: {
     fontSize: 14,
-    marginBottom: 8,
+    marginBottom: 2,
   },
   content: {
     fontSize: 16,
@@ -321,6 +378,13 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  deleteButton: {
+    backgroundColor: 'red',
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: 80,
+    height: '100%',
   },
 });
 
