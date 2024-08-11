@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, Modal, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, Dimensions } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/types';
 import { useTheme } from '../../context/ThemeContext';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { BarChart, PieChart } from 'react-native-chart-kit';
 import firebase from '@react-native-firebase/app';
 import '@react-native-firebase/database';
+import { useNavigation } from '@react-navigation/native';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -21,13 +21,6 @@ interface ReportCardProps {
     icon: string;
     value: string;
     onPress: () => void;
-}
-
-interface DetailedReportProps {
-    title: string;
-    data: any;
-    type: 'bar' | 'pie' | 'text';
-    onClose: () => void;
 }
 
 interface User {
@@ -45,22 +38,11 @@ interface User {
     isActive: boolean;
 }
 
-interface ReportData {
-    title: string;
-    data: any;
-    type: 'bar' | 'pie' | 'text';
-}
-
-interface DetailedReportProps extends ReportData {
-    onClose: () => void;
-}
-
-const ReportsScreen: React.FC<Props> = ({ navigation }) => {
+const ReportsScreen: React.FC<Props> = () => {
     const { colors } = useTheme();
     const [loading, setLoading] = useState(false);
-    const [modalVisible, setModalVisible] = useState(false);
-    const [selectedReport, setSelectedReport] = useState<ReportData | null>(null);
     const [users, setUsers] = useState<User[]>([]);
+    const navigation = useNavigation<ReportsScreenNavigationProp>();
 
     useEffect(() => {
         fetchUsers();
@@ -88,70 +70,11 @@ const ReportsScreen: React.FC<Props> = ({ navigation }) => {
         </TouchableOpacity>
     );
 
-    const DetailedReport: React.FC<DetailedReportProps> = ({ title, data, type, onClose }) => (
-        <View style={[styles.modalContent, { backgroundColor: colors.background }]}>
-            <View style={styles.modalHeader}>
-                <Text style={[styles.modalTitle, { color: colors.text }]}>{title}</Text>
-                <TouchableOpacity onPress={onClose}>
-                    <Icon name="close" size={24} color={colors.text} />
-                </TouchableOpacity>
-            </View>
-            <ScrollView>
-                {type === 'bar' && (
-                    <BarChart
-                        data={data}
-                        width={screenWidth - 40}
-                        height={220}
-                        yAxisLabel=""
-                        yAxisSuffix=""
-                        chartConfig={{
-                            backgroundColor: colors.background,
-                            backgroundGradientFrom: colors.background,
-                            backgroundGradientTo: colors.background,
-                            decimalPlaces: 0,
-                            color: (opacity = 1) => `rgba(${colors.primary}, ${opacity})`,
-                            labelColor: () => colors.text,
-                        }}
-                        style={styles.chart}
-                    />
-                )}
-                {type === 'pie' && (
-                    <PieChart
-                        data={data}
-                        width={screenWidth - 40}
-                        height={220}
-                        chartConfig={{
-                            backgroundColor: colors.background,
-                            backgroundGradientFrom: colors.background,
-                            backgroundGradientTo: colors.background,
-                            decimalPlaces: 0,
-                            color: (opacity = 1) => `rgba(${colors.primary}, ${opacity})`,
-                            labelColor: () => colors.text,
-                        }}
-                        accessor="value"
-                        backgroundColor="transparent"
-                        paddingLeft="15"
-                        style={styles.chart}
-                    />
-                )}
-                {type === 'text' && (
-                    <View>
-                        {Object.entries(data).map(([key, value]) => (
-                            <Text key={key} style={[styles.textData, { color: colors.text }]}>
-                            {key}: {String(value)}
-                        </Text>
-                        ))}
-                    </View>
-                )}
-            </ScrollView>
-        </View>
-    );
-
     const generateReport = (reportType: string) => {
         setLoading(true);
         setTimeout(() => {
             setLoading(false);
-            let reportData: ReportData;
+            let reportData: any;
             switch (reportType) {
                 case 'User Overview':
                     reportData = {
@@ -294,8 +217,7 @@ const ReportsScreen: React.FC<Props> = ({ navigation }) => {
                         data: { 'Info': 'Detailed report not available' }
                     };
             }
-            setSelectedReport(reportData);
-            setModalVisible(true);
+            navigation.navigate('DetailedReport', { reportData });
         }, 1000);
     };
 
@@ -317,140 +239,98 @@ const ReportsScreen: React.FC<Props> = ({ navigation }) => {
                 <ReportCard
                     title="Gender Distribution"
                     icon="wc"
-                    value="View Details"
+                    value="View"
                     onPress={() => generateReport('Gender Distribution')}
                 />
                 <ReportCard
                     title="Age Distribution"
-                    icon="event"
-                    value="View Details"
+                    icon="calendar-today"
+                    value="View"
                     onPress={() => generateReport('Age Distribution')}
                 />
                 <ReportCard
                     title="User Interests"
-                    icon="favorite"
-                    value="View Details"
+                    icon="interests"
+                    value="View"
                     onPress={() => generateReport('User Interests')}
                 />
                 <ReportCard
                     title="User Concerns"
-                    icon="warning"
-                    value="View Details"
+                    icon="report-problem"
+                    value="View"
                     onPress={() => generateReport('User Concerns')}
                 />
                 <ReportCard
                     title="Therapy Preferences"
-                    icon="psychology"
-                    value="View Details"
+                    icon="favorite"
+                    value="View"
                     onPress={() => generateReport('Therapy Preferences')}
                 />
                 <ReportCard
                     title="Challenge Completion"
-                    icon="emoji-events"
-                    value={`${users.reduce((sum, user) => sum + (user.completedChallenges || 0), 0)} completed`}
+                    icon="flag"
+                    value="View"
                     onPress={() => generateReport('Challenge Completion')}
                 />
                 <ReportCard
                     title="Sleep Habits"
                     icon="bedtime"
-                    value="View Details"
+                    value="View"
                     onPress={() => generateReport('Sleep Habits')}
                 />
                 <ReportCard
                     title="Language Preferences"
                     icon="language"
-                    value="View Details"
+                    value="View"
                     onPress={() => generateReport('Language Preferences')}
                 />
             </ScrollView>
             {loading && (
-                <View style={styles.loadingOverlay}>
-                    <ActivityIndicator size="large" color={colors.primary} />
-                </View>
+                <ActivityIndicator size="large" color={colors.primary} style={styles.loadingIndicator} />
             )}
-            <Modal
-                animationType="slide"
-                transparent={true}
-                visible={modalVisible}
-                onRequestClose={() => setModalVisible(false)}
-            >
-                {selectedReport && (
-                    <DetailedReport
-                        title={selectedReport.title}
-                        data={selectedReport.data}
-                        type={selectedReport.type as 'bar' | 'pie' | 'text'}
-                        onClose={() => setModalVisible(false)}
-                    />
-                )}
-            </Modal>
         </View>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
+        flex: 1
     },
     header: {
+        padding: 16,
         flexDirection: 'row',
-        justifyContent: 'space-between',
         alignItems: 'center',
-        paddingVertical: 15,
-        paddingHorizontal: 20,
     },
     headerText: {
         fontSize: 20,
-        fontWeight: 'bold',
+        marginLeft: 16,
     },
     contentContainer: {
-        padding: 20,
+        padding: 16,
     },
     reportCard: {
-        padding: 20,
-        borderRadius: 10,
-        marginBottom: 15,
+        padding: 16,
+        marginBottom: 16,
+        borderRadius: 8,
+        flexDirection: 'row',
         alignItems: 'center',
+        justifyContent: 'space-between',
+        elevation: 2,
     },
     reportTitle: {
         fontSize: 16,
         fontWeight: 'bold',
-        marginTop: 10,
+        flex: 1,
+        marginLeft: 16,
     },
     reportValue: {
-        fontSize: 18,
-        marginTop: 5,
+        fontSize: 14,
     },
-    loadingOverlay: {
-        ...StyleSheet.absoluteFillObject,
-        backgroundColor: 'rgba(0, 0, 0, 0.4)',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    modalContent: {
-        flex: 1,
-        marginTop: 50,
-        marginBottom: 50,
-        marginHorizontal: 20,
-        borderRadius: 20,
-        padding: 20,
-    },
-    modalHeader: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: 20,
-    },
-    modalTitle: {
-        fontSize: 20,
-        fontWeight: 'bold',
-    },
-    textData: {
-        fontSize: 16,
-        marginBottom: 10,
-    },
-    chart: {
-        marginVertical: 8,
-        borderRadius: 16,
+    loadingIndicator: {
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: [{ translateX: -12 }, { translateY: -12 }],
     },
 });
 

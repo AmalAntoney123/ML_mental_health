@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState  } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -7,22 +7,101 @@ import { useAuth } from '../utils/auth';
 import { firebase } from '@react-native-firebase/database';
 import storage from '@react-native-firebase/storage';
 import * as ImagePicker from 'react-native-image-picker';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from 'react-native-screens/lib/typescript/native-stack/types';
+import { RootStackParamList } from '../navigation/types';
+import { useFocusEffect } from '@react-navigation/native';
 
 interface UserData {
+    name?: string;
     age?: number;
     gender?: string;
     completedChallenges?: number;
     challenges?: Record<string, number>;
+    previousTherapyExperience?: string;
+    sleepHabits?: string;
+    interests?: string[];
+    languagePreference?: string;
+    goals?: string[];
+    concerns?: string[];
+    preferredTherapyType?: string;
 }
 
 const ProfileScreen = () => {
     const { colors } = useTheme();
     const { user } = useAuth() as { user: any };
-
     const [userName, setUserName] = useState<string | null>(user?.displayName || null);
     const [userPhotoURL, setUserPhotoURL] = useState<string | null>(user?.photoURL || null);
     const [userData, setUserData] = useState<UserData | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
+    type ProfileScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Home'>;
+
+    const navigation = useNavigation<ProfileScreenNavigationProp>();
+    
+
+    useFocusEffect(
+        React.useCallback(() => {
+            const fetchUserData = async () => {
+                if (user) {
+                    try {
+                        const userRef = firebase.database().ref(`users/${user.uid}`);
+                        const snapshot = await userRef.once('value');
+                        const data = snapshot.val();
+                        if (data) {
+                            setUserName(data.name || user.displayName || 'User');
+                            setUserPhotoURL(data.photoURL || user.photoURL || null);
+                            setUserData({
+                                age: data.age,
+                                gender: data.gender,
+                                previousTherapyExperience: data.previousTherapyExperience,
+                                challenges: data.challenges,
+                                completedChallenges: data.completedChallenges,
+                                sleepHabits: data.sleepHabits,
+                                interests: data.interests,
+                                languagePreference: data.languagePreference,
+                                goals: data.goals,
+                                concerns: data.concerns,
+                                preferredTherapyType: data.preferredTherapyType,
+                            });
+                        }
+                        setLoading(false);
+                    } catch (error) {
+                        console.error('Error fetching user data: ', error);
+                        setLoading(false);
+                    }
+                }
+            };
+    
+            fetchUserData();
+    
+            // Cleanup function
+            return () => {
+                // Any cleanup code if needed
+            };
+        }, [user])
+    );
+
+    const handleEditProfile = () => {
+        if (userData) {
+            console.error(userData);
+            navigation.navigate('EditProfile', {
+                userData: {
+                    name: userName || undefined,
+                    age: userData.age,
+                    gender: userData.gender,
+                    previousTherapyExperience: userData.previousTherapyExperience,
+                    sleepHabits: userData.sleepHabits,
+                    interests: userData.interests,
+                    languagePreference: userData.languagePreference,
+                    goals: userData.goals,
+                    concerns: userData.concerns,
+                    preferredTherapyType: userData.preferredTherapyType,
+                }
+            });
+        } else {
+            console.error('User data is not available');
+        }
+    };
 
     useEffect(() => {
         if (user) {
@@ -35,8 +114,15 @@ const ProfileScreen = () => {
                     setUserData({
                         age: data.age,
                         gender: data.gender,
-                        completedChallenges: data.completedChallenges,
-                        challenges: data.challenges,
+                        previousTherapyExperience: data.previousTherapyExperience,
+                        challenges:data.challenges,
+                        completedChallenges:data.completedChallenges,
+                        sleepHabits: data.sleepHabits,
+                        interests: data.interests,
+                        languagePreference: data.languagePreference,
+                        goals: data.goals,
+                        concerns: data.concerns,
+                        preferredTherapyType: data.preferredTherapyType,
                     });
                 }
                 setLoading(false);
@@ -56,19 +142,19 @@ const ProfileScreen = () => {
         try {
             const filename = `${user.uid}_profile_image.jpg`;
             const reference = storage().ref(`profile_images/${user.uid}/${filename}`);
-            
+
             // Upload the file
             await reference.putFile(uri);
-            
+
             // Get the download URL
             const url = await reference.getDownloadURL();
-            
+
             // Update user's photoURL in Firebase Authentication
             await user.updateProfile({ photoURL: url });
-            
+
             // Update user's photoURL in Realtime Database
             await firebase.database().ref(`users/${user.uid}`).update({ photoURL: url });
-            
+
             // Update local state
             setUserPhotoURL(url);
         } catch (error) {
@@ -169,6 +255,9 @@ const ProfileScreen = () => {
                     </View>
 
                     <View style={styles.buttonRow}>
+                        <TouchableOpacity style={[styles.button, { backgroundColor: colors.primary }]} onPress={handleEditProfile}>
+                            <Text style={styles.buttonText}>Edit Profile</Text>
+                        </TouchableOpacity>
                         <TouchableOpacity style={[styles.button, { backgroundColor: colors.primary }]}>
                             <Text style={styles.buttonText}>Add Friends</Text>
                         </TouchableOpacity>
@@ -385,7 +474,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     },
     bottomSpacer: {
-        height: 32, 
+        height: 32,
     },
 });
 

@@ -26,6 +26,8 @@ import AdminScreen from '../screens/admin/AdminScreen';
 import ManageUsersScreen from '../screens/admin/UserManagementScreen';
 import ChallengeManagementScreen from '../screens/admin/ChallengeManagementScreen';
 import ReportsScreen from '../screens/admin/ReportsScreen';
+import DetailedReportScreen from '../screens/admin/DetailedReportScreen';
+import EditProfileScreen from '../screens/EditProfileScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -123,6 +125,14 @@ const Navigation: React.FC = () => {
         <Stack.Screen
           name="Reports"
           component={ReportsScreen}
+          options={{ headerShown: false }} />
+        <Stack.Screen
+          name="DetailedReport"
+          component={DetailedReportScreen}
+          options={{ headerShown: false }} />
+        <Stack.Screen
+          name="EditProfile"
+          component={EditProfileScreen}
           options={{ headerShown: false }} />
       </Stack.Navigator>
     </NavigationContainer>
