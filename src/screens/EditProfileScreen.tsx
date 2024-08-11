@@ -80,7 +80,7 @@ const EditProfileScreen = ({ navigation, route }: Props) => {
 
     const renderSection = (title: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | null | undefined, children: string | number | boolean | React.JSX.Element | Iterable<React.ReactNode> | null | undefined) => (
         <Card style={[styles.card,{backgroundColor: colors.surface}]}>
-            <Card.Title title={title} titleStyle={[styles.sectionTitle, { color: colors.primary }]} />
+            <Card.Title title={title} titleStyle={[styles.sectionTitle, { color: colors.text }]} />
             <Card.Content>{children}</Card.Content>
         </Card>
     );
