@@ -83,6 +83,7 @@ const ReportsScreen: React.FC<Props> = () => {
                         data: {
                             'Total Users': users.length,
                             'Active Users': users.filter(user => user.isActive).length,
+                            'Deactivated Users': users.filter(user => !user.isActive).length,
                             'Admins': users.filter(user => user.role === 'admin').length,
                             'Regular Users': users.filter(user => user.role === 'user').length
                         }

@@ -50,6 +50,17 @@ const ManageUsersScreen: React.FC<Props> = ({ navigation }) => {
         setFilteredUsers(filtered);
     }, [users, searchQuery]);
 
+    useEffect(() => {
+        const filtered = users.filter(user =>
+            (user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                user.role.toLowerCase().includes(searchQuery.toLowerCase())) &&
+            user.role !== 'admin'
+        );
+        setFilteredUsers(filtered);
+    }, [users, searchQuery]);
+
+
     const fetchUsers = async () => {
         setLoading(true);
         setError(null);
@@ -64,7 +75,7 @@ const ManageUsersScreen: React.FC<Props> = ({ navigation }) => {
                     email: userData.email || 'No Email',
                     role: userData.role || 'user',
                     isActive: userData.isActive !== false
-                }));
+                })).filter(user => user.role !== 'admin'); // Exclude admins here
                 setUsers(usersArray);
                 setFilteredUsers(usersArray);
             } else {
@@ -248,15 +259,15 @@ const ManageUsersScreen: React.FC<Props> = ({ navigation }) => {
                 )}
 
                 <View style={styles.paginationContainer}>
-                    <Button 
-                        disabled={page === 0} 
+                    <Button
+                        disabled={page === 0}
                         onPress={() => setPage(page - 1)}
                     >
                         Previous
                     </Button>
                     <Text>{`Page ${page + 1} of ${Math.ceil(filteredUsers.length / itemsPerPage)}`}</Text>
-                    <Button 
-                        disabled={page >= Math.ceil(filteredUsers.length / itemsPerPage) - 1} 
+                    <Button
+                        disabled={page >= Math.ceil(filteredUsers.length / itemsPerPage) - 1}
                         onPress={() => setPage(page + 1)}
                     >
                         Next
@@ -267,6 +278,12 @@ const ManageUsersScreen: React.FC<Props> = ({ navigation }) => {
                     <Dialog visible={menuVisible} onDismiss={closeMenu}>
                         <Dialog.Title>Actions for {selectedUser?.name}</Dialog.Title>
                         <Dialog.Content>
+                            <Button mode="contained" style={styles.dialogButton} onPress={() => {
+                                navigation.navigate('ViewUser', { userId: selectedUser?.id });
+                                closeMenu();
+                            }}>
+                                View User
+                            </Button>
                             <Button mode="contained" style={styles.dialogButton} onPress={() => {
                                 if (selectedUser) toggleUserStatus(selectedUser.id, selectedUser.isActive);
                                 closeMenu();
@@ -279,12 +296,12 @@ const ManageUsersScreen: React.FC<Props> = ({ navigation }) => {
                             }}>
                                 Change to {selectedUser?.role === 'admin' ? 'User' : 'Admin'}
                             </Button>
-                            <Button mode="contained" style={styles.dialogButton} onPress={() => {
+                            {/* <Button mode="contained" style={styles.dialogButton} onPress={() => {
                                 if (selectedUser) handleDeleteUser(selectedUser.id);
                                 closeMenu();
                             }}>
                                 Delete
-                            </Button>
+                            </Button> */}
                         </Dialog.Content>
                         <Dialog.Actions>
                             <Button onPress={closeMenu}>Close</Button>

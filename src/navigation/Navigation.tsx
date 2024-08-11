@@ -28,6 +28,7 @@ import ChallengeManagementScreen from '../screens/admin/ChallengeManagementScree
 import ReportsScreen from '../screens/admin/ReportsScreen';
 import DetailedReportScreen from '../screens/admin/DetailedReportScreen';
 import EditProfileScreen from '../screens/EditProfileScreen';
+import ViewUserScreen from '../screens/admin/ViewUserScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -61,7 +62,7 @@ const Navigation: React.FC = () => {
   const getInitialRouteName = () => {
     if (isFirstTime) return 'Intro';
     if (!user || !isEmailVerified) return 'Login';
-    
+
     return 'Home';
   };
 
@@ -134,6 +135,8 @@ const Navigation: React.FC = () => {
           name="EditProfile"
           component={EditProfileScreen}
           options={{ headerShown: false }} />
+        <Stack.Screen name="ViewUser"
+          component={ViewUserScreen}options={{headerTitle: 'User Detail'}} />
       </Stack.Navigator>
     </NavigationContainer>
   );

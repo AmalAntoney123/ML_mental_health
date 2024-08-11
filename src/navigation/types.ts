@@ -44,4 +44,4 @@ export type RootStackParamList = {
   DetailedReport: {
     reportData: ReportData;
   };
-};
+  ViewUser: { userId: string | undefined };};
