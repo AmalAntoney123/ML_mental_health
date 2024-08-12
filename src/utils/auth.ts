@@ -113,6 +113,7 @@ export const logout = async () => {
 export const googleSignIn = async () => {
     try {
         await GoogleSignin.hasPlayServices();
+        await GoogleSignin.signOut();
         const { idToken } = await GoogleSignin.signIn();
         const googleCredential = auth.GoogleAuthProvider.credential(idToken);
         const userCredential = await auth().signInWithCredential(googleCredential);

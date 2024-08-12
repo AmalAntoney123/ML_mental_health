@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/types';
-import { useAuth, logout as logoutUtil } from '../../utils/auth';
+import { useAuth, logout as logoutUtil, logout } from '../../utils/auth';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useTheme } from '../../context/ThemeContext'; // Update this path
 
@@ -25,15 +25,15 @@ const AdminScreen: React.FC<Props> = ({ navigation }) => {
 
     const handleLogout = async () => {
         try {
-            setLoading(true);
-            await logoutUtil();
-            navigation.replace('Login');
+          await logout(); // Logout the user
+          // Delay navigation to ensure logout is processed
+          setTimeout(() => {
+            navigation.navigate('Login');
+          }, 100); // Adjust delay if needed
         } catch (error) {
-            console.error('Logout failed:', error);
-        } finally {
-            setLoading(false);
+          console.error('Logout failed:', error);
         }
-    };
+      };
 
     const AdminButton: React.FC<AdminButtonProps> = ({ title, icon, onPress }) => (
         <TouchableOpacity style={[styles.adminButton, { backgroundColor: colors.primary }]} onPress={onPress}>
