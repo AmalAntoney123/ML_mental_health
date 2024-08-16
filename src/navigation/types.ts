@@ -1,11 +1,36 @@
 import { hslToColorString } from "polished";
 
-interface ReportData {
+export interface User {
+  uid: string;
+  displayName: string | null;
+  email: string | null;
+}
+
+export interface SupportGroup {
+  id: string;
+  name: string;
+  description: string;
+  createdAt: number;
+  createdBy: string;
+  members: { [key: string]: boolean };
+  lastMessage: string | null;
+  lastMessageTimestamp: number | null;
+}
+
+export interface Message {
+  id: string;
+  text: string;
+  userId: string;
+  timestamp: number;
+}
+
+export interface ReportData {
   title: string;
   data: any;
   type: 'bar' | 'pie' | 'text';
 }
-interface UserData {
+
+export interface UserData {
   name?: string;
   age?: number;
   gender?: string;
@@ -19,6 +44,7 @@ interface UserData {
   concerns?: string[];
   preferredTherapyType?: string;
 }
+
 export type RootStackParamList = {
   Intro: undefined;
   Home: undefined;
@@ -34,6 +60,7 @@ export type RootStackParamList = {
   Nutrition: undefined;
   Sleep: undefined;
   Hydration: undefined;
+  CreateSupportGroup: undefined;
   Detail: { itemId: number } | undefined;
   Profile: undefined;
   AdminPanel: undefined;
@@ -41,10 +68,12 @@ export type RootStackParamList = {
   ManageChallenges: undefined;
   Reports: undefined;
   ExpandedJournalEntry: undefined;
+  ChatScreen: { group: SupportGroup };  // Updated this line
   EditProfile: { userData: UserData };
   DetailedReport: {
     reportData: ReportData;
   };
   ViewUser: { userId: string | undefined };
-  
+  SupportScreen: undefined;  // Added this line
+  ChatDetailsScreen: { group: SupportGroup };  // Added this line
 };

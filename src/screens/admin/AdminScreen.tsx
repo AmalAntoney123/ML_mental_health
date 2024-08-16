@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/types';
-import { useAuth, logout as logoutUtil, logout } from '../../utils/auth';
+import { useAuth, logout } from '../../utils/auth';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { useTheme } from '../../context/ThemeContext'; // Update this path
+import { useTheme } from '../../context/ThemeContext';
 
 type AdminScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'AdminPanel'>;
 
@@ -25,15 +25,14 @@ const AdminScreen: React.FC<Props> = ({ navigation }) => {
 
     const handleLogout = async () => {
         try {
-          await logout(); // Logout the user
-          // Delay navigation to ensure logout is processed
-          setTimeout(() => {
-            navigation.navigate('Login');
-          }, 100); // Adjust delay if needed
+            await logout();
+            setTimeout(() => {
+                navigation.navigate('Login');
+            }, 100);
         } catch (error) {
-          console.error('Logout failed:', error);
+            console.error('Logout failed:', error);
         }
-      };
+    };
 
     const AdminButton: React.FC<AdminButtonProps> = ({ title, icon, onPress }) => (
         <TouchableOpacity style={[styles.adminButton, { backgroundColor: colors.primary }]} onPress={onPress}>
@@ -76,6 +75,11 @@ const AdminScreen: React.FC<Props> = ({ navigation }) => {
                         title="Reports"
                         icon="bar-chart"
                         onPress={() => navigation.navigate('Reports')}
+                    />
+                    <AdminButton
+                        title="Create Support Group"
+                        icon="group-add"
+                        onPress={() => navigation.navigate('CreateSupportGroup')}
                     />
                 </View>
             </ScrollView>

@@ -29,6 +29,9 @@ import ReportsScreen from '../screens/admin/ReportsScreen';
 import DetailedReportScreen from '../screens/admin/DetailedReportScreen';
 import EditProfileScreen from '../screens/EditProfileScreen';
 import ViewUserScreen from '../screens/admin/ViewUserScreen';
+import CreateSupportGroupScreen from '../screens/admin/CreateSupportGroupScreen';
+import ChatScreen from '../screens/home/SupportGroup/ChatScreen';
+import ChatDetailsScreen from '../screens/home/SupportGroup/ChatDetailsScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -135,8 +138,16 @@ const Navigation: React.FC = () => {
           name="EditProfile"
           component={EditProfileScreen}
           options={{ headerShown: false }} />
+        <Stack.Screen
+          name="CreateSupportGroup"
+          component={CreateSupportGroupScreen}
+          options={{ headerShown: false }} />
         <Stack.Screen name="ViewUser"
-          component={ViewUserScreen}options={{headerTitle: 'User Detail'}} />
+          component={ViewUserScreen} options={{ headerTitle: 'User Detail' }} />
+        <Stack.Screen name="ChatScreen"
+          component={ChatScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="ChatDetailsScreen" component={ChatDetailsScreen} options={{ title: 'Chat Details' }} />
+
       </Stack.Navigator>
     </NavigationContainer>
   );
