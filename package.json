@@ -26,6 +26,7 @@
     "@react-navigation/stack": "^6.4.1",
     "invariant": "^2.2.4",
     "lodash": "^4.17.21",
+    "lodash.debounce": "^4.0.8",
     "lottie-react-native": "^6.7.2",
     "paths-js": "^0.4.11",
     "point-in-polygon": "^1.1.0",
