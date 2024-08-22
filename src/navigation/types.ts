@@ -67,6 +67,7 @@ export type RootStackParamList = {
   ManageUsers: undefined;
   ManageChallenges: undefined;
   Reports: undefined;
+  FindGroupsScreen: undefined;
   ExpandedJournalEntry: undefined;
   ChatScreen: { group: SupportGroup };  // Updated this line
   EditProfile: { userData: UserData };

@@ -34,6 +34,7 @@
     "react": "18.2.0",
     "react-native": "0.74.3",
     "react-native-chart-kit": "^6.12.0",
+    "react-native-emoji-picker": "^0.2.2",
     "react-native-gesture-handler": "^2.17.1",
     "react-native-image-picker": "^7.1.2",
     "react-native-modal": "^13.0.1",

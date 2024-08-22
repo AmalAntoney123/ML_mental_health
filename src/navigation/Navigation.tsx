@@ -32,6 +32,7 @@ import ViewUserScreen from '../screens/admin/ViewUserScreen';
 import CreateSupportGroupScreen from '../screens/admin/CreateSupportGroupScreen';
 import ChatScreen from '../screens/home/SupportGroup/ChatScreen';
 import ChatDetailsScreen from '../screens/home/SupportGroup/ChatDetailsScreen';
+import FindGroupsScreen from '../screens/home/SupportGroup/FindGroupsScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -141,6 +142,10 @@ const Navigation: React.FC = () => {
         <Stack.Screen
           name="CreateSupportGroup"
           component={CreateSupportGroupScreen}
+          options={{ headerShown: false }} />
+        <Stack.Screen
+          name="FindGroupsScreen"
+          component={FindGroupsScreen}
           options={{ headerShown: false }} />
         <Stack.Screen name="ViewUser"
           component={ViewUserScreen} options={{ headerTitle: 'User Detail' }} />

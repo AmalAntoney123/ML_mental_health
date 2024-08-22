@@ -5,14 +5,14 @@ import database from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
 import { useRoute, RouteProp, useNavigation, NavigationProp } from '@react-navigation/native';
 import { RootStackParamList } from '../../../navigation/types';
-import { GestureHandlerRootView, Swipeable } from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Menu, MenuOptions, MenuOption, MenuTrigger } from 'react-native-popup-menu';
+
 
 type ChatScreenRouteProp = RouteProp<RootStackParamList, 'ChatScreen'>;
 
 interface Message {
-    id: string;
+    id: string; 
     text: string;
     userId: string;
     userName: string;
@@ -60,7 +60,6 @@ const ChatScreen: React.FC = () => {
     const [replyingTo, setReplyingTo] = useState<Message | null>(null);
     const [users, setUsers] = useState<User[]>([]);
     const [typingUsers, setTypingUsers] = useState<string[]>([]);
-    const swipeableRefs = useRef<{ [key: string]: Swipeable | null }>({});
     const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
     useEffect(() => {
@@ -121,17 +120,6 @@ const ChatScreen: React.FC = () => {
         }
     }, [group.id, isJoined]);
 
-    const handleJoin = async () => {
-        const currentUser = auth().currentUser;
-        if (!currentUser) return;
-
-        try {
-            await database().ref(`supportGroups/${group.id}/members/${currentUser.uid}`).set(true);
-            setIsJoined(true);
-        } catch (error) {
-            console.error('Failed to join group:', error);
-        }
-    };
 
     const handleSendMessage = async () => {
         if (!newMessage.trim() || !isJoined) return;
@@ -267,14 +255,7 @@ const ChatScreen: React.FC = () => {
                         <Icon name="info" size={24} color={colors.primary} />
                     </TouchableOpacity>
                 </View>
-                {!isJoined ? (
-                    <TouchableOpacity
-                        style={[styles.joinButton, { backgroundColor: colors.primary }]}
-                        onPress={handleJoin}
-                    >
-                        <Text style={[styles.joinButtonText, { color: colors.onPrimary }]}>Join Group</Text>
-                    </TouchableOpacity>
-                ) : (
+                
                     <>
                         <FlatList
                             data={messages}
@@ -317,7 +298,6 @@ const ChatScreen: React.FC = () => {
                             </TouchableOpacity>
                         </View>
                     </>
-                )}
             </View>
         </UserContext.Provider>
     );
