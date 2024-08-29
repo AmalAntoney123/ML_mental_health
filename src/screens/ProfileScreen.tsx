@@ -213,8 +213,8 @@ const ProfileScreen = () => {
             iconName = 'water';
         } else if (lowercaseName.includes('mindfulness')) {
             iconName = 'meditation';
-        } else if (lowercaseName.includes('nutrition')) {
-            iconName = 'food-apple';
+        } else if (lowercaseName.includes('journal')) {
+            iconName = 'book';
         } else if (lowercaseName.includes('sleep')) {
             iconName = 'sleep';
         } else if (lowercaseName.includes('social')) {

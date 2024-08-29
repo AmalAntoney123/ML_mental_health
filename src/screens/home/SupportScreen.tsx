@@ -84,8 +84,7 @@ const SupportScreen: React.FC = () => {
   }, []);
 
   const handleGroupPress = (group: SupportGroup) => {
-    navigation.navigate('ChatScreen', { group });
-  };
+    navigation.navigate('ChatScreen', { group, fromSocialChallenge: false });  };
 
   const onRefresh = () => {
     setRefreshing(true);

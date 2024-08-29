@@ -41,7 +41,7 @@ const DashboardScreen: React.FC<Props> = ({ navigation }) => {
     gratitude: 0,
     exercise: 0,
     social: 0,
-    nutrition: 0,
+    journal: 0,
     sleep: 0,
     hydration: 0
   });
@@ -56,7 +56,7 @@ const DashboardScreen: React.FC<Props> = ({ navigation }) => {
     { title: 'Gratitude', icon: 'favorite', screens: ['Gratitude'] },
     { title: 'Exercise', icon: 'fitness-center', screens: ['Exercise'] },
     { title: 'Social', icon: 'people', screens: ['Social'] },
-    { title: 'Nutrition', icon: 'restaurant', screens: ['Nutrition'] },
+    { title: 'Journal', icon: 'book', screens: ['JournalChallenge'] },
     { title: 'Sleep', icon: 'nightlight', screens: ['Sleep'] },
     { title: 'Hydration', icon: 'local-drink', screens: ['Hydration'] },
   ];
@@ -68,7 +68,7 @@ const DashboardScreen: React.FC<Props> = ({ navigation }) => {
       gratitude: 0,
       exercise: 0,
       social: 0,
-      nutrition: 0,
+      journal: 0,
       sleep: 0,
       hydration: 0,
 
@@ -165,10 +165,11 @@ const DashboardScreen: React.FC<Props> = ({ navigation }) => {
     }
   }, [lastCompletedLevelIndex]);
 
+
+
   const getRandomScreen = (screens: (keyof RootStackParamList)[]) => {
     return screens[Math.floor(Math.random() * screens.length)];
   };
-
   const renderChallenge = ({ item, index, levelIndex }: { item: Challenge; index: number; levelIndex: number }) => {
     const isLevelOne = levelIndex === 0;
     const challengeCount = challengeData[item.title.toLowerCase() as keyof typeof challengeData];
@@ -177,7 +178,9 @@ const DashboardScreen: React.FC<Props> = ({ navigation }) => {
   
     const handleChallengePress = () => {
       const selectedScreen = getRandomScreen(item.screens);
-      navigation.navigate(selectedScreen);
+      if (selectedScreen) {
+        navigation.navigate(selectedScreen);
+      }
     };
   
     return (

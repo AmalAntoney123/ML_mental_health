@@ -57,7 +57,7 @@ export type RootStackParamList = {
   Gratitude: undefined;
   Exercise: undefined;
   Social: undefined;
-  Nutrition: undefined;
+  JournalChallenge: undefined;
   Sleep: undefined;
   Hydration: undefined;
   CreateSupportGroup: undefined;
@@ -69,7 +69,10 @@ export type RootStackParamList = {
   Reports: undefined;
   FindGroupsScreen: undefined;
   ExpandedJournalEntry: undefined;
-  ChatScreen: { group: SupportGroup };  // Updated this line
+  ChatScreen: {
+    group: SupportGroup;
+    fromSocialChallenge?: boolean;
+  }; 
   EditProfile: { userData: UserData };
   DetailedReport: {
     reportData: ReportData;

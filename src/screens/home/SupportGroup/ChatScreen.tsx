@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, createContext, useContext } from 'react';
+import React, { useState, useEffect, createContext, useContext } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, FlatList, TextInput, Alert } from 'react-native';
 import { useTheme } from '../../../context/ThemeContext';
 import database from '@react-native-firebase/database';
@@ -7,18 +7,19 @@ import { useRoute, RouteProp, useNavigation, NavigationProp } from '@react-navig
 import { RootStackParamList } from '../../../navigation/types';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Menu, MenuOptions, MenuOption, MenuTrigger } from 'react-native-popup-menu';
-
+import Toast from 'react-native-toast-message';
 
 type ChatScreenRouteProp = RouteProp<RootStackParamList, 'ChatScreen'>;
 
 interface Message {
-    id: string; 
+    id: string;
     text: string;
     userId: string;
     userName: string;
     timestamp: number;
     replyTo?: string;
     deletedAt?: number;
+    readBy: { [userId: string]: boolean };
 }
 
 interface User {
@@ -36,7 +37,10 @@ const UserContext = createContext<UserContextType>({ users: [], setUsers: () => 
 const TypingIndicator: React.FC<{ typingUsers: string[] }> = ({ typingUsers }) => {
     const { colors } = useTheme();
     const { users } = useContext(UserContext);
-
+    const route = useRoute<ChatScreenRouteProp>();
+    const { group, fromSocialChallenge } = route.params;
+    const [socialChallengeCompleted, setSocialChallengeCompleted] = useState(false);
+  
     if (typingUsers.length === 0) return null;
 
     const typingText = typingUsers.length === 1
@@ -51,16 +55,17 @@ const TypingIndicator: React.FC<{ typingUsers: string[] }> = ({ typingUsers }) =
 };
 
 const ChatScreen: React.FC = () => {
-    const { colors } = useTheme();
     const route = useRoute<ChatScreenRouteProp>();
-    const { group } = route.params;
-    const [isJoined, setIsJoined] = useState(false);
-    const [messages, setMessages] = useState<Message[]>([]);
-    const [newMessage, setNewMessage] = useState('');
-    const [replyingTo, setReplyingTo] = useState<Message | null>(null);
-    const [users, setUsers] = useState<User[]>([]);
-    const [typingUsers, setTypingUsers] = useState<string[]>([]);
-    const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const { group, fromSocialChallenge = false } = route.params;
+  const [socialChallengeCompleted, setSocialChallengeCompleted] = useState(false);
+  const [isJoined, setIsJoined] = useState(false);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [newMessage, setNewMessage] = useState('');
+  const [replyingTo, setReplyingTo] = useState<Message | null>(null);
+  const [users, setUsers] = useState<User[]>([]);
+  const [typingUsers, setTypingUsers] = useState<string[]>([]);
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const { colors } = useTheme();
 
     useEffect(() => {
         const currentUser = auth().currentUser;
@@ -83,7 +88,15 @@ const ChatScreen: React.FC = () => {
                         id,
                         ...data,
                     }));
-                    setMessages(messagesList.sort((a, b) => b.timestamp - a.timestamp));
+                    const sortedMessages = messagesList.sort((a, b) => b.timestamp - a.timestamp);
+                    setMessages(sortedMessages);
+
+                    // Mark displayed messages as read
+                    sortedMessages.forEach(message => {
+                        if (message.userId !== currentUser.uid && (!message.readBy || !message.readBy[currentUser.uid])) {
+                            markMessageAsRead(message.id);
+                        }
+                    });
                 }
             });
 
@@ -120,33 +133,76 @@ const ChatScreen: React.FC = () => {
         }
     }, [group.id, isJoined]);
 
-
-    const handleSendMessage = async () => {
-        if (!newMessage.trim() || !isJoined) return;
-
+    const markMessageAsRead = async (messageId: string) => {
         const currentUser = auth().currentUser;
         if (!currentUser) return;
 
-        try {
-            const userRef = database().ref(`users/${currentUser.uid}`);
-            const userSnapshot = await userRef.once('value');
-            const userName = userSnapshot.val()?.name || 'Unknown';
-
-            const messagesRef = database().ref(`supportGroups/${group.id}/messages`);
-            await messagesRef.push({
-                text: newMessage.trim(),
-                userId: currentUser.uid,
-                userName: userName,
-                timestamp: database.ServerValue.TIMESTAMP,
-                replyTo: replyingTo ? replyingTo.id : null,
-            });
-            setNewMessage('');
-            setReplyingTo(null);
-            updateTypingStatus(false);
-        } catch (error) {
-            console.error('Failed to send message:', error);
-        }
+        const messageRef = database().ref(`supportGroups/${group.id}/messages/${messageId}/readBy/${currentUser.uid}`);
+        await messageRef.set(true);
     };
+
+    const getReadStatus = (message: Message, allUsers: User[]) => {
+        if (!message.readBy) return 'sent';
+        const readByCount = Object.keys(message.readBy).length;
+        if (readByCount === 0) return 'sent';
+        if (readByCount === allUsers.length) return 'read';
+        return 'delivered';
+    };
+
+    const handleSendMessage = async () => {
+        if (!newMessage.trim() || !isJoined) return;
+    
+        const currentUser = auth().currentUser;
+        if (!currentUser) return;
+    
+        try {
+          const userRef = database().ref(`users/${currentUser.uid}`);
+          const userSnapshot = await userRef.once('value');
+          const userName = userSnapshot.val()?.name || 'Unknown';
+    
+          const messagesRef = database().ref(`supportGroups/${group.id}/messages`);
+          await messagesRef.push({
+            text: newMessage.trim(),
+            userId: currentUser.uid,
+            userName: userName,
+            timestamp: database.ServerValue.TIMESTAMP,
+            replyTo: replyingTo ? replyingTo.id : null,
+            readBy: { [currentUser.uid]: true },
+          });
+          setNewMessage('');
+          setReplyingTo(null);
+          updateTypingStatus(false);
+    
+          // Update social challenge completion only if coming from the challenge screen
+          if (fromSocialChallenge && !socialChallengeCompleted) {
+            const userRef = database().ref(`users/${currentUser.uid}`);
+            const socialChallengeSnapshot = await userRef.child('challenges/social').once('value');
+            const currentSocialChallengeCount = socialChallengeSnapshot.val() || 0;
+            
+            const completedChallengesSnapshot = await userRef.child('completedChallenges').once('value');
+            const currentLevel = Math.floor(completedChallengesSnapshot.val() / 7) + 1;
+    
+            if (currentSocialChallengeCount < currentLevel) {
+              await userRef.child('challenges/social').set(currentSocialChallengeCount + 1);
+              await userRef.child('completedChallenges').set(completedChallengesSnapshot.val() + 1);
+              setSocialChallengeCompleted(true);
+
+              Toast.show({
+                type: 'success',
+                text1: 'Social Challenge Completed!',
+                text2: 'Great job on completing your social challenge!',
+                visibilityTime: 3000,
+                autoHide: true,
+                topOffset: 30,
+                bottomOffset: 40,
+              });
+
+            }
+          }
+        } catch (error) {
+          console.error('Failed to send message:', error);
+        }
+      };
 
     const handleReply = (message: Message) => {
         setReplyingTo(message);
@@ -185,6 +241,7 @@ const ChatScreen: React.FC = () => {
     const renderMessage = ({ item }: { item: Message }) => {
         const isCurrentUser = item.userId === auth().currentUser?.uid;
         const isDeleted = item.text === "Message deleted";
+        const readStatus = getReadStatus(item, users);
 
         return (
             <Menu>
@@ -218,11 +275,26 @@ const ChatScreen: React.FC = () => {
                         ]}>
                             {item.text}
                         </Text>
-                        <Text style={[{ color: colors.gray }]}>
-                            {new Date(item.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                        </Text>
-                    </View>
-                </MenuTrigger>
+                        <View style={styles.messageFooter}>
+            <Text style={[styles.messageTime, { color: colors.gray }]}>
+              {new Date(item.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+            </Text>
+            {isCurrentUser && (
+              <View style={styles.readReceipt}>
+                {readStatus === 'sent' && (
+                  <Icon name="check" size={16} color={colors.gray} />
+                )}
+                {readStatus === 'delivered' && (
+                  <Icon name="done-all" size={16} color={colors.gray} />
+                )}
+                {readStatus === 'read' && (
+                  <Icon name="done-all" size={16} color={colors.secondary} />
+                )}
+              </View>
+            )}
+          </View>
+        </View>
+      </MenuTrigger>
                 <MenuOptions optionsContainerStyle={{ backgroundColor: colors.secondaryBackground, borderRadius: 30 }}>
                     {!isDeleted && (
                         <>
@@ -255,49 +327,49 @@ const ChatScreen: React.FC = () => {
                         <Icon name="info" size={24} color={colors.primary} />
                     </TouchableOpacity>
                 </View>
-                
-                    <>
-                        <FlatList
-                            data={messages}
-                            renderItem={renderMessage}
-                            keyExtractor={(item) => item.id}
-                            inverted
-                            contentContainerStyle={styles.listContainer}
-                        />
-                        <TypingIndicator typingUsers={typingUsers.filter(id => id !== auth().currentUser?.uid)} />
-                        {replyingTo && (
-                            <View style={[styles.replyingToContainer, { backgroundColor: colors.surface }]}>
-                                <Text style={[styles.replyingToText, { color: colors.text }]}>
-                                    Replying to: {replyingTo.userName}
-                                </Text>
-                                <TouchableOpacity onPress={handleCancelReply}>
-                                    <Icon name="close" size={20} color={colors.text} />
-                                </TouchableOpacity>
-                            </View>
-                        )}
-                        <View style={styles.inputContainer}>
-                            <TextInput
-                                style={[
-                                    styles.input,
-                                    { color: colors.text, borderColor: colors.border, backgroundColor: colors.surface },
-                                ]}
-                                value={newMessage}
-                                onChangeText={(text) => {
-                                    setNewMessage(text);
-                                    updateTypingStatus(text.length > 0);
-                                }}
-                                onBlur={() => updateTypingStatus(false)}
-                                placeholder="Type a message..."
-                                placeholderTextColor={colors.primaryLight}
-                            />
-                            <TouchableOpacity
-                                style={[styles.sendButton, { backgroundColor: colors.primary }]}
-                                onPress={handleSendMessage}
-                            >
-                                <Text style={[styles.sendButtonText, { color: colors.onPrimary }]}>Send</Text>
+
+                <>
+                    <FlatList
+                        data={messages}
+                        renderItem={renderMessage}
+                        keyExtractor={(item) => item.id}
+                        inverted
+                        contentContainerStyle={styles.listContainer}
+                    />
+                    <TypingIndicator typingUsers={typingUsers.filter(id => id !== auth().currentUser?.uid)} />
+                    {replyingTo && (
+                        <View style={[styles.replyingToContainer, { backgroundColor: colors.surface }]}>
+                            <Text style={[styles.replyingToText, { color: colors.text }]}>
+                                Replying to: {replyingTo.userName}
+                            </Text>
+                            <TouchableOpacity onPress={handleCancelReply}>
+                                <Icon name="close" size={20} color={colors.text} />
                             </TouchableOpacity>
                         </View>
-                    </>
+                    )}
+                    <View style={styles.inputContainer}>
+                        <TextInput
+                            style={[
+                                styles.input,
+                                { color: colors.text, borderColor: colors.border, backgroundColor: colors.surface },
+                            ]}
+                            value={newMessage}
+                            onChangeText={(text) => {
+                                setNewMessage(text);
+                                updateTypingStatus(text.length > 0);
+                            }}
+                            onBlur={() => updateTypingStatus(false)}
+                            placeholder="Type a message..."
+                            placeholderTextColor={colors.primaryLight}
+                        />
+                        <TouchableOpacity
+                            style={[styles.sendButton, { backgroundColor: colors.primary }]}
+                            onPress={handleSendMessage}
+                        >
+                            <Text style={[styles.sendButtonText, { color: colors.onPrimary }]}>Send</Text>
+                        </TouchableOpacity>
+                    </View>
+                </>
             </View>
         </UserContext.Provider>
     );
@@ -409,6 +481,23 @@ const styles = StyleSheet.create({
     typingText: {
         fontSize: 12,
         fontStyle: 'italic',
+    },
+    messageFooter: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginTop: 4,
+    },
+    messageTime: {
+        fontSize: 10,
+    },
+    readReceipt: {
+        flexDirection: 'column',
+        alignItems: 'center',
+        width: 30, // Set a fixed width to ensure proper alignment
+    },
+    readReceiptIcon: {
+        height: 13, // Half the size of the icon to create overlap
     },
 });
 

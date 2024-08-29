@@ -7,7 +7,7 @@ Emo is a comprehensive mental health and wellbeing app designed to help users im
 - **Mindfulness Challenges:** Engage in guided meditation and breathing exercises with animations and background music.
 - **Gratitude Journal:** Enter at least 5 things you're grateful for, with a progress bar showing your completion status.
 - **Social Challenges:** Complete easy social tasks designed to improve social skills and wellbeing.
-- **Dashboard:** A central hub that presents various challenges such as Mindfulness, Gratitude, Exercise, Social, Nutrition, Sleep, and Hydration, each leading to specific challenge screens.
+- **Dashboard:** A central hub that presents various challenges such as Mindfulness, Gratitude, Exercise, Social, journal, Sleep, and Hydration, each leading to specific challenge screens.
 - **User Profiles:** Track user progress and maintain a daily streak by completing challenges.
 - **Admin Panel:** Manage app content and user data with a dedicated admin panel.
 

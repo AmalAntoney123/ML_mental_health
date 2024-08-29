@@ -10,6 +10,7 @@ import { useTheme } from '../context/ThemeContext';
 import { logout, useAuth } from '../utils/auth';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { getDatabase, ref, get } from 'firebase/database';
+import { FAB } from 'react-native-paper';
 
 import DashboardScreen from './home/DashboardScreen';
 import LeaderboardScreen from './home/LeaderboardScreen';
@@ -78,7 +79,7 @@ const DrawerContent: React.FC<DrawerContentProps> = ({ navigation }) => {
       console.error('Logout failed:', error);
     }
   };
-  
+
 
   return (
     <View style={[styles.drawer, { backgroundColor: colors.surface }]}>
@@ -142,49 +143,70 @@ const Tab = createBottomTabNavigator();
 
 const TabNavigator = () => {
   const { colors } = useTheme();
+  const navigation = useNavigation();
+
+  const handleMoodRecording = () => {
+    // Navigate to the mood recording screen or open a modal
+    // For now, we'll just console.log
+    console.log('Record mood and predict');
+    // You would typically navigate to a new screen or open a modal here
+    // navigation.navigate('MoodRecording');
+  };
+
 
   return (
-    <Tab.Navigator
-      screenOptions={({ route }) => ({
-        header: () => <Header />,
-        tabBarIcon: ({ color, size }) => {
-          let iconName: string = 'circle';
+    <>
+      <Tab.Navigator
+        screenOptions={({ route }) => ({
+          header: () => <Header />,
+          tabBarIcon: ({ color, size }) => {
+            let iconName: string = 'circle';
 
-          if (route.name === 'Dashboard') {
-            iconName = 'dashboard';
-          } else if (route.name === 'Leaderboard') {
-            iconName = 'leaderboard';
-          } else if (route.name === 'Journal') {
-            iconName = 'book';
-          } else if (route.name === 'Therapy') {
-            iconName = 'healing';
-          } else if (route.name === 'Support') {
-            iconName = 'group';
-          }
+            if (route.name === 'Dashboard') {
+              iconName = 'dashboard';
+            } else if (route.name === 'Leaderboard') {
+              iconName = 'leaderboard';
+            } else if (route.name === 'Journal') {
+              iconName = 'book';
+            } else if (route.name === 'Therapy') {
+              iconName = 'healing';
+            } else if (route.name === 'Support') {
+              iconName = 'group';
+            }
 
-          return <Icon name={iconName} size={size} color={color} />;
-        },
-        tabBarActiveTintColor: colors.primary,
-        tabBarInactiveTintColor: colors.text,
-        tabBarStyle: { backgroundColor: colors.background },
-      })}
-    >
-      <Tab.Screen name="Dashboard" component={DashboardScreen} />
-      <Tab.Screen name="Leaderboard" component={LeaderboardScreen} />
-      <Tab.Screen name="Journal" component={JournalScreen} />
-      <Tab.Screen name="Therapy" component={TherapyScreen} />
-      <Tab.Screen name="Support" component={SupportScreen} />
-    </Tab.Navigator>
+            return <Icon name={iconName} size={size} color={color} />;
+          },
+          tabBarActiveTintColor: colors.primary,
+          tabBarInactiveTintColor: colors.text,
+          tabBarStyle: { backgroundColor: colors.background },
+        })}
+      >
+        <Tab.Screen name="Dashboard" component={DashboardScreen} />
+        <Tab.Screen name="Leaderboard" component={LeaderboardScreen} />
+        <Tab.Screen name="Journal" component={JournalScreen} />
+        <Tab.Screen name="Therapy" component={TherapyScreen} />
+        <Tab.Screen name="Support" component={SupportScreen} />
+      </Tab.Navigator>
+
+      <FAB
+        style={[styles.fab, { backgroundColor: colors.primary }]}
+        icon={({ size, color }) => (
+          <Icon name="mood" size={size} color={color} />
+        )}
+        onPress={handleMoodRecording}
+        color={colors.onPrimary}
+      />
+    </>
   );
 };
 
 const HomeScreen: React.FC = () => {
   return (
-<Drawer.Navigator
-            drawerContent={() => <DrawerContent navigation={useNavigation as any} />} // Pass navigation prop
-        >
-            <Drawer.Screen name="Home" component={TabNavigator} options={{ headerShown: false }} />
-        </Drawer.Navigator>
+    <Drawer.Navigator
+      drawerContent={() => <DrawerContent navigation={useNavigation as any} />} // Pass navigation prop
+    >
+      <Drawer.Screen name="Home" component={TabNavigator} options={{ headerShown: false }} />
+    </Drawer.Navigator>
   );
 };
 const styles = StyleSheet.create({
@@ -252,6 +274,15 @@ const styles = StyleSheet.create({
   drawerText: {
     marginLeft: 10,
     fontSize: 18,
+  },
+  fab: {
+    position: 'absolute',
+    marginRight: 20,
+    marginBottom: 36,
+    right: 0,
+    bottom: 20,
+    borderRadius: 28, // This makes the FAB round
+
   },
 });
 

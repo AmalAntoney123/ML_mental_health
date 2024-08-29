@@ -183,7 +183,7 @@ const OnboardingScreen: React.FC<Props> = ({ navigation }) => {
         gratitude: 0,
         exercise: 0,
         social: 0,
-        nutrition: 0,
+        journal: 0,
         sleep: 0,
         hydration: 0,
   
