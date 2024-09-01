@@ -10,14 +10,14 @@ import { useTheme } from '../context/ThemeContext';
 import { logout, useAuth } from '../utils/auth';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { getDatabase, ref, get } from 'firebase/database';
-import { FAB } from 'react-native-paper';
+import { FAB, Portal, Provider } from 'react-native-paper';
 
 import DashboardScreen from './home/DashboardScreen';
 import LeaderboardScreen from './home/LeaderboardScreen';
 import JournalScreen from './home/JournalScreen';
 import TherapyScreen from './home/TherapyScreen';
 import SupportScreen from './home/SupportScreen';
-
+import MoodTrackingScreen from './home/MoodTrackingScreen'; // Assuming this is the correct import for MoodTrackingScreen
 
 type CounterProps = {
   icon: string;
@@ -144,18 +144,10 @@ const Tab = createBottomTabNavigator();
 const TabNavigator = () => {
   const { colors } = useTheme();
   const navigation = useNavigation();
-
-  const handleMoodRecording = () => {
-    // Navigate to the mood recording screen or open a modal
-    // For now, we'll just console.log
-    console.log('Record mood and predict');
-    // You would typically navigate to a new screen or open a modal here
-    // navigation.navigate('MoodRecording');
-  };
-
+  const [fabOpen, setFabOpen] = useState(false);
 
   return (
-    <>
+    <Provider>
       <Tab.Navigator
         screenOptions={({ route }) => ({
           header: () => <Header />,
@@ -164,8 +156,6 @@ const TabNavigator = () => {
 
             if (route.name === 'Dashboard') {
               iconName = 'dashboard';
-            } else if (route.name === 'Leaderboard') {
-              iconName = 'leaderboard';
             } else if (route.name === 'Journal') {
               iconName = 'book';
             } else if (route.name === 'Therapy') {
@@ -182,21 +172,50 @@ const TabNavigator = () => {
         })}
       >
         <Tab.Screen name="Dashboard" component={DashboardScreen} />
-        <Tab.Screen name="Leaderboard" component={LeaderboardScreen} />
         <Tab.Screen name="Journal" component={JournalScreen} />
+        <Tab.Screen
+          name=" "
+          options={{
+            tabBarIcon: () => (
+              <FAB
+                icon={fabOpen ? 'close' : 'plus'}
+                onPress={() => setFabOpen(!fabOpen)}
+                style={[styles.fab, {backgroundColor: colors.primary}]}
+                color={colors.onPrimary}
+                backgroundColor={colors.primary}
+                />
+            ),
+          }}
+        >
+          {() => null}
+        </Tab.Screen>
         <Tab.Screen name="Therapy" component={TherapyScreen} />
         <Tab.Screen name="Support" component={SupportScreen} />
       </Tab.Navigator>
+      <Portal>
+        <FAB.Group
+          open={fabOpen}
+          visible = {false}
+          icon={fabOpen ? 'close' : 'plus'}
+          actions={[
+            {
+              icon: props => <Icon name="leaderboard" {...props} />,
+              label: 'Leaderboard',
+              onPress: () => navigation.navigate('Leaderboard')
+            },
+            {
+              icon: props => <Icon name="mood" {...props} />,
+              label: 'Mood Tracking',
+              onPress: () => navigation.navigate('MoodTracking')
+            },
+          ]}
+          onStateChange={({ open }) => setFabOpen(open)}
+          fabStyle={styles.fab}
+          style={styles.fabGroup}
 
-      <FAB
-        style={[styles.fab, { backgroundColor: colors.primary }]}
-        icon={({ size, color }) => (
-          <Icon name="mood" size={size} color={color} />
-        )}
-        onPress={handleMoodRecording}
-        color={colors.onPrimary}
-      />
-    </>
+        />
+      </Portal>
+    </Provider>
   );
 };
 
@@ -277,12 +296,30 @@ const styles = StyleSheet.create({
   },
   fab: {
     position: 'absolute',
-    marginRight: 20,
-    marginBottom: 36,
+    bottom: 5, // Adjust this value to position the FAB vertically
+    alignSelf: 'center',
+    alignItems: 'center',
+    borderRadius: 100,
+    padding: 6,
+  },
+  hiddenFab: {
+    display: 'none',
+  },
+  fabGroup: {
+    position: 'absolute',
+    paddingBottom: 0, 
     right: 0,
-    bottom: 20,
-    borderRadius: 28, // This makes the FAB round
-
+    left: 0,
+  },
+  fabContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    pointerEvents: 'box-none',
   },
 });
 

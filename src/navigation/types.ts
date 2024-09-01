@@ -69,6 +69,8 @@ export type RootStackParamList = {
   Reports: undefined;
   FindGroupsScreen: undefined;
   ExpandedJournalEntry: undefined;
+  MoodTracking: undefined;
+  Leaderboard: undefined;
   ChatScreen: {
     group: SupportGroup;
     fromSocialChallenge?: boolean;
