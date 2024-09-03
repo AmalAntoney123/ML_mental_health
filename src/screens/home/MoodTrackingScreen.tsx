@@ -5,6 +5,8 @@ import { useAuth } from '../../utils/auth';
 import database from '@react-native-firebase/database';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Slider from '@react-native-community/slider';
+import { LineChart } from 'react-native-chart-kit';
+import { Dimensions } from 'react-native';
 
 interface MoodEntry {
   date: string;
@@ -271,6 +273,69 @@ const MoodTrackingScreen: React.FC = () => {
     return null;
   };
 
+  const renderMoodChart = () => {
+    if (historicalMoods.length < 5) {
+      return null;
+    }
+
+    // Sort historical moods by date
+    const sortedMoods = [...historicalMoods].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+    const formatDate = (dateString: string) => {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('en-US', { weekday: 'short' }); // e.g., "Mon", "Tue"
+    };
+
+    const data = {
+      labels: sortedMoods.map(entry => formatDate(entry.date)).slice(-7), // Last 7 entries
+      datasets: [
+        {
+          data: sortedMoods.map(entry => entry.mood).slice(-7),
+          color: (opacity = 1) => `rgba(134, 65, 244, ${opacity})`, // optional
+          strokeWidth: 2 // optional
+        }
+      ],
+      legend: ["Mood"] // optional
+    };
+
+    return (
+      <View style={[styles.predictionContainer, { backgroundColor: colors.secondaryBackground }]}>
+        <Text style={[styles.predictionTitle, { color: colors.text }]}>Mood Chart</Text>
+        <ScrollView horizontal>
+          <LineChart
+            data={data}
+            width={Dimensions.get('window').width * 1.5} // Make the chart wider than the screen
+            height={220}
+            yAxisLabel=""
+            yAxisSuffix=""
+            yAxisInterval={1} // optional, defaults to 1
+            chartConfig={{
+              backgroundColor: colors.background,
+              backgroundGradientFrom: colors.background,
+              backgroundGradientTo: colors.background,
+              decimalPlaces: 1, // optional, defaults to 2dp
+              color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+              labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+              style: {
+                borderRadius: 16
+              },
+              propsForDots: {
+                r: "6",
+                strokeWidth: "2",
+                stroke: "#ffa726"
+              },
+            }}
+            bezier
+            style={{
+              marginVertical: 8,
+              borderRadius: 16
+            }}
+          />
+        </ScrollView>
+      </View>
+    );
+  };
+
   const renderMoodCard = () => (
     <View style={[styles.predictionContainer, { backgroundColor: colors.secondaryBackground }]}>
       <Text style={[styles.predictionTitle, { color: colors.text }]}>
@@ -333,6 +398,7 @@ const MoodTrackingScreen: React.FC = () => {
         contentContainerStyle={styles.contentContainer}
       >
         {renderPrediction()}
+        {renderMoodChart()}
         {renderMoodCard()}
 
         {isEditing || !currentEntryKey ? (
