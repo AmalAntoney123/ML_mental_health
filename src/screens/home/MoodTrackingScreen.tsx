@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, Alert, SafeAreaView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, Alert, SafeAreaView, Modal } from 'react-native';
 import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../utils/auth';
 import database from '@react-native-firebase/database';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Slider from '@react-native-community/slider';
-import { LineChart } from 'react-native-chart-kit';
+import { LineChart, BarChart } from 'react-native-chart-kit';
 import { Dimensions } from 'react-native';
 
 interface MoodEntry {
@@ -29,6 +29,12 @@ const MoodTrackingScreen: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [currentEntryKey, setCurrentEntryKey] = useState<string | null>(null);
   const [historicalMoods, setHistoricalMoods] = useState<MoodEntry[]>([]);
+  const [weeklyAverage, setWeeklyAverage] = useState<number>(0);
+  const [moodStreak, setMoodStreak] = useState<number>(0);
+  const [sleepAverage, setSleepAverage] = useState<number>(0);
+  const [stressAverage, setStressAverage] = useState<number>(0);
+  const [isMoodModalVisible, setIsMoodModalVisible] = useState(false);
+
 
   useEffect(() => {
     if (user) {
@@ -96,7 +102,7 @@ const MoodTrackingScreen: React.FC = () => {
     const today = new Date().toISOString().split('T')[0];
     const moodEntry = {
       date: today,
-      mood,
+      mood: mood,
       sleepQuality,
       stressLevel,
       physicalActivity,
@@ -124,7 +130,6 @@ const MoodTrackingScreen: React.FC = () => {
   const handleEditEntry = () => {
     setIsEditing(true);
   };
-
 
   const predictNextMood = () => {
     if (historicalMoods.length < 5) {
@@ -195,7 +200,8 @@ const MoodTrackingScreen: React.FC = () => {
     const scales = {
       mood: ['Very Bad', 'Bad', 'Poor', 'Fair', 'Okay', 'Good', 'Very Good', 'Great', 'Excellent', 'Amazing'],
       sleep: ['Terrible', 'Very Poor', 'Poor', 'Fair', 'Okay', 'Good', 'Very Good', 'Great', 'Excellent', 'Perfect'],
-      stress: ['None', 'Minimal', 'Very Low', 'Low', 'Manageable', 'Moderate', 'Considerable', 'High', 'Very High', 'Overwhelming'],      activity: ['None', 'Very Low', 'Low', 'Light', 'Moderate', 'Active', 'Very Active', 'Intense', 'Very Intense', 'Extreme'],
+      stress: ['None', 'Minimal', 'Very Low', 'Low', 'Manageable', 'Moderate', 'Considerable', 'High', 'Very High', 'Overwhelming'],
+      activity: ['None', 'Very Low', 'Low', 'Light', 'Moderate', 'Active', 'Very Active', 'Intense', 'Very Intense', 'Extreme'],
     };
     return scales[type as keyof typeof scales][value - 1];
   };
@@ -247,9 +253,9 @@ const MoodTrackingScreen: React.FC = () => {
   const renderPrediction = () => {
     if (historicalMoods.length < 5) {
       return (
-        <View style={[styles.predictionContainer, { backgroundColor: colors.secondaryBackground }]}>
-          <Text style={[styles.predictionTitle, { color: colors.text }]}>Not Enough Data</Text>
-          <Text style={[styles.predictionMessage, { color: colors.text }]}>
+        <View style={[styles.card, { backgroundColor: colors.secondaryBackground }]}>
+          <Text style={[styles.cardTitle, { color: colors.text }]}>Not Enough Data</Text>
+          <Text style={[styles.cardText, { color: colors.text }]}>
             Keep updating your mood every day to see predictions!
           </Text>
         </View>
@@ -258,12 +264,12 @@ const MoodTrackingScreen: React.FC = () => {
 
     if (prediction !== null) {
       return (
-        <View style={[styles.predictionContainer, { backgroundColor: colors.secondaryBackground }]}>
-          <Text style={[styles.predictionTitle, { color: colors.text }]}>Mood Prediction</Text>
-          <Text style={[styles.predictionMessage, { color: colors.text }]}>
+        <View style={[styles.card, { backgroundColor: colors.secondaryBackground }]}>
+          <Text style={[styles.cardTitle, { color: colors.text }]}>Mood Prediction</Text>
+          <Text style={[styles.cardText, { color: colors.text }]}>
             {getPredictionMessage(prediction)}
           </Text>
-          <Text style={[styles.predictionSubtext, { color: colors.text }]}>
+          <Text style={[styles.cardSubtext, { color: colors.text }]}>
             Predicted mood score: {prediction}/10
           </Text>
         </View>
@@ -278,83 +284,227 @@ const MoodTrackingScreen: React.FC = () => {
       return null;
     }
 
-    // Sort historical moods by date
     const sortedMoods = [...historicalMoods].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
     const formatDate = (dateString: string) => {
       const date = new Date(dateString);
-      return date.toLocaleDateString('en-US', { weekday: 'short' }); // e.g., "Mon", "Tue"
+      return date.toLocaleDateString('en-US', { weekday: 'short' });
     };
 
     const data = {
-      labels: sortedMoods.map(entry => formatDate(entry.date)).slice(-7), // Last 7 entries
+      labels: sortedMoods.map(entry => formatDate(entry.date)).slice(-7),
       datasets: [
         {
           data: sortedMoods.map(entry => entry.mood).slice(-7),
-          color: (opacity = 1) => `rgba(134, 65, 244, ${opacity})`, // optional
-          strokeWidth: 2 // optional
+          color: (opacity = 1) => `rgba(134, 65, 244, ${opacity})`,
+          strokeWidth: 2
         }
       ],
-      legend: ["Mood"] // optional
+      legend: ["Mood"]
     };
 
+    const chartWidth = Dimensions.get('window').width - 60; // Adjusted for padding
+    const chartHeight = 200; // Fixed height
+
     return (
-      <View style={[styles.predictionContainer, { backgroundColor: colors.secondaryBackground }]}>
-        <Text style={[styles.predictionTitle, { color: colors.text }]}>Mood Chart</Text>
-        <ScrollView horizontal>
-          <LineChart
-            data={data}
-            width={Dimensions.get('window').width * 1.5} // Make the chart wider than the screen
-            height={220}
-            yAxisLabel=""
-            yAxisSuffix=""
-            yAxisInterval={1} // optional, defaults to 1
-            chartConfig={{
-              backgroundColor: colors.background,
-              backgroundGradientFrom: colors.background,
-              backgroundGradientTo: colors.background,
-              decimalPlaces: 1, // optional, defaults to 2dp
-              color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-              labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-              style: {
-                borderRadius: 16
-              },
-              propsForDots: {
-                r: "6",
-                strokeWidth: "2",
-                stroke: "#ffa726"
-              },
-            }}
-            bezier
-            style={{
-              marginVertical: 8,
+      <View style={[styles.card, { backgroundColor: colors.secondaryBackground }]}>
+        <Text style={[styles.cardTitle, { color: colors.text }]}>Mood Chart</Text>
+        <LineChart
+          data={data}
+          width={chartWidth}
+          height={chartHeight}
+          yAxisLabel=""
+          yAxisSuffix=""
+          yAxisInterval={1}
+          chartConfig={{
+            backgroundColor: colors.secondaryBackground,
+            backgroundGradientFrom: colors.secondaryBackground,
+            backgroundGradientTo: colors.secondaryBackground,
+            decimalPlaces: 1,
+            color: (opacity = 1) => `rgba(134, 65, 244, ${opacity})`,
+            labelColor: (opacity = 1) => colors.text,
+            style: {
               borderRadius: 16
-            }}
-          />
-        </ScrollView>
+            },
+            propsForDots: {
+              r: "4",
+              strokeWidth: "2",
+              stroke: "#ffa726"
+            },
+          }}
+          bezier
+          style={{
+            marginVertical: 8,
+            borderRadius: 16
+          }}
+        />
       </View>
     );
   };
 
-  const renderMoodCard = () => (
-    <View style={[styles.predictionContainer, { backgroundColor: colors.secondaryBackground }]}>
-      <Text style={[styles.predictionTitle, { color: colors.text }]}>
-        {isEditing ? "Edit Today's Mood" : "How are you feeling today?"}
-      </Text>
-      {renderSlider(mood, setMood, "Mood", "mood", colors.primary, "mood")}
-      {renderSlider(sleepQuality, setSleepQuality, "Sleep Quality", "bedtime", colors.secondary, "sleep")}
-      {renderSlider(stressLevel, setStressLevel, "Stress Level", "psychology", colors.error, "stress")}
-      {renderSlider(physicalActivity, setPhysicalActivity, "Physical Activity", "directions-run", colors.success, "activity")}
-      <TextInput
-        style={[styles.input, { color: colors.text, borderColor: colors.border }]}
-        placeholder="Any notes about your day?"
-        placeholderTextColor={colors.text}
-        value={notes}
-        onChangeText={setNotes}
-        multiline
-        editable={isEditing || !currentEntryKey}
-      />
+  const calculateWeeklyAverage = () => {
+    const oneWeekAgo = new Date();
+    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+    
+    const lastWeekMoods = historicalMoods.filter(entry => new Date(entry.date) >= oneWeekAgo);
+    const average = lastWeekMoods.reduce((sum, entry) => sum + entry.mood, 0) / lastWeekMoods.length;
+    
+    setWeeklyAverage(Number(average.toFixed(1)));
+  };
+
+  const calculateMoodStreak = () => {
+    let streak = 0;
+    const sortedMoods = [...historicalMoods].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    
+    for (let i = 0; i < sortedMoods.length; i++) {
+      if (sortedMoods[i].mood >= 7) {
+        streak++;
+      } else {
+        break;
+      }
+    }
+    
+    setMoodStreak(streak);
+  };
+
+  const calculateSleepAverage = () => {
+    const oneWeekAgo = new Date();
+    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+    
+    const lastWeekMoods = historicalMoods.filter(entry => new Date(entry.date) >= oneWeekAgo);
+    const average = lastWeekMoods.reduce((sum, entry) => sum + entry.sleepQuality, 0) / lastWeekMoods.length;
+    
+    setSleepAverage(Number(average.toFixed(1)));
+  };
+
+  const calculateStressAverage = () => {
+    const oneWeekAgo = new Date();
+    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+    
+    const lastWeekMoods = historicalMoods.filter(entry => new Date(entry.date) >= oneWeekAgo);
+    const average = lastWeekMoods.reduce((sum, entry) => sum + entry.stressLevel, 0) / lastWeekMoods.length;
+    
+    setStressAverage(Number(average.toFixed(1)));
+  };
+
+  useEffect(() => {
+    if (historicalMoods.length > 0) {
+      calculateWeeklyAverage();
+      calculateMoodStreak();
+      calculateSleepAverage();
+      calculateStressAverage();
+    }
+  }, [historicalMoods]);
+
+  const renderInsightCard = (title: string, value: string | number, icon: string, color: string) => (
+    <View style={[styles.insightCard, { backgroundColor: colors.secondaryBackground }]}>
+      <Icon name={icon} size={24} color={color} />
+      <Text style={[styles.insightTitle, { color: colors.text }]}>{title}</Text>
+      <Text style={[styles.insightValue, { color }]}>{value}</Text>
     </View>
+  );
+
+  const renderMoodInsights = () => (
+    <View style={styles.insightsContainer}>
+      <Text style={[styles.sectionTitle, { color: colors.text }]}>Mood Insights</Text>
+      <View style={styles.insightRow}>
+        {renderInsightCard("Weekly Average", weeklyAverage, "trending-up", colors.primary)}
+        {renderInsightCard("Mood Streak", `${moodStreak} days`, "star", colors.secondary)}
+        {renderInsightCard("Sleep Average", sleepAverage.toFixed(1), "bedtime", colors.gray)}
+        {renderInsightCard("Stress Average", stressAverage.toFixed(1), "psychology", colors.error)}
+      </View>
+    </View>
+  );
+
+  const renderFactors = () => {
+    const factors = [
+      { name: "Sleep", value: sleepQuality, color: colors.secondary },
+      { name: "Stress", value: stressLevel, color: colors.error },
+      { name: "Activity", value: physicalActivity, color: colors.success },
+    ];
+
+    const data = {
+      labels: factors.map(f => f.name),
+      datasets: [{ data: factors.map(f => f.value) }],
+    };
+
+    const chartWidth = Dimensions.get('window').width - 60; // Adjusted for padding
+    const chartHeight = 200; // Fixed height
+
+    return (
+      <View style={[styles.card, { backgroundColor: colors.secondaryBackground }]}>
+        <Text style={[styles.cardTitle, { color: colors.text }]}>Mood Factors</Text>
+        <BarChart
+          data={data}
+          width={chartWidth}
+          height={chartHeight}
+          yAxisSuffix=""
+          yAxisLabel="Value"
+          chartConfig={{
+            backgroundColor: colors.secondaryBackground,
+            backgroundGradientFrom: colors.secondaryBackground,
+            backgroundGradientTo: colors.secondaryBackground,
+            decimalPlaces: 0,
+            color: (opacity = 1) => `rgba(134, 65, 244, ${opacity})`,
+            labelColor: (opacity = 1) => colors.text,
+            style: {
+              borderRadius: 16,
+            },
+            barPercentage: 0.7,
+          }}
+          style={{
+            marginVertical: 8,
+            borderRadius: 16,
+          }}
+        />
+      </View>
+    );
+  };
+
+  const renderMoodModal = () => (
+    <Modal
+      animationType="slide"
+      transparent={true}
+      visible={isMoodModalVisible}
+      onRequestClose={() => setIsMoodModalVisible(false)}
+    >
+      <View style={styles.modalContainer}>
+        <View style={[styles.modalContent, { backgroundColor: colors.background }]}>
+          <Text style={[styles.modalTitle, { color: colors.text }]}>
+            {isEditing ? "Edit Today's Mood" : "How are you feeling today?"}
+          </Text>
+          {renderSlider(mood, setMood, "Mood", "mood", colors.primary, "mood")}
+          {renderSlider(sleepQuality, setSleepQuality, "Sleep Quality", "bedtime", colors.secondary, "sleep")}
+          {renderSlider(stressLevel, setStressLevel, "Stress Level", "psychology", colors.error, "stress")}
+          {renderSlider(physicalActivity, setPhysicalActivity, "Physical Activity", "directions-run", colors.success, "activity")}
+          <TextInput
+            style={[styles.input, { color: colors.text, borderColor: colors.border }]}
+            placeholder="Any notes about your day?"
+            placeholderTextColor={colors.text}
+            value={notes}
+            onChangeText={setNotes}
+            multiline
+          />
+          <TouchableOpacity
+            style={[styles.button, { backgroundColor: colors.primary }]}
+            onPress={() => {
+              saveMoodEntry();
+              setIsMoodModalVisible(false);
+            }}
+          >
+            <Text style={[styles.buttonText, { color: colors.onPrimary }]}>
+              {isEditing ? 'Update Mood Entry' : 'Save Mood Entry'}
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.button, { backgroundColor: colors.secondary }]}
+            onPress={() => setIsMoodModalVisible(false)}
+          >
+            <Text style={[styles.buttonText, { color: colors.onSecondary }]}>Cancel</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </Modal>
   );
 
   const generateSampleData = async () => {
@@ -398,35 +548,17 @@ const MoodTrackingScreen: React.FC = () => {
         contentContainerStyle={styles.contentContainer}
       >
         {renderPrediction()}
+        {renderMoodInsights()}
         {renderMoodChart()}
-        {renderMoodCard()}
-
-        {isEditing || !currentEntryKey ? (
-          <TouchableOpacity
-            style={[styles.button, { backgroundColor: colors.primary }]}
-            onPress={saveMoodEntry}
-          >
-            <Text style={[styles.buttonText, { color: colors.onPrimary }]}>
-              {isEditing ? 'Update Mood Entry' : 'Save Mood Entry'}
-            </Text>
-          </TouchableOpacity>
-        ) : (
-          <TouchableOpacity
-            style={[styles.button, { backgroundColor: colors.secondary }]}
-            onPress={handleEditEntry}
-          >
-            <Text style={[styles.buttonText, { color: colors.onSecondary }]}>Edit Today's Entry</Text>
-          </TouchableOpacity>
-        )}
-
-        <TouchableOpacity
-          style={[styles.button, { backgroundColor: colors.secondary }]}
-          onPress={generateSampleData}>
-                        <Text style={[styles.buttonText, { color: colors.onSecondary }]}>Sample</Text>
-
-          </TouchableOpacity>
-
+        {renderFactors()}
       </ScrollView>
+      <TouchableOpacity
+        style={[styles.fab, { backgroundColor: colors.primary }]}
+        onPress={() => setIsMoodModalVisible(true)}
+      >
+        <Icon name="add" size={24} color={colors.onPrimary} />
+      </TouchableOpacity>
+      {renderMoodModal()}
     </SafeAreaView>
   );
 };
@@ -440,18 +572,38 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     padding: 20,
-    paddingBottom: 40, // Add extra padding at the bottom
+    paddingBottom: 80,
+  },
+  card: {
+    padding: 15,
+    borderRadius: 10,
+    marginBottom: 20,
+    alignItems: 'center', // Center the content horizontally
+  },
+  cardTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    alignSelf: 'flex-start', // Align the title to the left
+  },
+  cardText: {
+    fontSize: 16,
+    marginBottom: 5,
+  },
+  cardSubtext: {
+    fontSize: 14,
+    fontStyle: 'italic',
   },
   sliderContainer: {
-    marginBottom: 30,
+    marginBottom: 20,
   },
   labelContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: 5,
   },
   label: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 'bold',
     marginLeft: 10,
   },
@@ -493,23 +645,63 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
-  predictionContainer: {
+  insightsContainer: {
     marginBottom: 20,
-    padding: 15,
-    borderRadius: 10,
   },
-  predictionTitle: {
+  sectionTitle: {
     fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 10,
   },
-  predictionMessage: {
-    fontSize: 16,
-    marginBottom: 5,
+  insightRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
   },
-  predictionSubtext: {
+  insightCard: {
+    width: '48%',
+    padding: 15,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  insightTitle: {
     fontSize: 14,
-    fontStyle: 'italic',
+    marginTop: 5,
+  },
+  insightValue: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginTop: 5,
+  },
+  fab: {
+    position: 'absolute',
+    width: 56,
+    height: 56,
+    alignItems: 'center',
+    justifyContent: 'center',
+    right: 20,
+    bottom: 20,
+    borderRadius: 28,
+    elevation: 8,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    width: '90%',
+    padding: 20,
+    borderRadius: 10,
+    maxHeight: '90%',
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    textAlign: 'center',
   },
 });
 
