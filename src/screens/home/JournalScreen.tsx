@@ -58,11 +58,9 @@ const JournalScreen: React.FC = () => {
   useEffect(() => {
     const initializeVoice = async () => {
       try {
-        console.log('Initializing Voice...');
-        console.log('Device info:', Platform.OS, Platform.Version);
+
         
         const hasPermission = await requestMicrophonePermission();
-        console.log('Microphone permission:', hasPermission);
         
         if (hasPermission) {
           await Voice.destroy();
@@ -72,9 +70,7 @@ const JournalScreen: React.FC = () => {
           Voice.onSpeechError = (e) => {
             console.error('Speech recognition error:', e);
           };
-          console.log('Voice initialized successfully');
         } else {
-          console.log('Microphone permission denied');
           Alert.alert('Permission Denied', 'Microphone permission is required to use voice notes.');
         }
       } catch (error) {
@@ -127,7 +123,6 @@ const JournalScreen: React.FC = () => {
   };
 
   const onSpeechResults = (e: SpeechResultsEvent) => {
-    console.log('Speech results:', e.value);
     if (e.value && e.value.length > 0) {
       const text = e.value[0];
       setNewEntry((prevEntry) => prevEntry + ' ' + text);
@@ -136,21 +131,16 @@ const JournalScreen: React.FC = () => {
   };
 
   const onSpeechPartialResults = (e: SpeechResultsEvent) => {
-    console.log('Partial results:', e.value);
     setPartialResults(e.value ?? []);
   };
 
   const startVoiceRecording = async () => {
     try {
-      console.log('Starting voice recording...');
       const isAvailable = await Voice.isAvailable();
-      console.log('Voice recognition available:', isAvailable);
       if (isAvailable) {
         await Voice.start('en-US');
         setIsRecording(true);
-        console.log('Voice recording started');
       } else {
-        console.log('Voice recognition is not available on this device');
         Alert.alert('Error', 'Voice recognition is not available on this device');
       }
     } catch (error) {
