@@ -1,0 +1,97 @@
+import React from 'react';
+import { render, fireEvent, waitFor } from '@testing-library/react-native';
+import SignInScreen from '../src/screens/SignInScreen';
+import { ThemeProvider } from '../src/context/ThemeContext';
+import { NavigationContainer } from '@react-navigation/native';
+import * as auth from '../src/utils/auth';
+
+// Mock the necessary modules and functions
+jest.mock('@react-native-firebase/database', () => ({
+  __esModule: true,
+  default: jest.fn(() => ({
+    ref: jest.fn(() => ({
+      once: jest.fn(() => Promise.resolve({ exists: jest.fn(() => true) })),
+    })),
+  })),
+}));
+
+jest.mock('react-native-snackbar', () => ({
+  show: jest.fn(),
+}));
+
+jest.mock('../src/utils/auth', () => ({
+  useFormValidation: jest.fn(() => ({
+    emailError: '',
+    passwordError: '',
+    validateFields: jest.fn(),
+  })),
+  login: jest.fn(),
+  resendVerificationEmail: jest.fn(),
+  resetPassword: jest.fn(),
+  logout: jest.fn(),
+}));
+
+const mockNavigation = {
+  navigate: jest.fn(),
+};
+
+describe('SignInScreen', () => {
+  const renderComponent = () =>
+    render(
+      <NavigationContainer>
+        <ThemeProvider>
+          <SignInScreen navigation={mockNavigation as any} />
+        </ThemeProvider>
+      </NavigationContainer>
+    );
+
+  it('renders correctly', () => {
+    const { getByText, getByTestId } = renderComponent();
+    
+    expect(getByText('Emo')).toBeTruthy();
+    expect(getByTestId('email-input')).toBeTruthy();
+    expect(getByTestId('password-input')).toBeTruthy();
+    expect(getByText('Sign In')).toBeTruthy();
+    expect(getByText("Don't have an account? Sign Up")).toBeTruthy();
+  });
+
+  it('handles sign in with valid credentials', async () => {
+    const { getByTestId, getByText } = renderComponent();
+    
+    (auth.login as jest.Mock).mockResolvedValue({ uid: 'testUid' });
+
+    fireEvent.changeText(getByTestId('email-input'), 'test@example.com');
+    fireEvent.changeText(getByTestId('password-input'), 'password123');
+    fireEvent.press(getByText('Sign In'));
+
+    await waitFor(() => {
+      expect(auth.login).toHaveBeenCalledWith('test@example.com', 'password123');
+      expect(mockNavigation.navigate).toHaveBeenCalledWith('Home');
+    });
+  });
+
+  it('handles sign in error', async () => {
+    const { getByTestId, getByText } = renderComponent();
+    
+    (auth.login as jest.Mock).mockRejectedValue(new Error('auth/wrong-password'));
+
+    fireEvent.changeText(getByTestId('email-input'), 'test@example.com');
+    fireEvent.changeText(getByTestId('password-input'), 'wrongpassword');
+    fireEvent.press(getByText('Sign In'));
+
+    await waitFor(() => {
+      expect(auth.login).toHaveBeenCalledWith('test@example.com', 'wrongpassword');
+      // You might want to check for the error message display here
+    });
+  });
+
+  it('navigates to sign up screen', () => {
+    const { getByText } = renderComponent();
+    
+    fireEvent.press(getByText("Don't have an account? Sign Up"));
+    
+    expect(mockNavigation.navigate).toHaveBeenCalledWith('SignUp');
+  });
+
+  // Add more tests for other functionalities like forgot password, theme toggle, etc.
+});

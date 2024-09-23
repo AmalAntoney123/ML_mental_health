@@ -2,16 +2,49 @@
  * @format
  */
 
-import 'react-native';
 import React from 'react';
+import { render } from '@testing-library/react-native';
 import App from '../App';
+import { NavigationContainer } from '@react-navigation/native';
+import { MenuProvider } from 'react-native-popup-menu';
+import { ThemeProvider } from '../src/context/ThemeContext';
 
-// Note: import explicitly to use the types shipped with jest.
-import {it} from '@jest/globals';
+jest.mock('@react-navigation/native', () => ({
+  ...jest.requireActual('@react-navigation/native'),
+  NavigationContainer: ({ children }: { children: React.ReactNode }) => children,
+}));
 
-// Note: test renderer must be required after react-native.
-import renderer from 'react-test-renderer';
+jest.mock('@react-native-google-signin/google-signin', () => ({
+  GoogleSignin: {
+    configure: jest.fn(),
+    hasPlayServices: jest.fn().mockResolvedValue(true),
+    signIn: jest.fn().mockResolvedValue({
+      user: {
+        id: '12345',
+        name: 'Test User',
+        email: 'test@example.com',
+      },
+    }),
+  },
+}));
 
-it('renders correctly', () => {
-  renderer.create(<App />);
+jest.mock('../src/navigation/Navigation', () => {
+  return function MockNavigation() {
+    return null;
+  };
+});
+
+describe('App', () => {
+  it('renders correctly', () => {
+    const { toJSON } = render(
+      <NavigationContainer>
+        <MenuProvider>
+          <ThemeProvider>
+            <App />
+          </ThemeProvider>
+        </MenuProvider>
+      </NavigationContainer>
+    );
+    expect(toJSON()).toBeTruthy();
+  });
 });

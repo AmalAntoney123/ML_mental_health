@@ -271,7 +271,8 @@ const SignInScreen: React.FC<Props> = ({ navigation }) => {
                 <View style={styles.bottomContent}>
                     <View style={styles.inputContainer}>
                         <TextInput
-                            label="Email"
+                            testID="email-input"
+                            placeholder="Email"
                             value={email}
                             onChangeText={setEmail}
                             mode="outlined"
@@ -299,7 +300,8 @@ const SignInScreen: React.FC<Props> = ({ navigation }) => {
 
                     <View style={styles.inputContainer}>
                         <TextInput
-                            label="Password"
+                            testID="password-input"
+                            placeholder="Password"
                             value={password}
                             onChangeText={setPassword}
                             mode="outlined"
