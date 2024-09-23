@@ -162,7 +162,6 @@ export const useAuth = () => {
                         .once('value');
                     
                     const userData = userSnapshot.val();
-                    console.log(`Fetched user data for ${user.uid}:`, userData); // Debugging line
 
                     setIsAdmin(userData?.role === 'admin');
                     setIsActive(userData?.isActive !== false);  // Add this line

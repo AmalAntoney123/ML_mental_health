@@ -50,7 +50,6 @@ const ViewUserScreen: React.FC<Props> = ({ navigation, route }) => {
             const url = await reference.getDownloadURL();
             setProfileImage(url);
         } catch (error) {
-            console.log('No profile image in Firebase Storage, using default avatar');
             setProfileImage(null);
         }
     };

@@ -36,6 +36,7 @@ jest.mock('../src/navigation/Navigation', () => {
 
 describe('App', () => {
   it('renders correctly', () => {
+    console.log('\n🧪 Testing: App component renders correctly');
     const { toJSON } = render(
       <NavigationContainer>
         <MenuProvider>
@@ -46,5 +47,6 @@ describe('App', () => {
       </NavigationContainer>
     );
     expect(toJSON()).toBeTruthy();
+    console.log('✅ App component rendered successfully');
   });
 });

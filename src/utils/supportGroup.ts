@@ -7,14 +7,11 @@ export const createSupportGroup = async (groupName: string, groupDescription: st
         throw new Error('No user is currently signed in.');
     }
 
-    console.log('Current user:', user.uid); // Log the current user's UID
 
     try {
         const supportGroupsRef = database().ref('supportGroups');
-        console.log('Database reference created'); // Log successful reference creation
 
         const newGroupRef = supportGroupsRef.push();
-        console.log('New group reference created'); // Log successful group reference creation
         
         const groupData = {
             name: groupName.trim(),
@@ -27,10 +24,8 @@ export const createSupportGroup = async (groupName: string, groupDescription: st
             lastMessage: null,
             lastMessageTimestamp: null
         };
-        console.log('Group data:', groupData); // Log the group data being set
 
         await newGroupRef.set(groupData);
-        console.log('Group data set successfully'); // Log successful data set
 
         return newGroupRef.key;
     } catch (error) {

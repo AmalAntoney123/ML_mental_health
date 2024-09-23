@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, Dimensions, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, Dimensions, Alert, PermissionsAndroid, Platform } from 'react-native';
 import { useTheme } from '../../context/ThemeContext';
 import database from '@react-native-firebase/database';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -22,6 +22,28 @@ type GroupedEntry = {
   entries: JournalEntry[];
 };
 
+const requestMicrophonePermission = async () => {
+  if (Platform.OS === 'android') {
+    try {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
+        {
+          title: 'Microphone Permission',
+          message: 'We need access to your microphone to record voice notes.',
+          buttonNeutral: 'Ask Me Later',
+          buttonNegative: 'Cancel',
+          buttonPositive: 'OK',
+        },
+      );
+      return granted === PermissionsAndroid.RESULTS.GRANTED;
+    } catch (err) {
+      console.warn(err);
+      return false;
+    }
+  }
+  return true;
+};
+
 const JournalScreen: React.FC = () => {
   const { colors } = useTheme();
   const { user, isEmailVerified } = useAuth();
@@ -34,6 +56,32 @@ const JournalScreen: React.FC = () => {
   const [partialResults, setPartialResults] = useState<string[]>([]);
 
   useEffect(() => {
+    const initializeVoice = async () => {
+      try {
+        console.log('Initializing Voice...');
+        console.log('Device info:', Platform.OS, Platform.Version);
+        
+        const hasPermission = await requestMicrophonePermission();
+        console.log('Microphone permission:', hasPermission);
+        
+        if (hasPermission) {
+          await Voice.destroy();
+          await Voice.removeAllListeners();
+          Voice.onSpeechResults = onSpeechResults;
+          Voice.onSpeechPartialResults = onSpeechPartialResults;
+          Voice.onSpeechError = (e) => {
+            console.error('Speech recognition error:', e);
+          };
+          console.log('Voice initialized successfully');
+        } else {
+          console.log('Microphone permission denied');
+          Alert.alert('Permission Denied', 'Microphone permission is required to use voice notes.');
+        }
+      } catch (error) {
+        console.error('Error initializing Voice:', error);
+      }
+    };
+
     if (user && isEmailVerified) {
       const entriesRef = database().ref(`users/${user.uid}/entries`);
 
@@ -66,15 +114,20 @@ const JournalScreen: React.FC = () => {
         }
       });
 
-      Voice.onSpeechResults = onSpeechResults;
-      Voice.onSpeechPartialResults = onSpeechPartialResults;
+      initializeVoice();
+
       return () => {
         Voice.destroy().then(Voice.removeAllListeners);
       };
     }
   }, [user, isEmailVerified]);
 
+  const onSpeechError = (error: any) => {
+    console.error('Speech recognition error:', error);
+  };
+
   const onSpeechResults = (e: SpeechResultsEvent) => {
+    console.log('Speech results:', e.value);
     if (e.value && e.value.length > 0) {
       const text = e.value[0];
       setNewEntry((prevEntry) => prevEntry + ' ' + text);
@@ -83,16 +136,25 @@ const JournalScreen: React.FC = () => {
   };
 
   const onSpeechPartialResults = (e: SpeechResultsEvent) => {
+    console.log('Partial results:', e.value);
     setPartialResults(e.value ?? []);
   };
 
   const startVoiceRecording = async () => {
     try {
-      await Voice.start('en-US');
-      setIsRecording(true);
-      setPartialResults([]);
+      console.log('Starting voice recording...');
+      const isAvailable = await Voice.isAvailable();
+      console.log('Voice recognition available:', isAvailable);
+      if (isAvailable) {
+        await Voice.start('en-US');
+        setIsRecording(true);
+        console.log('Voice recording started');
+      } else {
+        console.log('Voice recognition is not available on this device');
+        Alert.alert('Error', 'Voice recognition is not available on this device');
+      }
     } catch (error) {
-      console.error(error);
+      console.error('Error starting voice recording:', error);
     }
   };
 
@@ -102,7 +164,7 @@ const JournalScreen: React.FC = () => {
       setIsRecording(false);
       setPartialResults([]);
     } catch (error) {
-      console.error(error);
+      console.error('Error stopping voice recording:', error);
     }
   };
 

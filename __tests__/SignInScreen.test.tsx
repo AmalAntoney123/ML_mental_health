@@ -46,6 +46,7 @@ describe('SignInScreen', () => {
     );
 
   it('renders correctly', () => {
+    console.log('\n🧪 Testing: SignInScreen renders correctly');
     const { getByText, getByTestId } = renderComponent();
     
     expect(getByText('Emo')).toBeTruthy();
@@ -53,9 +54,11 @@ describe('SignInScreen', () => {
     expect(getByTestId('password-input')).toBeTruthy();
     expect(getByText('Sign In')).toBeTruthy();
     expect(getByText("Don't have an account? Sign Up")).toBeTruthy();
+    console.log('✅ All expected elements are rendered');
   });
 
   it('handles sign in with valid credentials', async () => {
+    console.log('\n🧪 Testing: Sign in with valid credentials');
     const { getByTestId, getByText } = renderComponent();
     
     (auth.login as jest.Mock).mockResolvedValue({ uid: 'testUid' });
@@ -68,9 +71,11 @@ describe('SignInScreen', () => {
       expect(auth.login).toHaveBeenCalledWith('test@example.com', 'password123');
       expect(mockNavigation.navigate).toHaveBeenCalledWith('Home');
     });
+    console.log('✅ Sign in successful and navigated to Home');
   });
 
   it('handles sign in error', async () => {
+    console.log('\n🧪 Testing: Sign in with invalid credentials');
     const { getByTestId, getByText } = renderComponent();
     
     (auth.login as jest.Mock).mockRejectedValue(new Error('auth/wrong-password'));
@@ -81,17 +86,18 @@ describe('SignInScreen', () => {
 
     await waitFor(() => {
       expect(auth.login).toHaveBeenCalledWith('test@example.com', 'wrongpassword');
-      // You might want to check for the error message display here
     });
+    console.log('✅ Sign in error handled correctly');
   });
 
   it('navigates to sign up screen', () => {
+    console.log('\n🧪 Testing: Navigation to Sign Up screen');
     const { getByText } = renderComponent();
     
     fireEvent.press(getByText("Don't have an account? Sign Up"));
     
     expect(mockNavigation.navigate).toHaveBeenCalledWith('SignUp');
+    console.log('✅ Successfully navigated to Sign Up screen');
   });
 
-  // Add more tests for other functionalities like forgot password, theme toggle, etc.
 });

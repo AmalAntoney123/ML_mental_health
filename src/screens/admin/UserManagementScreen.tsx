@@ -107,7 +107,6 @@ const ManageUsersScreen: React.FC<Props> = ({ navigation }) => {
                             .ref(`users/${userId}/isActive`)
                             .set(newStatus)
                             .then(() => {
-                                console.log('User status updated.');
                                 setUsers(prevUsers =>
                                     prevUsers.map(user =>
                                         user.id === userId ? { ...user, isActive: newStatus } : user
@@ -151,7 +150,6 @@ const ManageUsersScreen: React.FC<Props> = ({ navigation }) => {
                             .ref(`users/${userId}/role`)
                             .set(newRole)
                             .then(() => {
-                                console.log('User role updated.');
                                 setUsers(prevUsers =>
                                     prevUsers.map(user =>
                                         user.id === userId ? { ...user, role: newRole } : user
@@ -179,7 +177,6 @@ const ManageUsersScreen: React.FC<Props> = ({ navigation }) => {
                             .ref(`users/${userId}`)
                             .remove()
                             .then(() => {
-                                console.log('User deleted.');
                                 setUsers(prevUsers => prevUsers.filter(user => user.id !== userId));
                             })
                             .catch(error => console.error('Error deleting user:', error));
