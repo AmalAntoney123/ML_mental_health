@@ -428,8 +428,8 @@ const MoodTrackingScreen: React.FC = () => {
       datasets: [{ data: factors.map(f => f.value) }],
     };
 
-    const chartWidth = Dimensions.get('window').width - 60; // Adjusted for padding
-    const chartHeight = 200; // Fixed height
+    const chartWidth = Dimensions.get('window').width - 60; 
+    const chartHeight = 200; 
 
     return (
       <View style={[styles.card, { backgroundColor: colors.secondaryBackground }]}>
