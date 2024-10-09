@@ -5,6 +5,8 @@ import { RootStackParamList } from '../../navigation/types';
 import { useAuth, logout } from '../../utils/auth';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useTheme } from '../../context/ThemeContext';
+import { triggerManualNotification, triggerMorningMotivation, triggerRandomMotivation } from '../../utils/notificationService';
+import Toast from 'react-native-toast-message';
 
 type AdminScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'AdminPanel'>;
 
@@ -32,6 +34,33 @@ const AdminScreen: React.FC<Props> = ({ navigation }) => {
         } catch (error) {
             console.error('Logout failed:', error);
         }
+    };
+
+    const handleManualNotification = () => {
+        triggerManualNotification();
+        Toast.show({
+            type: 'success',
+            text1: 'Notification Sent',
+            text2: 'Journal reminder notification has been sent.',
+        });
+    };
+
+    const handleMorningMotivation = () => {
+        triggerMorningMotivation();
+        Toast.show({
+            type: 'success',
+            text1: 'Motivation Sent',
+            text2: 'Morning motivation quote has been sent.',
+        });
+    };
+
+    const handleRandomMotivation = () => {
+        triggerRandomMotivation();
+        Toast.show({
+            type: 'success',
+            text1: 'Random Motivation Sent',
+            text2: 'A random motivational message has been sent.',
+        });
     };
 
     const AdminButton: React.FC<AdminButtonProps> = ({ title, icon, onPress }) => (
@@ -80,6 +109,21 @@ const AdminScreen: React.FC<Props> = ({ navigation }) => {
                         title="Create Support Group"
                         icon="group-add"
                         onPress={() => navigation.navigate('CreateSupportGroup')}
+                    />
+                    <AdminButton
+                        title="Send Journal Reminder"
+                        icon="notifications"
+                        onPress={handleManualNotification}
+                    />
+                    <AdminButton
+                        title="Send Motivation Quote"
+                        icon="lightbulb"
+                        onPress={handleMorningMotivation}
+                    />
+                    <AdminButton
+                        title="Send Random Motivation"
+                        icon="stars"
+                        onPress={handleRandomMotivation}
                     />
                 </View>
             </ScrollView>

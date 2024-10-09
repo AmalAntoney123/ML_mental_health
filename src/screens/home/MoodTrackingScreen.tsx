@@ -470,38 +470,40 @@ const MoodTrackingScreen: React.FC = () => {
     >
       <View style={styles.modalContainer}>
         <View style={[styles.modalContent, { backgroundColor: colors.background }]}>
-          <Text style={[styles.modalTitle, { color: colors.text }]}>
-            {isEditing ? "Edit Today's Mood" : "How are you feeling today?"}
-          </Text>
-          {renderSlider(mood, setMood, "Mood", "mood", colors.primary, "mood")}
-          {renderSlider(sleepQuality, setSleepQuality, "Sleep Quality", "bedtime", colors.secondary, "sleep")}
-          {renderSlider(stressLevel, setStressLevel, "Stress Level", "psychology", colors.error, "stress")}
-          {renderSlider(physicalActivity, setPhysicalActivity, "Physical Activity", "directions-run", colors.success, "activity")}
-          <TextInput
-            style={[styles.input, { color: colors.text, borderColor: colors.border }]}
-            placeholder="Any notes about your day?"
-            placeholderTextColor={colors.text}
-            value={notes}
-            onChangeText={setNotes}
-            multiline
-          />
-          <TouchableOpacity
-            style={[styles.button, { backgroundColor: colors.primary }]}
-            onPress={() => {
-              saveMoodEntry();
-              setIsMoodModalVisible(false);
-            }}
-          >
-            <Text style={[styles.buttonText, { color: colors.onPrimary }]}>
-              {isEditing ? 'Update Mood Entry' : 'Save Mood Entry'}
+          <ScrollView contentContainerStyle={styles.modalScrollContent}>
+            <Text style={[styles.modalTitle, { color: colors.text }]}>
+              {isEditing ? "Edit Today's Mood" : "How are you feeling today?"}
             </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.button, { backgroundColor: colors.secondary }]}
-            onPress={() => setIsMoodModalVisible(false)}
-          >
-            <Text style={[styles.buttonText, { color: colors.onSecondary }]}>Cancel</Text>
-          </TouchableOpacity>
+            {renderSlider(mood, setMood, "Mood", "mood", colors.primary, "mood")}
+            {renderSlider(sleepQuality, setSleepQuality, "Sleep Quality", "bedtime", colors.secondary, "sleep")}
+            {renderSlider(stressLevel, setStressLevel, "Stress Level", "psychology", colors.error, "stress")}
+            {renderSlider(physicalActivity, setPhysicalActivity, "Physical Activity", "directions-run", colors.success, "activity")}
+            <TextInput
+              style={[styles.input, { color: colors.text, borderColor: colors.border }]}
+              placeholder="Any notes about your day?"
+              placeholderTextColor={colors.text}
+              value={notes}
+              onChangeText={setNotes}
+              multiline
+            />
+            <TouchableOpacity
+              style={[styles.button, { backgroundColor: colors.primary }]}
+              onPress={() => {
+                saveMoodEntry();
+                setIsMoodModalVisible(false);
+              }}
+            >
+              <Text style={[styles.buttonText, { color: colors.onPrimary }]}>
+                {isEditing ? 'Update Mood Entry' : 'Save Mood Entry'}
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.button, { backgroundColor: colors.secondary }]}
+              onPress={() => setIsMoodModalVisible(false)}
+            >
+              <Text style={[styles.buttonText, { color: colors.onSecondary }]}>Cancel</Text>
+            </TouchableOpacity>
+          </ScrollView>
         </View>
       </View>
     </Modal>
@@ -693,9 +695,11 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     width: '90%',
-    padding: 20,
-    borderRadius: 10,
     maxHeight: '90%',
+    borderRadius: 10,
+  },
+  modalScrollContent: {
+    padding: 20,
   },
   modalTitle: {
     fontSize: 20,
