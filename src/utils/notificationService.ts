@@ -41,6 +41,13 @@ const inspirationTitles = [
   "Today's Potential",
   "Morning Magic",
   "Embrace the Day",
+  "Rise and Shine",
+  "Daybreak Motivation",
+  "Awakening Inspiration",
+  "Morning Momentum",
+  "Sunrise Serenity",
+  "Dawn of Possibilities",
+  "First Light Wisdom",
 ];
 
 const getRandomItem = (array: string[]) => {
@@ -171,7 +178,17 @@ const getRandomMotivationalQuote = () => {
     "Happiness is not something readymade. It comes from your own actions.",
     "The only person you are destined to become is the person you decide to be.",
     "It always seems impossible until it's done.",
-    "You are never too old to set another goal or to dream a new dream."
+    "You are never too old to set another goal or to dream a new dream.",
+    "The best way to predict the future is to create it.",
+    "Your attitude determines your direction.",
+    "The harder you work for something, the greater you'll feel when you achieve it.",
+    "Dream big and dare to fail.",
+    "The only place where success comes before work is in the dictionary.",
+    "Don't be afraid to give up the good to go for the great.",
+    "Opportunities don't happen. You create them.",
+    "Success is walking from failure to failure with no loss of enthusiasm.",
+    "The difference between ordinary and extraordinary is that little extra.",
+    "The only way to do great work is to love what you do.",
   ];
   return quotes[Math.floor(Math.random() * quotes.length)];
 };
