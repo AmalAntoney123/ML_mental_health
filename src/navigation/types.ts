@@ -71,6 +71,7 @@ export type RootStackParamList = {
   ExpandedJournalEntry: undefined;
   MoodTracking: undefined;
   Leaderboard: undefined;
+  ManageSleepMusic: undefined;
   ChatScreen: {
     group: SupportGroup;
     fromSocialChallenge?: boolean;

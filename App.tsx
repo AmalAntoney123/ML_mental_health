@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { AppRegistry } from 'react-native';
+import { AppRegistry, Platform } from 'react-native';
 import { ThemeProvider } from './src/context/ThemeContext';
 import Navigation from './src/navigation/Navigation';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
@@ -7,6 +7,7 @@ import { MenuProvider } from 'react-native-popup-menu';
 import Toast from 'react-native-toast-message';
 import { scheduleNotification, scheduleMorningNotification, scheduleRandomMotivation } from './src/utils/notificationService';
 import PushNotification from 'react-native-push-notification';
+import TrackPlayer from 'react-native-track-player';
 
 // Add this function to create the notification channel
 const createNotificationChannel = () => {
@@ -56,6 +57,16 @@ const createRandomMotivationChannel = () => {
   );
 };
 
+const requestNotificationPermissions = async () => {
+  if (Platform.OS === 'ios') {
+    const authStatus = await PushNotification.requestPermissions(['alert', 'badge', 'sound']);
+    console.log('Notification authorization status:', authStatus);
+  } else {
+    // For Android, permissions are requested automatically when creating the notification channel
+    console.log('Notification permissions requested for Android');
+  }
+};
+
 createNotificationChannel();
 createMorningMotivationChannel();
 createRandomMotivationChannel();
@@ -73,14 +84,39 @@ PushNotification.configure({
     console.log("NOTIFICATION:", notification);
   },
   popInitialNotification: true,
-  requestPermissions: true,
+  requestPermissions: false, // Set this to false, we'll request permissions manually
 });
 
 const App: React.FC = () => {
   useEffect(() => {
+    const setupTrackPlayer = async () => {
+      try {
+        await TrackPlayer.setupPlayer();
+        console.log('Track Player initialized');
+      } catch (error) {
+        console.error('Error setting up TrackPlayer:', error);
+      }
+    };
+
+    setupTrackPlayer();
+
+    requestNotificationPermissions();
     scheduleNotification();
     scheduleMorningNotification();
-    scheduleRandomMotivation(); // Add this line
+    scheduleRandomMotivation();
+
+    return () => {
+      const cleanupTrackPlayer = async () => {
+        try {
+          await TrackPlayer.reset();
+          await TrackPlayer.remove([]);
+        } catch (error) {
+          console.error('Error cleaning up TrackPlayer:', error);
+        }
+      };
+
+      cleanupTrackPlayer();
+    };
   }, []);
 
   return (

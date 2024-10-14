@@ -125,6 +125,11 @@ const AdminScreen: React.FC<Props> = ({ navigation }) => {
                         icon="stars"
                         onPress={handleRandomMotivation}
                     />
+                    <AdminButton
+                        title="Manage Sleep Music"
+                        icon="music-note"
+                        onPress={() => navigation.navigate('ManageSleepMusic')}
+                    />
                 </View>
             </ScrollView>
         </View>

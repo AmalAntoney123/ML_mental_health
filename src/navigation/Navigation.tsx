@@ -35,6 +35,7 @@ import FindGroupsScreen from '../screens/home/SupportGroup/FindGroupsScreen';
 import JournalChallengeScreen from '../screens/challenges/JournalChallengeScreen';
 import MoodTrackingScreen from '../screens/home/MoodTrackingScreen';
 import LeaderboardScreen from '../screens/home/LeaderboardScreen';
+import ManageSleepMusicScreen from '../screens/admin/ManageSleepMusicScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -154,17 +155,22 @@ const Navigation: React.FC = () => {
         <Stack.Screen name="ChatScreen"
           component={ChatScreen} options={{ headerShown: false }} />
         <Stack.Screen name="ChatDetailsScreen" component={ChatDetailsScreen} options={{ title: 'Chat Details' }} />
-        <Stack.Screen 
-          name="MoodTracking" 
-          component={MoodTrackingScreen} 
+        <Stack.Screen
+          name="MoodTracking"
+          component={MoodTrackingScreen}
           options={{ title: 'Mood Tracking' }}
         />
-        <Stack.Screen 
-          name="Leaderboard" 
-          component={LeaderboardScreen} 
+        <Stack.Screen
+          name="Leaderboard"
+          component={LeaderboardScreen}
           options={{ title: 'Leaderboard' }}
         />
-        
+        <Stack.Screen
+          name="ManageSleepMusic"
+          component={ManageSleepMusicScreen}
+          options={{ headerShown: false }}
+        />
+
       </Stack.Navigator>
     </NavigationContainer>
   );

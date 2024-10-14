@@ -27,6 +27,7 @@ const JournalChallengeScreen: React.FC = () => {
   useEffect(() => {
     Voice.onSpeechResults = onSpeechResults;
     Voice.onSpeechPartialResults = onSpeechPartialResults;
+    Voice.onSpeechError = onSpeechError;
     return () => {
       Voice.destroy().then(Voice.removeAllListeners);
     };
@@ -44,13 +45,64 @@ const JournalChallengeScreen: React.FC = () => {
     setPartialResults(e.value ?? []);
   };
 
+  const onSpeechError = (e: any) => {
+    console.error('Speech recognition error:', e);
+    
+    // Log additional details about the error
+    console.log('Error code:', e.error.code);
+    console.log('Error message:', e.error.message);
+    console.log('Network info:', JSON.stringify(e.error.networkInfo));
+    
+    // Only stop recording and show error for certain error codes
+    if (['2', '5', '11'].includes(e.error.code)) {
+      setIsRecording(false);
+      setPartialResults([]);
+      
+      let errorMessage = 'An error occurred with speech recognition.';
+      switch (e.error.code) {
+        case '2':
+          errorMessage = 'Network error. Please check your internet connection and ensure the app has network permissions.';
+          break;
+        case '5':
+          errorMessage = 'Speech recognition is not available at the moment. Please try again later.';
+          break;
+        case '11':
+          errorMessage = 'Sorry, I didn\'t understand that. Please try again.';
+          break;
+      }
+
+      Toast.show({
+        type: 'error',
+        text1: 'Speech Recognition Error',
+        text2: errorMessage,
+        visibilityTime: 5000,
+        autoHide: true,
+        topOffset: 30,
+        bottomOffset: 40,
+      });
+    }
+    // For error code '7' (No match), we'll just log it without interrupting the user
+    else if (e.error.code === '7') {
+      console.log('No match found, but continuing transcription');
+    }
+  };
+
   const startVoiceRecording = async () => {
     try {
       await Voice.start('en-US');
       setIsRecording(true);
       setPartialResults([]);
     } catch (error) {
-      console.error(error);
+      console.error('Error starting voice recording:', error);
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Failed to start voice recording. Please try again.',
+        visibilityTime: 3000,
+        autoHide: true,
+        topOffset: 30,
+        bottomOffset: 40,
+      });
     }
   };
 
@@ -60,7 +112,16 @@ const JournalChallengeScreen: React.FC = () => {
       setIsRecording(false);
       setPartialResults([]);
     } catch (error) {
-      console.error(error);
+      console.error('Error stopping voice recording:', error);
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Failed to stop voice recording. Please try again.',
+        visibilityTime: 3000,
+        autoHide: true,
+        topOffset: 30,
+        bottomOffset: 40,
+      });
     }
   };
 
