@@ -43,7 +43,7 @@ const DashboardScreen: React.FC<Props> = ({ navigation }) => {
     social: 0,
     journal: 0,
     sleep: 0,
-    hydration: 0
+    positivity: 0,
   });
   const flatListRef = useRef<FlatList>(null);
 
@@ -58,7 +58,7 @@ const DashboardScreen: React.FC<Props> = ({ navigation }) => {
     { title: 'Social', icon: 'people', screens: ['Social'] },
     { title: 'Journal', icon: 'book', screens: ['JournalChallenge'] },
     { title: 'Sleep', icon: 'nightlight', screens: ['Sleep'] },
-    { title: 'Hydration', icon: 'local-drink', screens: ['Hydration'] },
+    { title: 'Positivity', icon: 'sentiment-very-satisfied', screens: ['Positivity'] },
   ];
 
   const initializeUserChallenges = async (userId: string) => {
@@ -70,8 +70,7 @@ const DashboardScreen: React.FC<Props> = ({ navigation }) => {
       social: 0,
       journal: 0,
       sleep: 0,
-      hydration: 0,
-
+      positivity: 0,
     };
 
     try {
@@ -148,10 +147,11 @@ const DashboardScreen: React.FC<Props> = ({ navigation }) => {
       challenges: baseChallenges.map((challenge, index) => ({
         ...challenge,
         id: `${levelIndex + 1}-${index + 1}`,
-        completed: challengeData[challenge.title.toLowerCase() as keyof typeof challengeData] > levelIndex,
+        completed: challengeData[challenge.title.toLowerCase().replace(/\s+/g, '') as keyof typeof challengeData] > levelIndex,
       })),
     }));
   }, [challengeData]);
+
 
   const levels = generateLevels(10);
   const lastCompletedLevelIndex = Math.max(0, userLevel - 2);
@@ -172,17 +172,19 @@ const DashboardScreen: React.FC<Props> = ({ navigation }) => {
   };
   const renderChallenge = ({ item, index, levelIndex }: { item: Challenge; index: number; levelIndex: number }) => {
     const isLevelOne = levelIndex === 0;
-    const challengeCount = challengeData[item.title.toLowerCase() as keyof typeof challengeData];
+    const challengeKey = item.title.toLowerCase().replace(/\s+/g, '') as keyof typeof challengeData;
+    const challengeCount = challengeData[challengeKey];
     const isCompleted = challengeCount > levelIndex;
     const isLocked = !isLevelOne && (levelIndex + 1 > userLevel);
-  
+    console.log(`Challenge: ${item.title}, Count: ${challengeCount}, Level: ${levelIndex + 1}, Completed: ${isCompleted}`);
+
     const handleChallengePress = () => {
       const selectedScreen = getRandomScreen(item.screens);
       if (selectedScreen) {
         navigation.navigate(selectedScreen);
       }
     };
-  
+
     return (
       <View style={styles.challengeWrapper}>
         <TouchableOpacity

@@ -36,6 +36,8 @@ import JournalChallengeScreen from '../screens/challenges/JournalChallengeScreen
 import MoodTrackingScreen from '../screens/home/MoodTrackingScreen';
 import LeaderboardScreen from '../screens/home/LeaderboardScreen';
 import ManageSleepMusicScreen from '../screens/admin/ManageSleepMusicScreen';
+import SelfBoostScreen from '../screens/challenges/SelfBoostScreen';
+import PositivityScreen from '../screens/challenges/PositivityScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -114,6 +116,7 @@ const Navigation: React.FC = () => {
         <Stack.Screen name="JournalChallenge" component={JournalChallengeScreen} />
         <Stack.Screen name="Sleep" component={SleepScreen} />
         <Stack.Screen name="Hydration" component={HydrationScreen} />
+        <Stack.Screen name="Positivity" component={PositivityScreen} />
         <Stack.Screen
           name="Profile"
           component={ProfileScreen}

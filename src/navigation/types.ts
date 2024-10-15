@@ -54,6 +54,7 @@ export type RootStackParamList = {
   Onboarding: undefined;
   Breathing: undefined;
   Meditation: undefined;
+  Positivity: undefined;
   Gratitude: undefined;
   Exercise: undefined;
   Social: undefined;

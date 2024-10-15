@@ -1,4 +1,4 @@
-import React, { useEffect, useState  } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -37,7 +37,7 @@ const ProfileScreen = () => {
     type ProfileScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Home'>;
 
     const navigation = useNavigation<ProfileScreenNavigationProp>();
-    
+
 
     useFocusEffect(
         React.useCallback(() => {
@@ -71,9 +71,9 @@ const ProfileScreen = () => {
                     }
                 }
             };
-    
+
             fetchUserData();
-    
+
             // Cleanup function
             return () => {
                 // Any cleanup code if needed
@@ -115,8 +115,8 @@ const ProfileScreen = () => {
                         age: data.age,
                         gender: data.gender,
                         previousTherapyExperience: data.previousTherapyExperience,
-                        challenges:data.challenges,
-                        completedChallenges:data.completedChallenges,
+                        challenges: data.challenges,
+                        completedChallenges: data.completedChallenges,
                         sleepHabits: data.sleepHabits,
                         interests: data.interests,
                         languagePreference: data.languagePreference,
@@ -207,8 +207,6 @@ const ProfileScreen = () => {
             iconName = 'weight-lifter';
         } else if (lowercaseName.includes('gratitude')) {
             iconName = 'hand-heart';
-        } else if (lowercaseName.includes('hydration')) {
-            iconName = 'water';
         } else if (lowercaseName.includes('mindfulness')) {
             iconName = 'meditation';
         } else if (lowercaseName.includes('journal')) {
@@ -217,10 +215,11 @@ const ProfileScreen = () => {
             iconName = 'sleep';
         } else if (lowercaseName.includes('social')) {
             iconName = 'account-group';
+        } else if (lowercaseName.includes('selfboost')) {
+            iconName = 'emoticon-happy';
         }
-
         return iconName;
-    };
+    }
 
     return (
         <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>

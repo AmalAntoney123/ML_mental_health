@@ -185,8 +185,7 @@ const OnboardingScreen: React.FC<Props> = ({ navigation }) => {
         social: 0,
         journal: 0,
         sleep: 0,
-        hydration: 0,
-  
+        positivity: 0,  
       };
     const saveUserData = async () => {
         try {

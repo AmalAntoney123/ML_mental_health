@@ -4,6 +4,7 @@ import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../utils/auth';
 import database from '@react-native-firebase/database';
 import MusicPlayer, { MusicPlayerRef } from '../../components/MusicPlayer';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface SleepMusic {
   id: string;
@@ -17,19 +18,36 @@ const SleepScreen: React.FC = () => {
   const [sleepMusic, setSleepMusic] = useState<SleepMusic[]>([]);
   const [selectedMusic, setSelectedMusic] = useState<SleepMusic | null>(null);
   const [challengeCompleted, setChallengeCompleted] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [lastPlayedMusic, setLastPlayedMusic] = useState<SleepMusic | null>(null);
   const { colors } = useTheme();
   const { user } = useAuth();
   const playerRef = useRef<MusicPlayerRef>(null);
 
   useEffect(() => {
     fetchSleepMusic();
+    loadLastPlayedMusic();
     return () => {
-      // Cleanup the player when component unmounts
       if (playerRef.current) {
         playerRef.current.cleanup();
       }
     };
   }, []);
+
+  const loadLastPlayedMusic = async () => {
+    try {
+      const lastPlayed = await AsyncStorage.getItem('lastPlayedMusic');
+      if (lastPlayed) {
+        const parsedMusic = JSON.parse(lastPlayed);
+        setLastPlayedMusic(parsedMusic);
+        setSelectedMusic(parsedMusic);
+        setIsPlaying(true);
+        setStage('music');
+      }
+    } catch (error) {
+      console.error('Error loading last played music:', error);
+    }
+  };
 
   const fetchSleepMusic = async () => {
     const musicRef = database().ref('sleepMusic');
@@ -50,27 +68,48 @@ const SleepScreen: React.FC = () => {
     setStage('music');
   };
 
-  const handleMusicSelect = (music: SleepMusic) => {
+  const handleMusicSelect = async (music: SleepMusic) => {
     setSelectedMusic(music);
+    setLastPlayedMusic(music);
+    setIsPlaying(true);
+    AsyncStorage.setItem('lastPlayedMusic', JSON.stringify(music)).catch(error => {
+      console.error('Error saving last played music:', error);
+    });
+    await handleMusicComplete();
   };
 
   const handleMusicComplete = async () => {
-    setChallengeCompleted(true);
-    if (user) {
-      const userRef = database().ref(`users/${user.uid}`);
-      const snapshot = await userRef.once('value');
-      const userData = snapshot.val();
-      const currentLevel = Math.floor(userData.completedChallenges / 7) + 1;
+    if (!challengeCompleted) {
+      setChallengeCompleted(true);
+      if (user) {
+        const userRef = database().ref(`users/${user.uid}`);
+        const snapshot = await userRef.once('value');
+        const userData = snapshot.val();
+        const currentLevel = Math.floor(userData.completedChallenges / 7) + 1;
 
-      if (userData.challenges.sleep < currentLevel) {
-        await userRef.child('challenges/sleep').set(userData.challenges.sleep + 1);
-        await userRef.child('completedChallenges').set(userData.completedChallenges + 1);
+        if (userData.challenges.sleep < currentLevel) {
+          await userRef.child('challenges/sleep').set(userData.challenges.sleep + 1);
+          await userRef.child('completedChallenges').set(userData.completedChallenges + 1);
+        }
       }
     }
   };
 
-  const handleSkip = () => {
+  const handleStop = () => {
+    setSelectedMusic(null);
+    setIsPlaying(false);
+    setLastPlayedMusic(null);
+    AsyncStorage.removeItem('lastPlayedMusic').catch(error => {
+      console.error('Error removing last played music:', error);
+    });
+    if (playerRef.current) {
+      playerRef.current.cleanup();
+    }
+  };
+
+  const handleFinish = () => {
     setStage('finished');
+    setIsPlaying(false);
   };
 
   const renderMusicItem = ({ item }: { item: SleepMusic }) => (
@@ -89,14 +128,36 @@ const SleepScreen: React.FC = () => {
         return (
           <>
             <Text style={[styles.text, { color: colors.text }]}>
-              Listen to relaxing sleep music for at least 10 minutes to complete this challenge.
+              Enhance your sleep quality with soothing audio designed to calm your mind before bedtime. Select and start a track to complete this challenge. You can stop the audio at any time once the challenge is marked as complete.
             </Text>
             <TouchableOpacity style={[styles.button, { backgroundColor: colors.primary }]} onPress={handleStart}>
-              <Text style={styles.buttonText}>Start</Text>
+              <Text style={styles.buttonText}>Begin Sleep Challenge</Text>
             </TouchableOpacity>
           </>
         );
       case 'music':
+        if (isPlaying || lastPlayedMusic) {
+          const currentMusic = selectedMusic || lastPlayedMusic;
+          return (
+            <>
+              {currentMusic && (
+                <MusicPlayer
+                  ref={playerRef}
+                  music={currentMusic}
+                  onComplete={handleMusicComplete}
+                  challengeCompleted={challengeCompleted}
+                  onStop={handleStop}
+                />
+              )}
+              <View style={styles.buttonContainer}>
+
+                <TouchableOpacity style={[styles.button, { backgroundColor: colors.primary }]} onPress={handleFinish}>
+                  <Text style={styles.buttonText}>Finish Challenge</Text>
+                </TouchableOpacity>
+              </View>
+            </>
+          );
+        }
         return (
           <>
             <FlatList
@@ -105,16 +166,8 @@ const SleepScreen: React.FC = () => {
               keyExtractor={(item) => item.id}
               style={styles.musicList}
             />
-            {selectedMusic && (
-              <MusicPlayer
-                ref={playerRef}
-                music={selectedMusic}
-                onComplete={handleMusicComplete}
-                challengeCompleted={challengeCompleted}
-              />
-            )}
-            <TouchableOpacity style={[styles.button, { backgroundColor: colors.primary }]} onPress={handleSkip}>
-              <Text style={styles.buttonText}>Skip Challenge</Text>
+            <TouchableOpacity style={[styles.button, { backgroundColor: colors.primary }]} onPress={handleFinish}>
+              <Text style={styles.buttonText}>Finish Challenge</Text>
             </TouchableOpacity>
           </>
         );
@@ -124,7 +177,7 @@ const SleepScreen: React.FC = () => {
             <Text style={[styles.text, { color: colors.text }]}>
               {challengeCompleted
                 ? "Great job! You've completed the sleep challenge."
-                : "You've skipped the sleep challenge. Remember, good sleep is essential for your well-being."}
+                : "You've finished the sleep challenge. Remember, good sleep is essential for your well-being."}
             </Text>
             <TouchableOpacity
               style={[styles.button, { backgroundColor: colors.primary }]}
@@ -159,8 +212,9 @@ const styles = StyleSheet.create({
   button: {
     padding: 15,
     borderRadius: 25,
-    minWidth: 120,
+    minWidth: 200,
     alignItems: 'center',
+    marginVertical: 10,
   },
   buttonText: {
     color: 'white',
@@ -182,6 +236,11 @@ const styles = StyleSheet.create({
   },
   musicArtist: {
     fontSize: 14,
+  },
+  buttonContainer: {
+    flexDirection: 'column',
+    alignItems: 'center',
+    width: '100%',
   },
 });
 
