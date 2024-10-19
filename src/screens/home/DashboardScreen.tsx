@@ -47,6 +47,7 @@ const DashboardScreen: React.FC<Props> = ({ navigation }) => {
     sleep: 0,
     positivity: 0,
   });
+  const [levels, setLevels] = useState<LevelData[]>([]);
   const flatListRef = useRef<FlatList>(null);
 
   const baseChallenges: Omit<Challenge, 'id' | 'completed' | 'screen'>[] = [
@@ -120,44 +121,36 @@ const DashboardScreen: React.FC<Props> = ({ navigation }) => {
   };
 
   useEffect(() => {
-    const initializePermissions = async () => {
-      try {
-        const hasNotificationPermission = await requestNotificationPermission();
-        if (hasNotificationPermission) {
-          console.log('Notification permission granted');
-          // You can add any notification-related setup here
-        } else {
-          console.log('Notification permission denied');
-          Alert.alert('Permission Denied', 'Notification permission is required to receive reminders and updates.');
-        }
-      } catch (error) {
-        console.error('Error initializing permissions:', error);
-      }
-    };
-
-    initializePermissions();
-
-    if (!user) return;
+    console.log('DashboardScreen mounted');
+    if (!user) {
+      console.log('No user found');
+      return;
+    }
 
     const userId = user.uid;
     const userRef = database().ref(`users/${userId}`);
 
     const fetchUserData = async () => {
       try {
+        console.log('Fetching user data...');
         const snapshot = await userRef.once('value');
         const userData = snapshot.val();
 
         if (userData) {
+          console.log('User data fetched:', userData);
           if (!userData.challenges) {
+            console.log('No challenges found, initializing...');
             await initializeUserChallenges(userId);
           } else {
+            console.log('Setting challenge data:', userData.challenges);
             setChallengeData(userData.challenges);
           }
 
           if (userData.completedChallenges !== undefined) {
+            console.log('Setting completed challenges:', userData.completedChallenges);
             setCompletedChallenges(userData.completedChallenges);
           } else {
-            // Initialize completedChallenges if it doesn't exist
+            console.log('Initializing completed challenges to 0');
             await userRef.child('completedChallenges').set(0);
             setCompletedChallenges(0);
           }
@@ -174,11 +167,14 @@ const DashboardScreen: React.FC<Props> = ({ navigation }) => {
     // Set up a listener for real-time updates
     const onDataChange = (snapshot: FirebaseDatabaseTypes.DataSnapshot) => {
       const userData = snapshot.val();
+      console.log('Real-time update received:', userData);
       if (userData) {
         if (userData.challenges) {
+          console.log('Updating challenge data:', userData.challenges);
           setChallengeData(userData.challenges);
         }
         if (userData.completedChallenges !== undefined) {
+          console.log('Updating completed challenges:', userData.completedChallenges);
           setCompletedChallenges(userData.completedChallenges);
         }
       }
@@ -187,8 +183,18 @@ const DashboardScreen: React.FC<Props> = ({ navigation }) => {
     userRef.on('value', onDataChange);
 
     // Clean up the listener
-    return () => userRef.off('value', onDataChange);
-  }, []); // Empty dependency array to run only once when component mounts
+    return () => {
+      console.log('DashboardScreen unmounting, removing listener');
+      userRef.off('value', onDataChange);
+    };
+  }, [user]); // Add user to the dependency array
+
+  useEffect(() => {
+    console.log('Generating levels with challenge data:', challengeData);
+    const generatedLevels = generateLevels(10);
+    console.log('Generated levels:', generatedLevels);
+    setLevels(generatedLevels);
+  }, [challengeData, generateLevels]);
 
   useEffect(() => {
     // Update user level based on completed challenges
@@ -197,18 +203,21 @@ const DashboardScreen: React.FC<Props> = ({ navigation }) => {
   }, [completedChallenges]);
 
   const generateLevels = useCallback((numLevels: number): LevelData[] => {
-    return Array.from({ length: numLevels }, (_, levelIndex) => ({
-      level: levelIndex + 1,
-      challenges: baseChallenges.map((challenge, index) => ({
-        ...challenge,
-        id: `${levelIndex + 1}-${index + 1}`,
-        completed: challengeData[challenge.title.toLowerCase().replace(/\s+/g, '') as keyof typeof challengeData] > levelIndex,
-      })),
-    }));
+    return Array.from({ length: numLevels }, (_, levelIndex) => {
+      const challenges = baseChallenges.map((challenge, index) => {
+        const challengeKey = challenge.title.toLowerCase().replace(/\s+/g, '') as keyof typeof challengeData;
+        const completed = challengeData[challengeKey] > levelIndex;
+        console.log(`Challenge: ${challenge.title}, Level: ${levelIndex + 1}, Completed: ${completed}, Count: ${challengeData[challengeKey]}`);
+        return {
+          ...challenge,
+          id: `${levelIndex + 1}-${index + 1}`,
+          completed: completed,
+        };
+      });
+      return { level: levelIndex + 1, challenges };
+    });
   }, [challengeData]);
 
-
-  const levels = generateLevels(10);
   const lastCompletedLevelIndex = Math.max(0, userLevel - 2);
 
   useEffect(() => {
@@ -219,8 +228,6 @@ const DashboardScreen: React.FC<Props> = ({ navigation }) => {
       });
     }
   }, [lastCompletedLevelIndex]);
-
-
 
   const getRandomScreen = (screens: (keyof RootStackParamList)[]) => {
     return screens[Math.floor(Math.random() * screens.length)];
@@ -333,22 +340,26 @@ const DashboardScreen: React.FC<Props> = ({ navigation }) => {
       <View style={styles.header}>
         <Text style={[styles.headerText, { color: colors.onBackground }]}>Welcome Back, User</Text>
       </View>
-      <FlatList
-        ref={flatListRef}
-        data={levels}
-        renderItem={renderLevel}
-        keyExtractor={(item) => item.level.toString()}
-        contentContainerStyle={styles.listContent}
-        showsVerticalScrollIndicator={false}
-        onScrollToIndexFailed={(info) => {
-          const wait = new Promise(resolve => setTimeout(resolve, 500));
-          wait.then(() => {
-            if (flatListRef.current) {
-              flatListRef.current.scrollToIndex({ index: info.index, animated: false });
-            }
-          });
-        }}
-      />
+      {levels.length > 0 ? (
+        <FlatList
+          ref={flatListRef}
+          data={levels}
+          renderItem={renderLevel}
+          keyExtractor={(item) => item.level.toString()}
+          contentContainerStyle={styles.listContent}
+          showsVerticalScrollIndicator={false}
+          onScrollToIndexFailed={(info) => {
+            const wait = new Promise(resolve => setTimeout(resolve, 500));
+            wait.then(() => {
+              if (flatListRef.current) {
+                flatListRef.current.scrollToIndex({ index: info.index, animated: false });
+              }
+            });
+          }}
+        />
+      ) : (
+        <Text style={[styles.loadingText, { color: colors.text }]}>Loading levels...</Text>
+      )}
     </SafeAreaView>
   );
 };
@@ -444,7 +455,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
     paddingVertical: 4,
     borderRadius: 20
-  }
+  },
+  loadingText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginTop: 20,
+  },
 });
 
 export default DashboardScreen;

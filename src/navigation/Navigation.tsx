@@ -3,7 +3,7 @@ import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useColorScheme } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
-import HomeScreen from '../screens/HomeScreen';
+import MainScreen from '../screens/HomeScreen';
 import DetailScreen from '../screens/DetailScreen';
 import IntroScreen from '../screens/IntroScreen';
 import { RootStackParamList } from '../navigation/types';
@@ -36,7 +36,6 @@ import JournalChallengeScreen from '../screens/challenges/JournalChallengeScreen
 import MoodTrackingScreen from '../screens/home/MoodTrackingScreen';
 import LeaderboardScreen from '../screens/home/LeaderboardScreen';
 import ManageSleepMusicScreen from '../screens/admin/ManageSleepMusicScreen';
-import SelfBoostScreen from '../screens/challenges/SelfBoostScreen';
 import PositivityScreen from '../screens/challenges/PositivityScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -72,7 +71,7 @@ const Navigation: React.FC = () => {
     if (isFirstTime) return 'Intro';
     if (!user || !isEmailVerified) return 'Login';
 
-    return 'Home';
+    return 'MainScreen';
   };
 
   return (
@@ -99,8 +98,8 @@ const Navigation: React.FC = () => {
           options={{ headerShown: false }}
         />
         <Stack.Screen
-          name="Home"
-          component={HomeScreen}
+          name="MainScreen"
+          component={MainScreen}
           options={{ headerShown: false }}
         />
         <Stack.Screen

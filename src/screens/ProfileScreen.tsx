@@ -34,7 +34,7 @@ const ProfileScreen = () => {
     const [userPhotoURL, setUserPhotoURL] = useState<string | null>(user?.photoURL || null);
     const [userData, setUserData] = useState<UserData | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
-    type ProfileScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Home'>;
+    type ProfileScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'MainScreen'>;
 
     const navigation = useNavigation<ProfileScreenNavigationProp>();
 

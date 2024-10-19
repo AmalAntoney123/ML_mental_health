@@ -93,7 +93,7 @@ const AdminScreen: React.FC<Props> = ({ navigation }) => {
                     <AdminButton
                         title="Dashboard"
                         icon="dashboard"
-                        onPress={() => navigation.navigate('Home')}
+                        onPress={() => navigation.navigate('MainScreen')}
                     />
                     <AdminButton
                         title="Manage Challenges"

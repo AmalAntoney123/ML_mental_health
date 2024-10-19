@@ -219,15 +219,16 @@ const TabNavigator = () => {
   );
 };
 
-const HomeScreen: React.FC = () => {
+const MainScreen: React.FC = () => {
   return (
     <Drawer.Navigator
-      drawerContent={() => <DrawerContent navigation={useNavigation as any} />} // Pass navigation prop
+      drawerContent={() => <DrawerContent navigation={useNavigation as any} />}
     >
-      <Drawer.Screen name="Home" component={TabNavigator} options={{ headerShown: false }} />
+      <Drawer.Screen name="MainDashboard" component={TabNavigator} options={{ headerShown: false }} />
     </Drawer.Navigator>
   );
 };
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -323,4 +324,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default HomeScreen;
+export default MainScreen;

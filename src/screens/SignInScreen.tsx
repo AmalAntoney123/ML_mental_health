@@ -144,7 +144,7 @@ const SignInScreen: React.FC<Props> = ({ navigation }) => {
                 const userDataExists = await checkUserDataExists(user.uid);
                 
                 if (userDataExists) {
-                    navigation.navigate('Home');
+                    navigation.navigate('MainScreen');
                 } else {
                     navigation.navigate('Onboarding');
                 }

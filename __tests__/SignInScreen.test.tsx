@@ -69,7 +69,7 @@ describe('SignInScreen', () => {
 
     await waitFor(() => {
       expect(auth.login).toHaveBeenCalledWith('test@example.com', 'password123');
-      expect(mockNavigation.navigate).toHaveBeenCalledWith('Home');
+      expect(mockNavigation.navigate).toHaveBeenCalledWith('MainScreen');
     });
     console.log('✅ Sign in successful and navigated to Home');
   });

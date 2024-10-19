@@ -7,6 +7,8 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+
 
     <queries>
         <intent>
@@ -62,6 +64,10 @@
         </intent-filter>
       </activity>
     <service android:name="com.tanguyantoine.react.MusicControlNotification$NotificationService" />
-
+    <service
+        android:name="com.doublesymmetry.trackplayer.service.MusicService"
+        android:foregroundServiceType="mediaPlayback"
+        android:exported="true">
+    </service>
     </application>
 </manifest>

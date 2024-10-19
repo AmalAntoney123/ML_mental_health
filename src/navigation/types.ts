@@ -47,7 +47,7 @@ export interface UserData {
 
 export type RootStackParamList = {
   Intro: undefined;
-  Home: undefined;
+  MainScreen: undefined;
   Login: undefined;
   SignUp: undefined;
   SignIn: undefined;

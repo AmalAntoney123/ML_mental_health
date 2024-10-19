@@ -41,7 +41,7 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
                 throw new Error('user-disabled');
             }
             if (userData) {
-                navigation.navigate('Home');
+                navigation.navigate('MainScreen');
             } else {
                 navigation.navigate('Onboarding');
             }

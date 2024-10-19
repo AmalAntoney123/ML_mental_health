@@ -209,7 +209,7 @@ const OnboardingScreen: React.FC<Props> = ({ navigation }) => {
                     isActive : true,
                 });
                 
-                navigation.navigate('Home');
+                navigation.navigate('MainScreen');
             } else {
                 Alert.alert('Error', 'User not found. Please sign in again.');
             }

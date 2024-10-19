@@ -19,7 +19,7 @@ const DetailScreen: React.FC<Props> = ({ navigation }) => {
       <Text style={[styles.title, { color: colors.text }]}>Detail Screen</Text>
       <Button
         title="Go back to Home"
-        onPress={() => navigation.navigate('Home')}
+        onPress={() => navigation.navigate('MainScreen')}
         color={colors.primary}
       />
     </View>
