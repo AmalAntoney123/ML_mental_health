@@ -131,39 +131,39 @@ const MoodTrackingScreen: React.FC = () => {
     setIsEditing(true);
   };
 
-  const predictNextMood = () => {
+  const predictNextMood = async () => {
     if (historicalMoods.length < 5) {
       setPrediction(null);
       return;
     }
 
-    const normalize = (value: number, min: number, max: number) => (value - min) / (max - min);
-
-    const features = historicalMoods.map(entry => [
-      normalize(entry.sleepQuality, 1, 10),
-      normalize(entry.stressLevel, 1, 10),
-      normalize(entry.physicalActivity, 1, 10),
-      Math.sin(2 * Math.PI * new Date(entry.date).getDay() / 7), // Day of week cyclical feature
-      Math.cos(2 * Math.PI * new Date(entry.date).getDay() / 7)
-    ]);
-
-    const labels = historicalMoods.map(entry => normalize(entry.mood, 1, 10));
-
-    const { slope, intercept } = linearRegression(features, labels);
-
     const today = new Date();
-    const predictedMoodNormalized = slope.reduce((sum, coef, index) => {
-      if (index < 3) {
-        return sum + coef * normalize([sleepQuality, stressLevel, physicalActivity][index], 1, 10);
-      } else if (index === 3) {
-        return sum + coef * Math.sin(2 * Math.PI * today.getDay() / 7);
-      } else {
-        return sum + coef * Math.cos(2 * Math.PI * today.getDay() / 7);
-      }
-    }, intercept);
+    const data = {
+      sleep_quality: sleepQuality,
+      stress_level: stressLevel,
+      physical_activity: physicalActivity,
+      day_of_week: today.getDay()
+    };
 
-    const predictedMood = predictedMoodNormalized * 9 + 1; // Denormalize
-    setPrediction(Math.min(Math.max(Math.round(predictedMood * 10) / 10, 1), 10));
+    try {
+      const response = await fetch('https://emo-ml-api.onrender.com/predict', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      const result = await response.json();
+      setPrediction(result.predicted_mood);
+    } catch (error) {
+      console.error('Error predicting mood:', error);
+      setPrediction(null);
+    }
   };
 
   const linearRegression = (features: number[][], labels: number[]) => {
@@ -543,6 +543,40 @@ const MoodTrackingScreen: React.FC = () => {
     }
   };
 
+  const generateWeeklyRandomData = async () => {
+    if (!user) return;
+
+    const weeklyData: MoodEntry[] = [];
+    const today = new Date();
+
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date(today);
+      date.setDate(date.getDate() - i);
+
+      weeklyData.push({
+        date: date.toISOString().split('T')[0],
+        mood: Math.floor(Math.random() * 10) + 1,
+        sleepQuality: Math.floor(Math.random() * 10) + 1,
+        stressLevel: Math.floor(Math.random() * 10) + 1,
+        physicalActivity: Math.floor(Math.random() * 10) + 1,
+        notes: `Random entry for ${date.toDateString()}`,
+      });
+    }
+
+    const moodEntriesRef = database().ref(`users/${user.uid}/moodEntries`);
+
+    try {
+      for (const entry of weeklyData) {
+        await moodEntriesRef.push(entry);
+      }
+      Alert.alert('Success', 'Random weekly data generated successfully');
+      fetchHistoricalMoods(); // Refresh the historical moods
+    } catch (error) {
+      console.error('Error generating random weekly data:', error);
+      Alert.alert('Error', 'Failed to generate random weekly data. Please try again.');
+    }
+  };
+
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
       <ScrollView
@@ -553,6 +587,14 @@ const MoodTrackingScreen: React.FC = () => {
         {renderMoodInsights()}
         {renderMoodChart()}
         {renderFactors()}
+        <TouchableOpacity
+          style={[styles.button, { backgroundColor: colors.secondary }]}
+          onPress={generateWeeklyRandomData}
+        >
+          <Text style={[styles.buttonText, { color: colors.onSecondary }]}>
+            Generate Random Weekly Data
+          </Text>
+        </TouchableOpacity>
       </ScrollView>
       <TouchableOpacity
         style={[styles.fab, { backgroundColor: colors.primary }]}
@@ -641,7 +683,7 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 5,
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: 20,
   },
   buttonText: {
     fontSize: 16,
