@@ -114,7 +114,6 @@ const App: React.FC = () => {
           console.log('Notification permissions not granted');
         }
       } catch (error) {
-        console.error('Error setting up app:', error);
       }
     };
 

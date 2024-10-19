@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef, useEffect } from 'react';
+import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Dimensions, SafeAreaView, Platform, Alert } from 'react-native';
 import { useTheme } from '../../context/ThemeContext';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -36,8 +36,6 @@ const DashboardScreen: React.FC<Props> = ({ navigation }) => {
   const { colors } = useTheme();
   const { user } = useAuth();
 
-  const [userLevel, setUserLevel] = useState(1);
-  const [completedChallenges, setCompletedChallenges] = useState(0);
   const [challengeData, setChallengeData] = useState({
     mindfulness: 0,
     gratitude: 0,
@@ -146,13 +144,9 @@ const DashboardScreen: React.FC<Props> = ({ navigation }) => {
             setChallengeData(userData.challenges);
           }
 
-          if (userData.completedChallenges !== undefined) {
-            console.log('Setting completed challenges:', userData.completedChallenges);
-            setCompletedChallenges(userData.completedChallenges);
-          } else {
+          if (userData.completedChallenges === undefined) {
             console.log('Initializing completed challenges to 0');
             await userRef.child('completedChallenges').set(0);
-            setCompletedChallenges(0);
           }
         } else {
           console.error('User data not found');
@@ -168,15 +162,9 @@ const DashboardScreen: React.FC<Props> = ({ navigation }) => {
     const onDataChange = (snapshot: FirebaseDatabaseTypes.DataSnapshot) => {
       const userData = snapshot.val();
       console.log('Real-time update received:', userData);
-      if (userData) {
-        if (userData.challenges) {
-          console.log('Updating challenge data:', userData.challenges);
-          setChallengeData(userData.challenges);
-        }
-        if (userData.completedChallenges !== undefined) {
-          console.log('Updating completed challenges:', userData.completedChallenges);
-          setCompletedChallenges(userData.completedChallenges);
-        }
+      if (userData && userData.challenges) {
+        console.log('Updating challenge data:', userData.challenges);
+        setChallengeData(userData.challenges);
       }
     };
 
@@ -189,25 +177,12 @@ const DashboardScreen: React.FC<Props> = ({ navigation }) => {
     };
   }, [user]); // Add user to the dependency array
 
-  useEffect(() => {
-    console.log('Generating levels with challenge data:', challengeData);
-    const generatedLevels = generateLevels(10);
-    console.log('Generated levels:', generatedLevels);
-    setLevels(generatedLevels);
-  }, [challengeData, generateLevels]);
-
-  useEffect(() => {
-    // Update user level based on completed challenges
-    // Ensure the user is at least Level 1
-    setUserLevel(Math.max(1, Math.floor(completedChallenges / 7) + 1));
-  }, [completedChallenges]);
-
-  const generateLevels = useCallback((numLevels: number): LevelData[] => {
+  // Memoize the generateLevels function
+  const generateLevels = useMemo(() => (numLevels: number): LevelData[] => {
     return Array.from({ length: numLevels }, (_, levelIndex) => {
       const challenges = baseChallenges.map((challenge, index) => {
         const challengeKey = challenge.title.toLowerCase().replace(/\s+/g, '') as keyof typeof challengeData;
         const completed = challengeData[challengeKey] > levelIndex;
-        console.log(`Challenge: ${challenge.title}, Level: ${levelIndex + 1}, Completed: ${completed}, Count: ${challengeData[challengeKey]}`);
         return {
           ...challenge,
           id: `${levelIndex + 1}-${index + 1}`,
@@ -217,6 +192,22 @@ const DashboardScreen: React.FC<Props> = ({ navigation }) => {
       return { level: levelIndex + 1, challenges };
     });
   }, [challengeData]);
+
+  // Calculate user level and completed challenges more efficiently
+  const { userLevel, completedChallenges } = useMemo(() => {
+    const totalCompleted = Object.values(challengeData).reduce((sum, count) => sum + count, 0);
+    return {
+      userLevel: Math.max(1, Math.floor(totalCompleted / 7) + 1),
+      completedChallenges: totalCompleted,
+    };
+  }, [challengeData]);
+
+  useEffect(() => {
+    console.log('Generating levels with challenge data:', challengeData);
+    const generatedLevels = generateLevels(10);
+    console.log('Generated levels:', generatedLevels);
+    setLevels(generatedLevels);
+  }, [challengeData, generateLevels]);
 
   const lastCompletedLevelIndex = Math.max(0, userLevel - 2);
 
@@ -232,7 +223,7 @@ const DashboardScreen: React.FC<Props> = ({ navigation }) => {
   const getRandomScreen = (screens: (keyof RootStackParamList)[]) => {
     return screens[Math.floor(Math.random() * screens.length)];
   };
-  const renderChallenge = ({ item, index, levelIndex }: { item: Challenge; index: number; levelIndex: number }) => {
+  const renderChallenge = useCallback(({ item, index, levelIndex }: { item: Challenge; index: number; levelIndex: number }) => {
     const isLevelOne = levelIndex === 0;
     const challengeKey = item.title.toLowerCase().replace(/\s+/g, '') as keyof typeof challengeData;
     const challengeCount = challengeData[challengeKey];
@@ -280,7 +271,7 @@ const DashboardScreen: React.FC<Props> = ({ navigation }) => {
         )}
       </View>
     );
-  };
+  }, [challengeData, userLevel, colors, navigation]);
 
   const renderLevel = ({ item, index }: { item: LevelData; index: number }) => {
     const isLocked = item.level > userLevel && item.level !== 1;
