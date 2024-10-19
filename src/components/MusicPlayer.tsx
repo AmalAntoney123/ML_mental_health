@@ -5,6 +5,7 @@ import TrackPlayer, { Event, State, usePlaybackState, useProgress } from 'react-
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useTheme } from '../context/ThemeContext';
 import { PanResponder, GestureResponderEvent } from 'react-native';
+import TimerModal from './TimerModal';
 
 interface MusicPlayerProps {
   music: {
@@ -20,6 +21,7 @@ interface MusicPlayerProps {
 
 export interface MusicPlayerRef {
   cleanup: () => Promise<void>;
+  setStopTimer: (minutes: number | null) => void;
 }
 
 const MusicPlayer: React.ForwardRefRenderFunction<MusicPlayerRef, MusicPlayerProps> = ({ music, onComplete, challengeCompleted, onStop }, ref) => {
@@ -29,13 +31,37 @@ const MusicPlayer: React.ForwardRefRenderFunction<MusicPlayerRef, MusicPlayerPro
   const trackSet = useRef(false);
   const [isLoading, setIsLoading] = useState(true);
   const [currentProgress, setCurrentProgress] = useState(0);
+  const [stopTimer, setStopTimer] = useState<number | null>(null);
+  const stopTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const [isTimerModalVisible, setIsTimerModalVisible] = useState(false);
 
   useImperativeHandle(ref, () => ({
     cleanup: async () => {
       await TrackPlayer.reset();
       trackSet.current = false;
+      clearStopTimer();
+    },
+    setStopTimer: (minutes: number | null) => {
+      setAndStartTimer(minutes);
     }
   }));
+
+  const clearStopTimer = () => {
+    if (stopTimerRef.current) {
+      clearTimeout(stopTimerRef.current);
+      stopTimerRef.current = null;
+    }
+  };
+
+  const setAndStartTimer = (minutes: number | null) => {
+    clearStopTimer();
+    setStopTimer(minutes);
+    if (minutes !== null) {
+      stopTimerRef.current = setTimeout(() => {
+        handleStop();
+      }, minutes * 60 * 1000);
+    }
+  };
 
   useEffect(() => {
     const setupTrack = async () => {
@@ -49,10 +75,14 @@ const MusicPlayer: React.ForwardRefRenderFunction<MusicPlayerRef, MusicPlayerPro
             title: music.title,
             artist: music.artist,
           });
+          // Set repeat mode to track
+          await TrackPlayer.setRepeatMode(1); // 1 corresponds to RepeatMode.Track
           trackSet.current = true;
           await TrackPlayer.play();
         } catch (error) {
           console.error('Error adding track:', error);
+        } finally {
+          setIsLoading(false);
         }
       }
     };
@@ -186,6 +216,22 @@ const MusicPlayer: React.ForwardRefRenderFunction<MusicPlayerRef, MusicPlayerPro
         </TouchableOpacity>
       </View>
       
+      <TouchableOpacity
+        style={[styles.timerButton, { backgroundColor: colors.primary }]}
+        onPress={() => setIsTimerModalVisible(true)}
+      >
+        <Text style={styles.timerButtonText}>
+          {stopTimer ? `Timer: ${stopTimer} min` : 'Set Timer'}
+        </Text>
+      </TouchableOpacity>
+      
+      <TimerModal
+        isVisible={isTimerModalVisible}
+        onClose={() => setIsTimerModalVisible(false)}
+        onSetTimer={setAndStartTimer}
+        currentTimer={stopTimer}
+      />
+      
       {challengeCompleted && (
         <Text style={[styles.completedText, { color: colors.success }]}>Challenge Completed!</Text>
       )}
@@ -286,6 +332,15 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 25,
     marginHorizontal: 10,
+  },
+  timerButton: {
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 20,
+  },
+  timerButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
   },
 });
 

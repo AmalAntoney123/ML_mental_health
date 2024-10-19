@@ -10,3 +10,7 @@ import TrackPlayer from 'react-native-track-player';
 
 AppRegistry.registerComponent(appName, () => App);
 TrackPlayer.registerPlaybackService(() => PlaybackService);
+
+TrackPlayer.setupPlayer().then(() => {
+  console.log('TrackPlayer is ready');
+});

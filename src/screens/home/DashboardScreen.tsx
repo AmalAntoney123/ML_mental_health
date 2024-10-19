@@ -1,11 +1,13 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Dimensions, SafeAreaView } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Dimensions, SafeAreaView, Platform, Alert } from 'react-native';
 import { useTheme } from '../../context/ThemeContext';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { RootStackParamList } from '../../navigation/types';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import database, { FirebaseDatabaseTypes } from '@react-native-firebase/database';
 import { useAuth } from '../../utils/auth';
+import PushNotification from 'react-native-push-notification';
+import { PermissionsAndroid } from 'react-native';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const CHALLENGE_SIZE = SCREEN_WIDTH * 0.25;
@@ -81,7 +83,60 @@ const DashboardScreen: React.FC<Props> = ({ navigation }) => {
     }
   };
 
+  const requestNotificationPermission = async () => {
+    if (Platform.OS === 'android') {
+      try {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
+          {
+            title: "Notification Permission",
+            message: "We need your permission to send you notifications.",
+            buttonNeutral: "Ask Me Later",
+            buttonNegative: "Cancel",
+            buttonPositive: "OK"
+          }
+        );
+        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+          console.log("Notification permission granted");
+          return true;
+        } else {
+          console.log("Notification permission denied");
+          return false;
+        }
+      } catch (err) {
+        console.warn(err);
+        return false;
+      }
+    } else if (Platform.OS === 'ios') {
+      try {
+        const authStatus = await PushNotification.requestPermissions(['alert', 'badge', 'sound']);
+        return authStatus.alert && authStatus.badge && authStatus.sound;
+      } catch (error) {
+        console.error("Error requesting iOS notification permissions:", error);
+        return false;
+      }
+    }
+    return true;
+  };
+
   useEffect(() => {
+    const initializePermissions = async () => {
+      try {
+        const hasNotificationPermission = await requestNotificationPermission();
+        if (hasNotificationPermission) {
+          console.log('Notification permission granted');
+          // You can add any notification-related setup here
+        } else {
+          console.log('Notification permission denied');
+          Alert.alert('Permission Denied', 'Notification permission is required to receive reminders and updates.');
+        }
+      } catch (error) {
+        console.error('Error initializing permissions:', error);
+      }
+    };
+
+    initializePermissions();
+
     if (!user) return;
 
     const userId = user.uid;
@@ -133,7 +188,7 @@ const DashboardScreen: React.FC<Props> = ({ navigation }) => {
 
     // Clean up the listener
     return () => userRef.off('value', onDataChange);
-  }, [user]); // Add user as a dependency
+  }, []); // Empty dependency array to run only once when component mounts
 
   useEffect(() => {
     // Update user level based on completed challenges
@@ -176,7 +231,6 @@ const DashboardScreen: React.FC<Props> = ({ navigation }) => {
     const challengeCount = challengeData[challengeKey];
     const isCompleted = challengeCount > levelIndex;
     const isLocked = !isLevelOne && (levelIndex + 1 > userLevel);
-    console.log(`Challenge: ${item.title}, Count: ${challengeCount}, Level: ${levelIndex + 1}, Completed: ${isCompleted}`);
 
     const handleChallengePress = () => {
       const selectedScreen = getRandomScreen(item.screens);

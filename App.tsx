@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { AppRegistry, Platform } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ThemeProvider } from './src/context/ThemeContext';
 import Navigation from './src/navigation/Navigation';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
@@ -61,9 +62,10 @@ const requestNotificationPermissions = async () => {
   if (Platform.OS === 'ios') {
     const authStatus = await PushNotification.requestPermissions(['alert', 'badge', 'sound']);
     console.log('Notification authorization status:', authStatus);
+    return authStatus.alert && authStatus.badge && authStatus.sound;
   } else {
-    // For Android, permissions are requested automatically when creating the notification channel
-    console.log('Notification permissions requested for Android');
+    // For Android, permissions are requested when creating the notification channel
+    return true;
   }
 };
 
@@ -89,21 +91,34 @@ PushNotification.configure({
 
 const App: React.FC = () => {
   useEffect(() => {
-    const setupTrackPlayer = async () => {
+    const setupApp = async () => {
       try {
         await TrackPlayer.setupPlayer();
         console.log('Track Player initialized');
+
+        const permissionGranted = await requestNotificationPermissions();
+        if (permissionGranted) {
+          const lastScheduled = await AsyncStorage.getItem('lastNotificationSchedule');
+          const currentDate = new Date().toDateString();
+
+          if (lastScheduled !== currentDate) {
+            scheduleNotification();
+            scheduleMorningNotification();
+            scheduleRandomMotivation();
+            await AsyncStorage.setItem('lastNotificationSchedule', currentDate);
+            console.log('Notifications scheduled for:', currentDate);
+          } else {
+            console.log('Notifications already scheduled for today');
+          }
+        } else {
+          console.log('Notification permissions not granted');
+        }
       } catch (error) {
-        console.error('Error setting up TrackPlayer:', error);
+        console.error('Error setting up app:', error);
       }
     };
 
-    setupTrackPlayer();
-
-    requestNotificationPermissions();
-    scheduleNotification();
-    scheduleMorningNotification();
-    scheduleRandomMotivation();
+    setupApp();
 
     return () => {
       const cleanupTrackPlayer = async () => {

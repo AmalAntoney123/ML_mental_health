@@ -76,6 +76,10 @@ const SleepScreen: React.FC = () => {
       console.error('Error saving last played music:', error);
     });
     await handleMusicComplete();
+    // Reset the stop timer when selecting new music
+    if (playerRef.current) {
+      playerRef.current.setStopTimer(null);
+    }
   };
 
   const handleMusicComplete = async () => {
@@ -150,7 +154,6 @@ const SleepScreen: React.FC = () => {
                 />
               )}
               <View style={styles.buttonContainer}>
-
                 <TouchableOpacity style={[styles.button, { backgroundColor: colors.primary }]} onPress={handleFinish}>
                   <Text style={styles.buttonText}>Finish Challenge</Text>
                 </TouchableOpacity>

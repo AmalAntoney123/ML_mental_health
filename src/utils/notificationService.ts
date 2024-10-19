@@ -3,6 +3,15 @@ import PushNotification from 'react-native-push-notification';
 const JOURNAL_NOTIFICATION_ID = 'daily-journal-reminder';
 const MORNING_MOTIVATION_ID = 'morning-inspiration';
 
+// New constants for notification times
+const JOURNAL_REMINDER_TIME = { hours: 19, minutes: 30 };
+const MORNING_MOTIVATION_TIME = { hours: 7, minutes: 0 };
+const FIXED_MOTIVATION_TIMES = [
+  { hours: 11, minutes: 30 },  // 11:30 AM
+  { hours: 16, minutes: 0 },   // 4:00 PM
+  { hours: 23, minutes: 0 }    // 11:00 PM
+];
+
 const journalTitles = [
   "Moment of Reflection",
   "Pause and Ponder",
@@ -104,9 +113,9 @@ export const scheduleNotification = () => {
   console.log('Setting up notification scheduler...');
   
   const now = new Date();
-  const scheduledTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 19, 30, 0, 0);
+  const scheduledTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), JOURNAL_REMINDER_TIME.hours, JOURNAL_REMINDER_TIME.minutes, 0, 0);
   
-  // If it's already past 11:04 PM, schedule for the next day
+  // If it's already past the scheduled time, schedule for the next day
   if (now > scheduledTime) {
     scheduledTime.setDate(scheduledTime.getDate() + 1);
   }
@@ -122,8 +131,10 @@ export const scheduleNotification = () => {
     date: scheduledTime,
     allowWhileIdle: true,
     repeatType: 'day',
-    repeatTime: 1,
+    repeatTime: 24 * 60 * 60 * 1000, // Repeat every 24 hours
   });
+
+  console.log('Notification scheduled for:', scheduledTime.toLocaleString());
 };
 
 export const triggerManualNotification = () => {
@@ -140,9 +151,9 @@ export const scheduleMorningNotification = () => {
   console.log('Setting up morning notification scheduler...');
   
   const now = new Date();
-  const scheduledTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 7, 0, 0, 0);
+  const scheduledTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), MORNING_MOTIVATION_TIME.hours, MORNING_MOTIVATION_TIME.minutes, 0, 0);
   
-  // If it's already past 7:00 AM, schedule for the next day
+  // If it's already past the scheduled time, schedule for the next day
   if (now > scheduledTime) {
     scheduledTime.setDate(scheduledTime.getDate() + 1);
   }
@@ -204,57 +215,33 @@ export const triggerMorningMotivation = () => {
 };
 
 export const scheduleRandomMotivation = () => {
-  console.log('Setting up random motivation scheduler...');
+  console.log('Setting up fixed-time motivation scheduler...');
   
   const now = new Date();
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   
-  const timePeriods = [
-    { start: 7, end: 12 },  // Morning: 7 AM - 10 AM
-    { start: 12, end: 17 }, // Afternoon: 10 AM - 3 PM
-    { start: 17, end: 22 }  // Evening: 3 PM - 10 PM
-  ];
+  FIXED_MOTIVATION_TIMES.forEach((time, index) => {
+    const scheduledTime = new Date(today.getTime());
+    scheduledTime.setHours(time.hours, time.minutes, 0, 0);
 
-  timePeriods.forEach((period, index) => {
-    const startTime = new Date(today.getTime());
-    startTime.setHours(period.start, 0, 0, 0);
-    
-    const endTime = new Date(today.getTime());
-    endTime.setHours(period.end, 0, 0, 0);
-
-    // If the current time is past this period, schedule for tomorrow
-    if (now > endTime) {
-      startTime.setDate(startTime.getDate() + 1);
-      endTime.setDate(endTime.getDate() + 1);
+    // If the scheduled time has already passed, set it for tomorrow
+    if (now > scheduledTime) {
+      scheduledTime.setDate(scheduledTime.getDate() + 1);
     }
-
-    // If the current time is within this period, adjust the start time
-    if (now > startTime && now < endTime) {
-      startTime.setTime(now.getTime());
-    }
-
-    // Generate a random time within this period
-    const randomTime = new Date(startTime.getTime() + Math.random() * (endTime.getTime() - startTime.getTime()));
 
     PushNotification.localNotificationSchedule({
-      channelId: "random-motivation",
-      id: `random-motivation-${index}`, // Use a consistent ID for each period
+      channelId: "fixed-time-motivation",
+      id: `fixed-time-motivation-${index}`,
       title: getRandomItem(randomMotivationTitles),
       message: getRandomItem(randomMotivationMessages),
-      date: randomTime,
+      date: scheduledTime,
       allowWhileIdle: true,
+      repeatType: 'day',
+      repeatTime: 24 * 60 * 60 * 1000, // Repeat every 24 hours
     });
 
-    console.log(`Random motivation for period ${index + 1} scheduled for ${randomTime.toLocaleTimeString()}`);
+    console.log(`Fixed-time motivation ${index + 1} scheduled for ${scheduledTime.toLocaleTimeString()}`);
   });
-
-  // Schedule the next day's motivations
-  const tomorrowMorning = new Date(today.getTime());
-  tomorrowMorning.setDate(tomorrowMorning.getDate() + 1);
-  tomorrowMorning.setHours(7, 0, 0, 0);
-
-  const timeUntilTomorrow = tomorrowMorning.getTime() - now.getTime();
-  setTimeout(() => scheduleRandomMotivation(), timeUntilTomorrow);
 };
 
 export const triggerRandomMotivation = () => {
