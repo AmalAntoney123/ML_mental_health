@@ -37,6 +37,8 @@ import MoodTrackingScreen from '../screens/home/MoodTrackingScreen';
 import LeaderboardScreen from '../screens/home/LeaderboardScreen';
 import ManageSleepMusicScreen from '../screens/admin/ManageSleepMusicScreen';
 import PositivityScreen from '../screens/challenges/PositivityScreen';
+import SettingsScreen from '../screens/SettingsScreen';
+import JournalHistoryScreen from '../screens/home/JournalHistoryScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -172,6 +174,8 @@ const Navigation: React.FC = () => {
           component={ManageSleepMusicScreen}
           options={{ headerShown: false }}
         />
+        <Stack.Screen name="Settings" component={SettingsScreen} />
+        <Stack.Screen name="JournalHistory" component={JournalHistoryScreen} />
 
       </Stack.Navigator>
     </NavigationContainer>

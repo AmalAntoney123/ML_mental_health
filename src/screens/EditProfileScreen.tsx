@@ -1,16 +1,19 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, ScrollView, SafeAreaView, Text, TouchableOpacity, Alert, Dimensions } from 'react-native';
-import { TextInput, Chip, Provider as PaperProvider, DefaultTheme, Card } from 'react-native-paper';
+import { TextInput, Chip, Provider as PaperProvider, DefaultTheme, Card, ActivityIndicator, FAB } from 'react-native-paper';
 import { useTheme } from '../context/ThemeContext';
 import { firebase } from '@react-native-firebase/database';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { NavigationProp } from '@react-navigation/native';
+import * as ImagePicker from 'react-native-image-picker';
+import storage from '@react-native-firebase/storage';
+import { Image } from 'react-native';
 
 const { width } = Dimensions.get('window');
 interface Props {
     navigation: NavigationProp<any, any>;
     route: any;
-  }
+}
 const EditProfileScreen = ({ navigation, route }: Props) => {
     const { userData } = route.params;
     const { colors } = useTheme();
@@ -25,6 +28,8 @@ const EditProfileScreen = ({ navigation, route }: Props) => {
     const [goals, setGoals] = useState(userData.goals || []);
     const [concerns, setConcerns] = useState(userData.concerns || []);
     const [preferredTherapyType, setPreferredTherapyType] = useState(userData.preferredTherapyType || '');
+    const [userPhotoURL, setUserPhotoURL] = useState(userData.photoURL || null);
+    const [isUploading, setIsUploading] = useState(false);
 
     const paperTheme = {
         ...DefaultTheme,
@@ -41,6 +46,50 @@ const EditProfileScreen = ({ navigation, route }: Props) => {
             backdrop: colors.background,
             notification: colors.secondary,
         },
+    };
+
+    const selectImage = () => {
+        ImagePicker.launchImageLibrary({
+            mediaType: 'photo',
+            quality: 0.5,
+        }, (response) => {
+            if (response.didCancel) {
+                console.log('User cancelled image picker');
+            } else if (response.errorCode) {
+                console.log('ImagePicker Error: ', response.errorMessage);
+            } else if (response.assets && response.assets[0].uri) {
+                uploadImage(response.assets[0].uri);
+            }
+        });
+    };
+
+    const uploadImage = async (uri: string) => {
+        const user = firebase.auth().currentUser;
+        if (!user) {
+            Alert.alert("Error", "User not authenticated");
+            return;
+        }
+
+        setIsUploading(true);
+
+        try {
+            const filename = `${user.uid}_profile_image.jpg`;
+            const reference = storage().ref(`profile_images/${user.uid}/${filename}`);
+
+            // Upload the file
+            await reference.putFile(uri);
+
+            // Get the download URL
+            const url = await reference.getDownloadURL();
+
+            // Update local state
+            setUserPhotoURL(url);
+        } catch (error) {
+            console.error("Error uploading image: ", error);
+            Alert.alert("Error", "Failed to upload image. Please try again.");
+        } finally {
+            setIsUploading(false);
+        }
     };
 
     const handleSave = async () => {
@@ -61,11 +110,17 @@ const EditProfileScreen = ({ navigation, route }: Props) => {
                     ...(JSON.stringify(goals) !== JSON.stringify(userData.goals) && { goals }),
                     ...(JSON.stringify(concerns) !== JSON.stringify(userData.concerns) && { concerns }),
                     ...(preferredTherapyType !== userData.preferredTherapyType && { preferredTherapyType }),
+                    ...(userPhotoURL !== userData.photoURL && { photoURL: userPhotoURL }),
                 };
 
                 const mergedData = { ...currentData, ...newData };
 
                 await firebase.database().ref(`users/${user.uid}`).update(mergedData);
+
+                // Update user's photoURL in Firebase Authentication
+                if (userPhotoURL !== userData.photoURL) {
+                    await user.updateProfile({ photoURL: userPhotoURL });
+                }
 
                 Alert.alert('Success', 'Profile updated successfully');
                 navigation.goBack();
@@ -79,7 +134,7 @@ const EditProfileScreen = ({ navigation, route }: Props) => {
     };
 
     const renderSection = (title: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | null | undefined, children: string | number | boolean | React.JSX.Element | Iterable<React.ReactNode> | null | undefined) => (
-        <Card style={[styles.card,{backgroundColor: colors.surface}]}>
+        <Card style={[styles.card, { backgroundColor: colors.surface }]}>
             <Card.Title title={title} titleStyle={[styles.sectionTitle, { color: colors.text }]} />
             <Card.Content>{children}</Card.Content>
         </Card>
@@ -90,6 +145,28 @@ const EditProfileScreen = ({ navigation, route }: Props) => {
             <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
                 <ScrollView contentContainerStyle={styles.scrollContent}>
                     <Text style={[styles.title, { color: colors.primary }]}>Edit Profile</Text>
+
+                    {renderSection("Profile Picture", (
+                        <View style={styles.profilePictureContainer}>
+                            {isUploading ? (
+                                <ActivityIndicator size="large" color={colors.primary} style={styles.loader} />
+                            ) : userPhotoURL ? (
+                                <Image
+                                    source={{ uri: userPhotoURL }}
+                                    style={styles.profilePicture}
+                                />
+                            ) : (
+                                <View style={[styles.profilePicturePlaceholder, { backgroundColor: colors.surface }]}>
+                                    <Icon name="person" size={40} color={colors.primary} />
+                                </View>
+                            )}
+                            <TouchableOpacity onPress={selectImage} style={[styles.changePhotoButton, { backgroundColor: colors.primary }]} disabled={isUploading}>
+                                <Text style={[styles.changePhotoButtonText, { color: colors.onPrimary }]}>
+                                    {isUploading ? 'Uploading...' : 'Change Photo'}
+                                </Text>
+                            </TouchableOpacity>
+                        </View>
+                    ))}
 
                     {renderSection("Basic Information", (
                         <>
@@ -232,12 +309,14 @@ const EditProfileScreen = ({ navigation, route }: Props) => {
                             ))}
                         </View>
                     ))}
-
-                    <TouchableOpacity onPress={handleSave} style={[styles.saveButton, { backgroundColor: colors.primary }]}>
-                        <Text style={[styles.saveButtonText, { color: colors.onPrimary }]}>Save Changes</Text>
-                        <Icon name="check" size={24} color={colors.onPrimary} />
-                    </TouchableOpacity>
                 </ScrollView>
+                <FAB
+                    icon="content-save"
+                    label="Save"
+                    onPress={handleSave}
+                    style={[styles.fab, { backgroundColor: colors.primary }]}
+                    color={colors.onPrimary}
+                />
             </SafeAreaView>
         </PaperProvider>
     );
@@ -275,18 +354,44 @@ const styles = StyleSheet.create({
     chip: {
         margin: 4,
     },
-    saveButton: {
-        borderRadius: 20,
-        paddingVertical: 15,
-        paddingHorizontal: 20,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginTop: 20,
+    fab: {
+        position: 'absolute',
+        margin: 16,
+        right: 0,
+        bottom: 0,
     },
-    saveButtonText: {
-        fontSize: 18,
-        marginRight: 10,
+    profilePictureContainer: {
+        alignItems: 'center',
+        marginBottom: 20,
+    },
+    profilePicture: {
+        width: 120,
+        height: 120,
+        borderRadius: 60,
+        marginBottom: 10,
+    },
+    profilePicturePlaceholder: {
+        width: 120,
+        height: 120,
+        borderRadius: 60,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 10,
+    },
+    changePhotoButton: {
+        paddingVertical: 8,
+        paddingHorizontal: 16,
+        borderRadius: 20,
+    },
+    changePhotoButtonText: {
+        fontSize: 16,
+    },
+    loader: {
+        width: 120,
+        height: 120,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 10,
     },
 });
 

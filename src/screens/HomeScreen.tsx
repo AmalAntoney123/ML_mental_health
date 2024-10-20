@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Switch } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { DrawerActions, useNavigation } from '@react-navigation/native';
-import { createDrawerNavigator } from '@react-navigation/drawer';
-import { DrawerNavigationProp } from '@react-navigation/drawer';
-import { NativeStackNavigationProp } from 'react-native-screens/lib/typescript/native-stack/types';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/types';
 import { useTheme } from '../context/ThemeContext';
 import { logout, useAuth } from '../utils/auth';
@@ -52,99 +50,19 @@ const BottomNavItem: React.FC<BottomNavItemProps> = ({ icon, label, isActive, on
   );
 };
 
-type HomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Login'>;
+type HomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList>;
 type ProfileNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Profile'>;
 type AdminNavigationProp = NativeStackNavigationProp<RootStackParamList, 'AdminPanel'>;
 
-type DrawerContentProps = {
-  navigation: DrawerNavigationProp<any>;
-};
-
-const Drawer = createDrawerNavigator();
-
-const DrawerContent: React.FC<DrawerContentProps> = ({ navigation }) => {
-  const { colors, toggleTheme, isDarkMode } = useTheme();
-  const { user, isAdmin } = useAuth(); // Assuming this provides the current logged-in user
-  const AdminNavigationProp = useNavigation<AdminNavigationProp>();
-  const HomeScreenNavigationProp = useNavigation<HomeScreenNavigationProp>();
-
-  const handleLogout = async () => {
-    try {
-      await logout(); // Logout the user
-      // Delay navigation to ensure logout is processed
-      setTimeout(() => {
-        HomeScreenNavigationProp.navigate('Login');
-      }, 100); // Adjust delay if needed
-    } catch (error) {
-      console.error('Logout failed:', error);
-    }
-  };
-
-
-  return (
-    <View style={[styles.drawer, { backgroundColor: colors.surface }]}>
-      {isAdmin && (
-        <TouchableOpacity
-          style={styles.drawerItem}
-          onPress={() => AdminNavigationProp.navigate('AdminPanel')}
-        >
-          <Icon name="admin-panel-settings" size={24} color={colors.text} />
-          <Text style={[styles.drawerText, { color: colors.text }]}>Admin Panel</Text>
-        </TouchableOpacity>
-      )}
-      <TouchableOpacity style={styles.drawerItem}>
-        <Icon name="settings" size={24} color={colors.text} />
-        <Text style={[styles.drawerText, { color: colors.text }]}>Settings</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.drawerItem}>
-        <Icon name="help" size={24} color={colors.text} />
-        <Text style={[styles.drawerText, { color: colors.text }]}>Help</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.drawerItem} onPress={handleLogout}>
-        <Icon name="logout" size={24} color={colors.text} />
-        <Text style={[styles.drawerText, { color: colors.text }]}>Logout</Text>
-      </TouchableOpacity>
-      <View style={styles.drawerItem}>
-        <Icon name="brightness-6" size={24} color={colors.text} />
-        <Text style={[styles.drawerText, { color: colors.text }]}>Dark Mode</Text>
-        <Switch
-          value={isDarkMode}
-          onValueChange={toggleTheme}
-          trackColor={{ false: colors.gray, true: colors.primary }}
-          thumbColor={isDarkMode ? colors.primary : colors.gray}
-        />
-      </View>
-    </View>
-  );
-};
-
-const Header: React.FC = () => {
-  const { colors } = useTheme();
-  const navigation = useNavigation();
-  const profileNavigation = useNavigation<ProfileNavigationProp>();
-
-  return (
-    <View style={[styles.header, { backgroundColor: colors.surface }]}>
-      <TouchableOpacity onPress={() => navigation.dispatch(DrawerActions.openDrawer())}>
-        <Icon name="menu" size={24} color={colors.onSurface} />
-      </TouchableOpacity>
-      <View style={styles.counterContainer}>
-        <Counter icon="local-fire-department" count={5} color={colors.primary} />
-        <Counter icon="money" count={100} color={colors.secondary} />
-      </View>
-      <TouchableOpacity onPress={() => profileNavigation.navigate('Profile')}>
-        <Icon name="person" size={24} color={colors.onSurface} />
-      </TouchableOpacity>
-    </View>
-  );
+type BottomTabNavigatorProps = {
+  navigation: NativeStackNavigationProp<RootStackParamList>;
 };
 
 const Tab = createBottomTabNavigator();
 
 const TabNavigator = () => {
   const { colors } = useTheme();
-  const navigation = useNavigation();
-  const [fabOpen, setFabOpen] = useState(false);
+  const navigation = useNavigation<HomeScreenNavigationProp>();
 
   return (
     <Provider>
@@ -168,7 +86,12 @@ const TabNavigator = () => {
           },
           tabBarActiveTintColor: colors.primary,
           tabBarInactiveTintColor: colors.text,
-          tabBarStyle: { backgroundColor: colors.background },
+          tabBarStyle: { 
+            backgroundColor: colors.background,
+            paddingBottom: 8, // Add padding to the bottom
+            height: 60, // Increase the height to accommodate the padding
+            paddingTop: 8,
+          },
         })}
       >
         <Tab.Screen name="Dashboard" component={DashboardScreen} />
@@ -178,12 +101,10 @@ const TabNavigator = () => {
           options={{
             tabBarIcon: () => (
               <FAB
-                icon={fabOpen ? 'close' : 'plus'}
-                onPress={() => setFabOpen(!fabOpen)}
-                style={[styles.fab, {backgroundColor: colors.primary}]}
-                color={colors.onPrimary}
-                backgroundColor={colors.primary}
-                />
+                icon={() => <Icon name="mood" size={24} color={colors.primary} />}
+                onPress={() => navigation.navigate('MoodTracking')}
+                style={[styles.fab, {backgroundColor: colors.onPrimary}]}
+              />
             ),
           }}
         >
@@ -192,41 +113,32 @@ const TabNavigator = () => {
         <Tab.Screen name="Therapy" component={TherapyScreen} />
         <Tab.Screen name="Support" component={SupportScreen} />
       </Tab.Navigator>
-      <Portal>
-        <FAB.Group
-          open={fabOpen}
-          visible = {false}
-          icon={fabOpen ? 'close' : 'plus'}
-          actions={[
-            {
-              icon: props => <Icon name="leaderboard" {...props} />,
-              label: 'Leaderboard',
-              onPress: () => navigation.navigate('Leaderboard')
-            },
-            {
-              icon: props => <Icon name="mood" {...props} />,
-              label: 'Mood Tracking',
-              onPress: () => navigation.navigate('MoodTracking')
-            },
-          ]}
-          onStateChange={({ open }) => setFabOpen(open)}
-          fabStyle={styles.fab}
-          style={styles.fabGroup}
-
-        />
-      </Portal>
     </Provider>
   );
 };
 
-const MainScreen: React.FC = () => {
+const Header: React.FC = () => {
+  const { colors } = useTheme();
+  const navigation = useNavigation<HomeScreenNavigationProp>();
+
   return (
-    <Drawer.Navigator
-      drawerContent={() => <DrawerContent navigation={useNavigation as any} />}
-    >
-      <Drawer.Screen name="MainDashboard" component={TabNavigator} options={{ headerShown: false }} />
-    </Drawer.Navigator>
+    <View style={[styles.header, { backgroundColor: colors.surface }]}>
+      <View style={styles.headerItem}>
+        {/* Empty view for spacing */}
+      </View>
+      <View style={styles.counterContainer}>
+        <Counter icon="local-fire-department" count={5} color={colors.primary} />
+        <Counter icon="money" count={100} color={colors.secondary} />
+      </View>
+      <TouchableOpacity onPress={() => navigation.navigate('Profile')} style={styles.headerItem}>
+        <Icon name="person" size={24} color={colors.onSurface} />
+      </TouchableOpacity>
+    </View>
   );
+};
+
+const MainScreen: React.FC = () => {
+  return <TabNavigator />;
 };
 
 const styles = StyleSheet.create({
@@ -239,8 +151,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 16,
   },
+  headerItem: {
+    width: 24, // Match the width of the profile icon
+  },
   counterContainer: {
     flexDirection: 'row',
+    justifyContent: 'center',
+    flex: 1,
   },
   counter: {
     flexDirection: 'row',
@@ -297,30 +214,11 @@ const styles = StyleSheet.create({
   },
   fab: {
     position: 'absolute',
-    bottom: 5, // Adjust this value to position the FAB vertically
+    bottom: 5,
     alignSelf: 'center',
     alignItems: 'center',
     borderRadius: 100,
     padding: 6,
-  },
-  hiddenFab: {
-    display: 'none',
-  },
-  fabGroup: {
-    position: 'absolute',
-    paddingBottom: 0, 
-    right: 0,
-    left: 0,
-  },
-  fabContainer: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    justifyContent: 'center',
-    alignItems: 'center',
-    pointerEvents: 'box-none',
   },
 });
 

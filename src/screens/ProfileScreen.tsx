@@ -83,7 +83,6 @@ const ProfileScreen = () => {
 
     const handleEditProfile = () => {
         if (userData) {
-            console.error(userData);
             navigation.navigate('EditProfile', {
                 userData: {
                     name: userName || undefined,
@@ -96,6 +95,7 @@ const ProfileScreen = () => {
                     goals: userData.goals,
                     concerns: userData.concerns,
                     preferredTherapyType: userData.preferredTherapyType,
+                    photoURL: userPhotoURL, // Add this line
                 }
             });
         } else {
@@ -224,7 +224,7 @@ const ProfileScreen = () => {
     return (
         <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
             <View style={styles.header}>
-                <TouchableOpacity style={styles.settingsIcon}>
+                <TouchableOpacity style={styles.settingsIcon} onPress={() => navigation.navigate('Settings')}>
                     <Icon name="settings" size={24} color={colors.onSurface} />
                 </TouchableOpacity>
             </View>

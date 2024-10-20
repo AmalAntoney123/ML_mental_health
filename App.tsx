@@ -9,6 +9,7 @@ import Toast from 'react-native-toast-message';
 import { scheduleNotification, scheduleMorningNotification, scheduleRandomMotivation } from './src/utils/notificationService';
 import PushNotification from 'react-native-push-notification';
 import TrackPlayer from 'react-native-track-player';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 // Add this function to create the notification channel
 const createNotificationChannel = () => {
@@ -134,12 +135,14 @@ const App: React.FC = () => {
   }, []);
 
   return (
-    <MenuProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
       <ThemeProvider>
-        <Navigation />
-        <Toast />
+        <MenuProvider>
+          <Navigation />
+          <Toast />
+        </MenuProvider>
       </ThemeProvider>
-    </MenuProvider>
+    </GestureHandlerRootView>
   );
 };
 

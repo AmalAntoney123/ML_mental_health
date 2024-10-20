@@ -76,12 +76,14 @@ export type RootStackParamList = {
   ChatScreen: {
     group: SupportGroup;
     fromSocialChallenge?: boolean;
-  }; 
+  };
   EditProfile: { userData: UserData };
   DetailedReport: {
     reportData: ReportData;
   };
   ViewUser: { userId: string | undefined };
-  SupportScreen: undefined;  // Added this line
-  ChatDetailsScreen: { group: SupportGroup };  // Added this line
+  SupportScreen: undefined;
+  ChatDetailsScreen: { group: SupportGroup };
+  Settings: undefined;
+  JournalHistory: undefined;
 };

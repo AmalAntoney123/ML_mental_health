@@ -253,3 +253,8 @@ export const triggerRandomMotivation = () => {
     allowWhileIdle: true,
   });
 };
+
+export const cancelAllNotifications = () => {
+  console.log('Cancelling all notifications...');
+  PushNotification.cancelAllLocalNotifications();
+};
