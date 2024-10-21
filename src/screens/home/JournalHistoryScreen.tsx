@@ -7,7 +7,6 @@ import { useAuth } from '../../utils/auth';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { RectButton } from 'react-native-gesture-handler';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
-import CryptoJS from 'crypto-js';
 
 type JournalEntry = {
   id: string;
@@ -38,7 +37,7 @@ const JournalHistoryScreen: React.FC = () => {
           const entryList: JournalEntry[] = Object.entries(data).map(([id, entry]: [string, any]) => ({
             id,
             date: entry.date,
-            content: decryptContent(entry.content, user.uid),
+            content: entry.content,
           }));
 
           // Group entries by date
@@ -62,16 +61,6 @@ const JournalHistoryScreen: React.FC = () => {
       });
     }
   }, [user]);
-
-  const decryptContent = (encryptedContent: string, key: string): string => {
-    try {
-      const bytes = CryptoJS.AES.decrypt(encryptedContent, key);
-      return bytes.toString(CryptoJS.enc.Utf8);
-    } catch (error) {
-      console.error('Error decrypting content:', error);
-      return 'Error: Unable to decrypt entry';
-    }
-  };
 
   const deleteEntry = (groupDate: string, entryId: string) => {
     Alert.alert(

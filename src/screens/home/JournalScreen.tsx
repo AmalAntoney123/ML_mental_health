@@ -6,7 +6,6 @@ import { useAuth } from '../../utils/auth';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Voice, { SpeechResultsEvent } from '@react-native-voice/voice';
 import { useNavigation, NavigationProp } from '@react-navigation/native';
-import CryptoJS from 'crypto-js';
 
 // Define your navigation param list type
 type RootStackParamList = {
@@ -111,27 +110,17 @@ const JournalScreen: React.FC = () => {
     }
   };
 
-  const addEntry = async () => {
+  const addEntry = () => {
     if (newEntry.trim() && user) {
-      try {
-        // Encrypt the entry content
-        const encryptedContent = CryptoJS.AES.encrypt(newEntry.trim(), user.uid).toString();
-        
-        // Save the encrypted content to Firebase
-        const entriesRef = database().ref(`users/${user.uid}/entries`);
-        const newEntryRef = entriesRef.push();
+      const entriesRef = database().ref(`users/${user.uid}/entries`);
+      const newEntryRef = entriesRef.push();
 
-        await newEntryRef.set({
-          date: new Date().toISOString().split('T')[0],
-          content: encryptedContent,
-        });
+      newEntryRef.set({
+        date: new Date().toISOString().split('T')[0],
+        content: newEntry.trim(),
+      });
 
-        setNewEntry('');
-        Alert.alert('Success', 'Journal entry saved securely.');
-      } catch (error) {
-        console.error('Error saving entry:', error);
-        Alert.alert('Error', 'Failed to save journal entry. Please try again.');
-      }
+      setNewEntry('');
     }
   };
 
