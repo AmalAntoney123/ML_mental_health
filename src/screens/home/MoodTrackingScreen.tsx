@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, Alert, SafeAreaView, Modal } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, Alert, SafeAreaView, Modal, ActivityIndicator } from 'react-native';
 import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../utils/auth';
 import database from '@react-native-firebase/database';
@@ -7,6 +7,9 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import Slider from '@react-native-community/slider';
 import { LineChart, BarChart } from 'react-native-chart-kit';
 import { Dimensions } from 'react-native';
+import { HfInference } from "@huggingface/inference";
+import { HUGGINGFACE_API_KEY } from '../../config';
+import * as Progress from 'react-native-progress';
 
 interface MoodEntry {
   date: string;
@@ -15,6 +18,11 @@ interface MoodEntry {
   stressLevel: number;
   physicalActivity: number;
   notes: string;
+}
+
+interface MoodRecommendation {
+  message: string;
+  suggestion: string;
 }
 
 const MoodTrackingScreen: React.FC = () => {
@@ -34,18 +42,23 @@ const MoodTrackingScreen: React.FC = () => {
   const [sleepAverage, setSleepAverage] = useState<number>(0);
   const [stressAverage, setStressAverage] = useState<number>(0);
   const [isMoodModalVisible, setIsMoodModalVisible] = useState(false);
-
+  const [moodRecommendation, setMoodRecommendation] = useState<MoodRecommendation | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [tomorrowsPrediction, setTomorrowsPrediction] = useState<number | null>(null);
 
   useEffect(() => {
     if (user) {
       fetchTodaysMoodEntry();
       fetchHistoricalMoods();
+      retrieveTomorrowsPrediction();
     }
   }, [user]);
 
   useEffect(() => {
     if (historicalMoods.length >= 5) {
-      predictNextMood();
+      generateMoodRecommendation();
+    } else {
     }
   }, [historicalMoods]);
 
@@ -120,7 +133,7 @@ const MoodTrackingScreen: React.FC = () => {
         Alert.alert('Success', 'New mood entry saved successfully');
       }
       predictNextMood();
-      fetchTodaysMoodEntry(); // Refresh the current entry
+      fetchTodaysMoodEntry();
     } catch (error) {
       console.error('Error saving mood entry:', error);
       Alert.alert('Error', 'Failed to save mood entry. Please try again.');
@@ -131,18 +144,52 @@ const MoodTrackingScreen: React.FC = () => {
     setIsEditing(true);
   };
 
+  const retrieveTomorrowsPrediction = async () => {
+    if (!user) return;
+
+    try {
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      const tomorrowDate = tomorrow.toISOString().split('T')[0];
+
+      // Check Firebase for tomorrow's prediction and recommendation
+      const userPredictionsRef = database().ref(`users/${user.uid}/predictions/${tomorrowDate}`);
+      const snapshot = await userPredictionsRef.once('value');
+      const predictionData = snapshot.val();
+
+      if (predictionData && predictionData.predictedMood) {
+        setTomorrowsPrediction(predictionData.predictedMood);
+        setPrediction(predictionData.predictedMood);
+        if (predictionData.recommendation) {
+          setMoodRecommendation(predictionData.recommendation);
+        }
+      }
+    } catch (error) {
+      console.error('Error retrieving tomorrow\'s prediction:', error);
+    }
+  };
+
   const predictNextMood = async () => {
-    if (historicalMoods.length < 5) {
+    if (!user || historicalMoods.length < 5) {
       setPrediction(null);
-      return;
+      return null;
     }
 
-    const today = new Date();
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const tomorrowDate = tomorrow.toISOString().split('T')[0];
+
+    // Check if we already have a prediction for tomorrow
+    if (tomorrowsPrediction !== null) {
+      setPrediction(tomorrowsPrediction);
+      return tomorrowsPrediction;
+    }
+
     const data = {
       sleep_quality: sleepQuality,
       stress_level: stressLevel,
       physical_activity: physicalActivity,
-      day_of_week: today.getDay()
+      day_of_week: tomorrow.getDay()
     };
 
     try {
@@ -155,45 +202,147 @@ const MoodTrackingScreen: React.FC = () => {
       });
 
       if (!response.ok) {
-        throw new Error('Network response was not ok');
+        throw new Error(`Network response was not ok: ${response.status} ${response.statusText}`);
       }
 
       const result = await response.json();
-      setPrediction(result.predicted_mood);
+      const predictedMood = result.predicted_mood;
+      setPrediction(predictedMood);
+      setTomorrowsPrediction(predictedMood);
+
+      // Generate a recommendation for the predicted mood
+      const recommendation = await generateFallbackRecommendation(predictedMood);
+
+      // Save the prediction and recommendation to Firebase
+      const userPredictionsRef = database().ref(`users/${user.uid}/predictions/${tomorrowDate}`);
+      await userPredictionsRef.set({ predictedMood, recommendation });
+
+      setMoodRecommendation(recommendation);
+
+      return predictedMood;
     } catch (error) {
       console.error('Error predicting mood:', error);
       setPrediction(null);
+      throw error;
     }
   };
 
-  const linearRegression = (features: number[][], labels: number[]) => {
-    const n = features.length;
-    const dim = features[0].length;
+  const getMoodKey = (mood: number): string => {
+    return Math.round(mood * 10).toString();
+  };
 
-    // Calculate means
-    const xMean = features.reduce((sum, x) => sum.map((s, i) => s + x[i] / n), new Array(dim).fill(0));
-    const yMean = labels.reduce((sum, y) => sum + y, 0) / n;
+  const retrieveSavedRecommendation = async (predictedMood: number): Promise<MoodRecommendation | null> => {
+    if (!user) return null;
 
-    // Calculate coefficients
-    const slope = new Array(dim).fill(0);
-    let numerator = new Array(dim).fill(0);
-    let denominator = new Array(dim).fill(0);
+    const moodKey = getMoodKey(predictedMood);
+    const recommendationsRef = database().ref(`users/${user.uid}/moodRecommendations/${moodKey}`);
 
-    for (let i = 0; i < n; i++) {
-      for (let j = 0; j < dim; j++) {
-        numerator[j] += (features[i][j] - xMean[j]) * (labels[i] - yMean);
-        denominator[j] += (features[i][j] - xMean[j]) ** 2;
+    try {
+      const snapshot = await recommendationsRef.once('value');
+      const savedRecommendation = snapshot.val();
+      if (savedRecommendation) {
+        console.log('Retrieved saved recommendation:', savedRecommendation);
+        return savedRecommendation;
+      }
+    } catch (error) {
+      console.error('Error retrieving saved recommendation:', error);
+    }
+
+    return null;
+  };
+
+  const generateFallbackRecommendation = async (predictedMood: number): Promise<MoodRecommendation> => {
+    console.log(`Starting generateFallbackRecommendation with predictedMood: ${predictedMood}`);
+
+    const inference = new HfInference(HUGGINGFACE_API_KEY);
+
+    const prompt = `Generate a mood recommendation in JSON format for a predicted mood score of ${predictedMood.toFixed(2)}/10 for tomorrow. The output should be ONLY valid JSON, with no additional text, code, or explanations. Use this exact structure:
+                  {
+                    "message": "A supportive and encouraging message about the predicted mood for tomorrow (max 20 words)",
+                    "suggestion": "A practical suggestion to prepare for or improve tomorrow's predicted mood (max 20 words)"
+                  }
+
+                  Ensure the message and suggestion are specific to preparing for tomorrow's predicted mood.
+                  Remember: Output ONLY the JSON object as text, nothing else. Keep each field under 20 words.`;
+
+    console.log('Prompt prepared:', prompt);
+
+    try {
+      console.log('Attempting to call Hugging Face API...');
+      const response = await inference.textGeneration({
+        model: "meta-llama/Llama-3.2-11B-Vision-Instruct",
+        inputs: prompt,
+        parameters: {
+          max_new_tokens: 200,
+          return_full_text: false,
+        },
+      });
+
+      console.log('API response received:', response);
+      const generatedText = response.generated_text;
+      console.log('Generated text:', generatedText);
+
+      try {
+        let jsonStartIndex = generatedText.indexOf('{');
+        let jsonEndIndex = generatedText.indexOf('}', jsonStartIndex);
+        console.log(`JSON start index: ${jsonStartIndex}, end index: ${jsonEndIndex}`);
+
+        if (jsonStartIndex !== -1 && jsonEndIndex !== -1 && jsonEndIndex > jsonStartIndex) {
+          let jsonString = generatedText.substring(jsonStartIndex, jsonEndIndex + 1);
+          console.log('Extracted JSON string:', jsonString);
+
+          const recommendation: MoodRecommendation = JSON.parse(jsonString);
+          console.log('Parsed recommendation:', recommendation);
+
+          if (recommendation.message && recommendation.suggestion) {
+            console.log('Valid recommendation generated');
+            return recommendation;
+          } else {
+            console.log('Parsed JSON does not contain required fields');
+          }
+        } else {
+          console.log('Could not find valid JSON in generated text');
+        }
+      } catch (parseError) {
+        console.error('Error parsing recommendation:', parseError);
+      }
+    } catch (error) {
+      console.error('Error generating fallback recommendation:', error);
+      if (error instanceof Error) {
+        console.error('Error details:', error.message);
+        console.error('Error stack:', error.stack);
       }
     }
 
-    for (let j = 0; j < dim; j++) {
-      slope[j] = numerator[j] / denominator[j];
+    console.log('Returning default recommendation');
+    return {
+      message: "We couldn't generate a personalized recommendation at this time.",
+      suggestion: "Consider reflecting on your recent activities and how they might be affecting your mood."
+    };
+  };
+
+  const generateMoodRecommendation = async () => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const predictedMood = await predictNextMood();
+      if (predictedMood === null) {
+        throw new Error("Failed to predict mood");
+      }
+
+      // The recommendation is now set in predictNextMood, so we don't need to generate it here
+      // Just ensure that moodRecommendation is set
+      if (!moodRecommendation) {
+        const recommendation = await generateFallbackRecommendation(predictedMood);
+        setMoodRecommendation(recommendation);
+      }
+    } catch (error) {
+      console.error('Error generating mood recommendation:', error);
+      setError("Failed to generate mood recommendation. Please try again later.");
+    } finally {
+      setIsLoading(false);
     }
-
-    // Calculate intercept
-    const intercept = yMean - slope.reduce((sum, coef, index) => sum + coef * xMean[index], 0);
-
-    return { slope, intercept };
   };
 
   const getScaleLabel = (value: number, type: string) => {
@@ -242,41 +391,76 @@ const MoodTrackingScreen: React.FC = () => {
     </View>
   );
 
-  const getPredictionMessage = (predictionValue: number) => {
-    if (predictionValue >= 8) return "Your mood is likely to be great tomorrow!";
-    if (predictionValue >= 6) return "You're on track for a good day tomorrow.";
-    if (predictionValue >= 4) return "Your mood tomorrow might be average.";
-    if (predictionValue >= 2) return "You might face some challenges tomorrow.";
-    return "Tomorrow might be tough. Consider reaching out for support.";
-  };
-
   const renderPrediction = () => {
     if (historicalMoods.length < 5) {
       return (
         <View style={[styles.card, { backgroundColor: colors.secondaryBackground }]}>
           <Text style={[styles.cardTitle, { color: colors.text }]}>Not Enough Data</Text>
           <Text style={[styles.cardText, { color: colors.text }]}>
-            Keep updating your mood every day to see predictions!
+            Keep updating your mood daily for predictions!
           </Text>
         </View>
       );
     }
 
-    if (prediction !== null) {
-      return (
-        <View style={[styles.card, { backgroundColor: colors.secondaryBackground }]}>
+    return (
+      <View style={[styles.card, { backgroundColor: colors.secondaryBackground }]}>
+        <View style={styles.cardHeader}>
           <Text style={[styles.cardTitle, { color: colors.text }]}>Mood Prediction</Text>
-          <Text style={[styles.cardText, { color: colors.text }]}>
-            {getPredictionMessage(prediction)}
-          </Text>
-          <Text style={[styles.cardSubtext, { color: colors.text }]}>
-            Predicted mood score: {prediction}/10
-          </Text>
+          <Text style={[styles.cardSubtitle, { color: colors.text }]}>Tomorrow's Forecast</Text>
         </View>
-      );
-    }
 
-    return null;
+        {prediction !== null && (
+          <View style={styles.predictionScoreContainer}>
+            <View style={styles.predictionScoreRow}>
+              <Text style={[styles.predictionScoreValue, { color: colors.primary }]}>
+                {prediction.toFixed(1)}
+              </Text>
+              <Text style={[styles.predictionScoreMax, { color: colors.text }]}>/10</Text>
+            </View>
+            <Progress.Bar
+              progress={prediction / 10}
+              width={null}
+              height={10}
+              color={colors.primary}
+              unfilledColor={colors.border}
+              borderWidth={0}
+              style={styles.progressBar}
+            />
+            <Text style={[styles.predictionScoreLabel, { color: colors.text }]}>Predicted Mood for Tomorrow</Text>
+          </View>
+        )}
+
+        {isLoading ? (
+          <View style={styles.loaderContainer}>
+            <ActivityIndicator size="large" color={colors.primary} />
+            <Text style={[styles.loadingText, { color: colors.text }]}>Generating insights...</Text>
+          </View>
+        ) : moodRecommendation ? (
+          <>
+            <View style={styles.insightContainer}>
+              <Icon name="lightbulb" size={24} color={colors.secondary} style={styles.insightIcon} />
+              <View style={styles.insightTextContainer}>
+                <Text style={[styles.insightTitle, { color: colors.text }]}>Recommendation</Text>
+                <Text style={[styles.insightText, { color: colors.text }]}>{moodRecommendation.message}</Text>
+              </View>
+            </View>
+
+            <View style={styles.insightContainer}>
+              <Icon name="tips-and-updates" size={24} color={colors.success} style={styles.insightIcon} />
+              <View style={styles.insightTextContainer}>
+                <Text style={[styles.insightTitle, { color: colors.text }]}>Suggestion</Text>
+                <Text style={[styles.insightText, { color: colors.text }]}>{moodRecommendation.suggestion}</Text>
+              </View>
+            </View>
+          </>
+        ) : (
+          <Text style={[styles.cardText, { color: colors.text }]}>
+            No insights available. Try generating new ones.
+          </Text>
+        )}
+      </View>
+    );
   };
 
   const renderMoodChart = () => {
@@ -345,17 +529,17 @@ const MoodTrackingScreen: React.FC = () => {
   const calculateWeeklyAverage = () => {
     const oneWeekAgo = new Date();
     oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-    
+
     const lastWeekMoods = historicalMoods.filter(entry => new Date(entry.date) >= oneWeekAgo);
     const average = lastWeekMoods.reduce((sum, entry) => sum + entry.mood, 0) / lastWeekMoods.length;
-    
+
     setWeeklyAverage(Number(average.toFixed(1)));
   };
 
   const calculateMoodStreak = () => {
     let streak = 0;
     const sortedMoods = [...historicalMoods].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-    
+
     for (let i = 0; i < sortedMoods.length; i++) {
       if (sortedMoods[i].mood >= 7) {
         streak++;
@@ -363,27 +547,27 @@ const MoodTrackingScreen: React.FC = () => {
         break;
       }
     }
-    
+
     setMoodStreak(streak);
   };
 
   const calculateSleepAverage = () => {
     const oneWeekAgo = new Date();
     oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-    
+
     const lastWeekMoods = historicalMoods.filter(entry => new Date(entry.date) >= oneWeekAgo);
     const average = lastWeekMoods.reduce((sum, entry) => sum + entry.sleepQuality, 0) / lastWeekMoods.length;
-    
+
     setSleepAverage(Number(average.toFixed(1)));
   };
 
   const calculateStressAverage = () => {
     const oneWeekAgo = new Date();
     oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-    
+
     const lastWeekMoods = historicalMoods.filter(entry => new Date(entry.date) >= oneWeekAgo);
     const average = lastWeekMoods.reduce((sum, entry) => sum + entry.stressLevel, 0) / lastWeekMoods.length;
-    
+
     setStressAverage(Number(average.toFixed(1)));
   };
 
@@ -428,8 +612,8 @@ const MoodTrackingScreen: React.FC = () => {
       datasets: [{ data: factors.map(f => f.value) }],
     };
 
-    const chartWidth = Dimensions.get('window').width - 60; 
-    const chartHeight = 200; 
+    const chartWidth = Dimensions.get('window').width - 60;
+    const chartHeight = 200;
 
     return (
       <View style={[styles.card, { backgroundColor: colors.secondaryBackground }]}>
@@ -619,24 +803,86 @@ const styles = StyleSheet.create({
     paddingBottom: 80,
   },
   card: {
-    padding: 15,
-    borderRadius: 10,
+    borderRadius: 15,
+    padding: 20,
     marginBottom: 20,
-    alignItems: 'center', // Center the content horizontally
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.23,
+    shadowRadius: 2.62,
+    elevation: 4,
+  },
+  cardHeader: {
+    marginBottom: 20,
   },
   cardTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 5,
+  },
+  cardSubtitle: {
+    fontSize: 16,
+  },
+  predictionScoreContainer: {
+    marginBottom: 30,
+  },
+  predictionScoreRow: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    justifyContent: 'center',
+    marginBottom: 10,
+  },
+  predictionScoreValue: {
+    fontSize: 36,
+    fontWeight: 'bold',
+  },
+  predictionScoreMax: {
+    fontSize: 18,
+    marginLeft: 5,
+  },
+  progressBar: {
+    marginBottom: 10,
+  },
+  predictionScoreLabel: {
+    fontSize: 16,
+    textAlign: 'center',
+  },
+  insightContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 20,
+  },
+  insightIcon: {
+    marginRight: 15,
+    marginTop: 2,
+  },
+  insightTextContainer: {
+    flex: 1,
+  },
+  insightTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: 10,
-    alignSelf: 'flex-start', // Align the title to the left
+    marginBottom: 5,
+  },
+  insightText: {
+    fontSize: 16,
+    lineHeight: 22,
   },
   cardText: {
     fontSize: 16,
-    marginBottom: 5,
+    lineHeight: 22,
   },
-  cardSubtext: {
-    fontSize: 14,
-    fontStyle: 'italic',
+  loaderContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 20,
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
   },
   sliderContainer: {
     marginBottom: 20,
@@ -708,10 +954,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: 'center',
     marginBottom: 10,
-  },
-  insightTitle: {
-    fontSize: 14,
-    marginTop: 5,
   },
   insightValue: {
     fontSize: 20,

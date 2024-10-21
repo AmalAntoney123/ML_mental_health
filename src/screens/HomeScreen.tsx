@@ -214,7 +214,7 @@ const styles = StyleSheet.create({
   },
   fab: {
     position: 'absolute',
-    bottom: 5,
+    bottom: 3,
     alignSelf: 'center',
     alignItems: 'center',
     borderRadius: 100,
