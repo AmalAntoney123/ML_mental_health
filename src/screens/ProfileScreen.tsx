@@ -11,6 +11,7 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from 'react-native-screens/lib/typescript/native-stack/types';
 import { RootStackParamList } from '../navigation/types';
 import { useFocusEffect } from '@react-navigation/native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 interface UserData {
     name?: string;
@@ -222,92 +223,94 @@ const ProfileScreen = () => {
     }
 
     return (
-        <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
-            <View style={styles.header}>
-                <TouchableOpacity style={styles.settingsIcon} onPress={() => navigation.navigate('Settings')}>
-                    <Icon name="settings" size={24} color={colors.onSurface} />
-                </TouchableOpacity>
-            </View>
-            <View style={styles.profileCardWrapper}>
-                <View style={[styles.card, styles.profileContainer, { backgroundColor: colors.secondaryBackground }]}>
-                    {userPhotoURL ? (
-                        <Image
-                            source={{ uri: userPhotoURL }}
-                            style={styles.avatar}
-                        />
-                    ) : (
-                        <TouchableOpacity onPress={selectImage} style={styles.avatarPlaceholder}>
-                            <Icon name="add-a-photo" size={40} color={colors.primary} />
-                            <Text style={[styles.avatarPlaceholderText, { color: colors.text }]}>Add Photo</Text>
-                        </TouchableOpacity>
-                    )}
-                    <Text style={[styles.name, { color: colors.text }]}>{userName || 'User'}</Text>
-                    <Text style={[styles.membership, { color: colors.gray }]}>
-                        Age: {userData.age || 'N/A'} • Gender: {userData.gender || 'N/A'}
-                    </Text>
-
-                    <View style={styles.followInfo}>
-                        <Text style={[styles.followText, { color: colors.primary }]}>12 Following</Text>
-                        <Text style={[styles.followText, { color: colors.primary }]}> • 4 Followers</Text>
-                    </View>
-
-                    <View style={styles.buttonRow}>
-                        <TouchableOpacity style={[styles.button, { backgroundColor: colors.primary }]} onPress={handleEditProfile}>
-                            <Text style={styles.buttonText}>Edit Profile</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={[styles.button, { backgroundColor: colors.primary }]}>
-                            <Text style={styles.buttonText}>Add Friends</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={[styles.button, { backgroundColor: colors.surface }]}>
-                            <Icon name="mail" size={20} color={colors.text} />
-                        </TouchableOpacity>
-                    </View>
+        <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }} edges={['top']}>
+            <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
+                <View style={styles.header}>
+                    <TouchableOpacity style={styles.settingsIcon} onPress={() => navigation.navigate('Settings')}>
+                        <Icon name="settings" size={24} color={colors.onSurface} />
+                    </TouchableOpacity>
                 </View>
-            </View>
+                <View style={styles.profileCardWrapper}>
+                    <View style={[styles.card, styles.profileContainer, { backgroundColor: colors.secondaryBackground }]}>
+                        {userPhotoURL ? (
+                            <Image
+                                source={{ uri: userPhotoURL }}
+                                style={styles.avatar}
+                            />
+                        ) : (
+                            <TouchableOpacity onPress={selectImage} style={styles.avatarPlaceholder}>
+                                <Icon name="add-a-photo" size={40} color={colors.primary} />
+                                <Text style={[styles.avatarPlaceholderText, { color: colors.text }]}>Add Photo</Text>
+                            </TouchableOpacity>
+                        )}
+                        <Text style={[styles.name, { color: colors.text }]}>{userName || 'User'}</Text>
+                        <Text style={[styles.membership, { color: colors.gray }]}>
+                            Age: {userData.age || 'N/A'} • Gender: {userData.gender || 'N/A'}
+                        </Text>
 
-            <View style={[styles.card, styles.badgesContainer, { backgroundColor: colors.secondaryBackground }]}>
-                <View style={styles.badgesHeader}>
-                    <Text style={[styles.badgesText, { color: colors.text }]}>Badges</Text>
-                    <Text style={[styles.viewAllText, { color: colors.primary }]}>View all</Text>
-                </View>
-                <View style={styles.badgesRow}>
-                    {/* Placeholder for badges */}
-                    <View style={styles.badgeItem}>
-                        <Icon name="emoji-events" size={60} color={colors.primary} style={styles.badgeIcon} />
-                        <Text style={[styles.badgeLabel, { color: colors.text }]}>Placeholder Badge</Text>
-                    </View>
-                </View>
-            </View>
-
-            <View style={[styles.card, styles.challengesContainer, { backgroundColor: colors.secondaryBackground }]}>
-                <Text style={[styles.challengesTitle, { color: colors.text }]}>Challenges</Text>
-                {userData.challenges && Object.entries(userData.challenges).map(([challenge, level], index) => {
-                    const iconName = getChallengeIcon(challenge);
-                    return (
-                        <View key={index} style={styles.challengeItem}>
-                            <MaterialCommunityIcons name={iconName} size={24} color={colors.primary} />
-                            <Text style={[styles.challengeName, { color: colors.text }]}>{challenge}</Text>
-                            <Text style={[styles.challengeLevel, { color: colors.primary }]}>Level {level}</Text>
+                        <View style={styles.followInfo}>
+                            <Text style={[styles.followText, { color: colors.primary }]}>12 Following</Text>
+                            <Text style={[styles.followText, { color: colors.primary }]}> • 4 Followers</Text>
                         </View>
-                    );
-                })}
-            </View>
 
-            <View style={[styles.card, styles.progressContainer, { backgroundColor: colors.secondaryBackground }]}>
-                <Text style={[styles.progressTitle, { color: colors.text }]}>Your Overall Progress</Text>
-                <View style={styles.progressRow}>
-                    <View style={styles.progressItem}>
-                        <Text style={[styles.progressLabel, { color: colors.gray }]}>Completed Challenges</Text>
-                        <Text style={[styles.progressValue, { color: colors.text }]}>{userData.completedChallenges || 0}</Text>
-                    </View>
-                    <View style={styles.progressItem}>
-                        <Text style={[styles.progressLabel, { color: colors.gray }]}>Overall Level</Text>
-                        <Text style={[styles.progressValue, { color: colors.text }]}>{overallLevel}</Text>
+                        <View style={styles.buttonRow}>
+                            <TouchableOpacity style={[styles.button, { backgroundColor: colors.primary }]} onPress={handleEditProfile}>
+                                <Text style={styles.buttonText}>Edit Profile</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={[styles.button, { backgroundColor: colors.primary }]}>
+                                <Text style={styles.buttonText}>Add Friends</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={[styles.button, { backgroundColor: colors.surface }]}>
+                                <Icon name="mail" size={20} color={colors.text} />
+                            </TouchableOpacity>
+                        </View>
                     </View>
                 </View>
-            </View>
-            <View style={styles.bottomSpacer} />
-        </ScrollView>
+
+                <View style={[styles.card, styles.badgesContainer, { backgroundColor: colors.secondaryBackground }]}>
+                    <View style={styles.badgesHeader}>
+                        <Text style={[styles.badgesText, { color: colors.text }]}>Badges</Text>
+                        <Text style={[styles.viewAllText, { color: colors.primary }]}>View all</Text>
+                    </View>
+                    <View style={styles.badgesRow}>
+                        {/* Placeholder for badges */}
+                        <View style={styles.badgeItem}>
+                            <Icon name="emoji-events" size={60} color={colors.primary} style={styles.badgeIcon} />
+                            <Text style={[styles.badgeLabel, { color: colors.text }]}>Placeholder Badge</Text>
+                        </View>
+                    </View>
+                </View>
+
+                <View style={[styles.card, styles.challengesContainer, { backgroundColor: colors.secondaryBackground }]}>
+                    <Text style={[styles.challengesTitle, { color: colors.text }]}>Challenges</Text>
+                    {userData.challenges && Object.entries(userData.challenges).map(([challenge, level], index) => {
+                        const iconName = getChallengeIcon(challenge);
+                        return (
+                            <View key={index} style={styles.challengeItem}>
+                                <MaterialCommunityIcons name={iconName} size={24} color={colors.primary} />
+                                <Text style={[styles.challengeName, { color: colors.text }]}>{challenge}</Text>
+                                <Text style={[styles.challengeLevel, { color: colors.primary }]}>Level {level}</Text>
+                            </View>
+                        );
+                    })}
+                </View>
+
+                <View style={[styles.card, styles.progressContainer, { backgroundColor: colors.secondaryBackground }]}>
+                    <Text style={[styles.progressTitle, { color: colors.text }]}>Your Overall Progress</Text>
+                    <View style={styles.progressRow}>
+                        <View style={styles.progressItem}>
+                            <Text style={[styles.progressLabel, { color: colors.gray }]}>Completed Challenges</Text>
+                            <Text style={[styles.progressValue, { color: colors.text }]}>{userData.completedChallenges || 0}</Text>
+                        </View>
+                        <View style={styles.progressItem}>
+                            <Text style={[styles.progressLabel, { color: colors.gray }]}>Overall Level</Text>
+                            <Text style={[styles.progressValue, { color: colors.text }]}>{overallLevel}</Text>
+                        </View>
+                    </View>
+                </View>
+                <View style={styles.bottomSpacer} />
+            </ScrollView>
+        </SafeAreaView>
     );
 };
 

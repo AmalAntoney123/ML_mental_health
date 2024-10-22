@@ -3,6 +3,7 @@ import { View, Text, Button, StyleSheet } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/types';
 import { useAuth } from '../../utils/auth';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 type ManageChallengesScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'ManageChallenges'>;
 

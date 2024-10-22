@@ -7,6 +7,7 @@ import { Appbar, Card, Title, Paragraph, ActivityIndicator, Avatar } from 'react
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/types';
 import { RouteProp } from '@react-navigation/native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 type ViewUserScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'ViewUser'>;
 type ViewUserScreenRouteProp = RouteProp<RootStackParamList, 'ViewUser'>;

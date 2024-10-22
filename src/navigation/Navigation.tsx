@@ -4,7 +4,6 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useColorScheme } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 import MainScreen from '../screens/HomeScreen';
-import DetailScreen from '../screens/DetailScreen';
 import IntroScreen from '../screens/IntroScreen';
 import { RootStackParamList } from '../navigation/types';
 import AsyncStorage from '@react-native-async-storage/async-storage';

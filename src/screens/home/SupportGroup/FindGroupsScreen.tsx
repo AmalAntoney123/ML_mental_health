@@ -7,6 +7,7 @@ import auth from '@react-native-firebase/auth';
 import { useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../../../navigation/types';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 interface SupportGroup {
   id: string;
@@ -37,7 +38,7 @@ const FindGroupsScreen: React.FC = () => {
       const supportGroupsRef = database().ref('supportGroups');
       const snapshot = await supportGroupsRef.once('value');
       const groupsData = snapshot.val();
-      
+
       if (groupsData) {
         const groupsArray: SupportGroup[] = Object.entries(groupsData)
           .map(([id, data]: [string, any]) => ({
@@ -69,7 +70,7 @@ const FindGroupsScreen: React.FC = () => {
     }
   };
 
-  const filteredGroups = availableGroups.filter(group => 
+  const filteredGroups = availableGroups.filter(group =>
     group.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     group.description.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -90,26 +91,33 @@ const FindGroupsScreen: React.FC = () => {
   );
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <Text style={[styles.title, { color: colors.text }]}>Find New Groups</Text>
-      <TextInput
-        style={[styles.searchInput, { backgroundColor: colors.surface, color: colors.text }]}
-        placeholder="Search groups..."
-        placeholderTextColor={colors.text}
-        value={searchQuery}
-        onChangeText={setSearchQuery}
-      />
-      <FlatList
-        data={filteredGroups}
-        renderItem={renderGroupItem}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.listContainer}
-      />
-    </View>
+    <SafeAreaView style={styles.safeArea} edges={['top']}>
+
+      <View style={[styles.container, { backgroundColor: colors.background }]}>
+        <Text style={[styles.title, { color: colors.text }]}>Find New Groups</Text>
+        <TextInput
+          style={[styles.searchInput, { backgroundColor: colors.surface, color: colors.text }]}
+          placeholder="Search groups..."
+          placeholderTextColor={colors.text}
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+        />
+        <FlatList
+          data={filteredGroups}
+          renderItem={renderGroupItem}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={styles.listContainer}
+        />
+      </View>
+    </SafeAreaView>
+
   );
 };
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+  },
   container: {
     flex: 1,
     padding: 16,

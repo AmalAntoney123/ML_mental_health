@@ -7,6 +7,7 @@ import { useTheme } from '../../context/ThemeContext';
 import database from '@react-native-firebase/database';
 import { Button, Searchbar, Text, Appbar, Portal, Dialog, Card, Title, Paragraph } from 'react-native-paper';
 import { Provider as PaperProvider } from 'react-native-paper';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 type ManageUsersScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'ManageUsers'>;
 

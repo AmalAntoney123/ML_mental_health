@@ -7,6 +7,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useTheme } from '../../context/ThemeContext';
 import { triggerManualNotification, triggerMorningMotivation, triggerRandomMotivation } from '../../utils/notificationService';
 import Toast from 'react-native-toast-message';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 type AdminScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'AdminPanel'>;
 
@@ -71,72 +72,79 @@ const AdminScreen: React.FC<Props> = ({ navigation }) => {
     );
 
     return (
-        <View style={[styles.container, { backgroundColor: colors.background }]}>
-            <View style={[styles.header, { backgroundColor: colors.primary }]}>
-                <Text style={[styles.headerText, { color: colors.onPrimary }]}>Admin Panel</Text>
-                <TouchableOpacity style={styles.logoutButton} onPress={handleLogout} disabled={loading}>
-                    {loading ? (
-                        <ActivityIndicator color={colors.onPrimary} />
-                    ) : (
-                        <Icon name="logout" size={24} color={colors.onPrimary} />
-                    )}
-                </TouchableOpacity>
-            </View>
-            <ScrollView contentContainerStyle={styles.contentContainer}>
-                <Text style={[styles.welcomeText, { color: colors.text }]}>Welcome, {user?.displayName}</Text>
-                <View style={styles.buttonsContainer}>
-                    <AdminButton
-                        title="Manage Users"
-                        icon="people"
-                        onPress={() => navigation.navigate('ManageUsers')}
-                    />
-                    <AdminButton
-                        title="Dashboard"
-                        icon="dashboard"
-                        onPress={() => navigation.navigate('MainScreen')}
-                    />
-                    <AdminButton
-                        title="Manage Challenges"
-                        icon="settings"
-                        onPress={() => navigation.navigate('ManageChallenges')}
-                    />
-                    <AdminButton
-                        title="Reports"
-                        icon="bar-chart"
-                        onPress={() => navigation.navigate('Reports')}
-                    />
-                    <AdminButton
-                        title="Create Support Group"
-                        icon="group-add"
-                        onPress={() => navigation.navigate('CreateSupportGroup')}
-                    />
-                    <AdminButton
-                        title="Send Journal Reminder"
-                        icon="notifications"
-                        onPress={handleManualNotification}
-                    />
-                    <AdminButton
-                        title="Send Motivation Quote"
-                        icon="lightbulb"
-                        onPress={handleMorningMotivation}
-                    />
-                    <AdminButton
-                        title="Send Random Motivation"
-                        icon="stars"
-                        onPress={handleRandomMotivation}
-                    />
-                    <AdminButton
-                        title="Manage Sleep Music"
-                        icon="music-note"
-                        onPress={() => navigation.navigate('ManageSleepMusic')}
-                    />
+        <SafeAreaView style={styles.safeArea} edges={['top']}>
+
+            <View style={[styles.container, { backgroundColor: colors.background }]}>
+                <View style={[styles.header, { backgroundColor: colors.primary }]}>
+                    <Text style={[styles.headerText, { color: colors.onPrimary }]}>Admin Panel</Text>
+                    <TouchableOpacity style={styles.logoutButton} onPress={handleLogout} disabled={loading}>
+                        {loading ? (
+                            <ActivityIndicator color={colors.onPrimary} />
+                        ) : (
+                            <Icon name="logout" size={24} color={colors.onPrimary} />
+                        )}
+                    </TouchableOpacity>
                 </View>
-            </ScrollView>
-        </View>
+                <ScrollView contentContainerStyle={styles.contentContainer}>
+                    <Text style={[styles.welcomeText, { color: colors.text }]}>Welcome, {user?.displayName}</Text>
+                    <View style={styles.buttonsContainer}>
+                        <AdminButton
+                            title="Manage Users"
+                            icon="people"
+                            onPress={() => navigation.navigate('ManageUsers')}
+                        />
+                        <AdminButton
+                            title="Dashboard"
+                            icon="dashboard"
+                            onPress={() => navigation.navigate('MainScreen')}
+                        />
+                        <AdminButton
+                            title="Manage Challenges"
+                            icon="settings"
+                            onPress={() => navigation.navigate('ManageChallenges')}
+                        />
+                        <AdminButton
+                            title="Reports"
+                            icon="bar-chart"
+                            onPress={() => navigation.navigate('Reports')}
+                        />
+                        <AdminButton
+                            title="Create Support Group"
+                            icon="group-add"
+                            onPress={() => navigation.navigate('CreateSupportGroup')}
+                        />
+                        <AdminButton
+                            title="Send Journal Reminder"
+                            icon="notifications"
+                            onPress={handleManualNotification}
+                        />
+                        <AdminButton
+                            title="Send Motivation Quote"
+                            icon="lightbulb"
+                            onPress={handleMorningMotivation}
+                        />
+                        <AdminButton
+                            title="Send Random Motivation"
+                            icon="stars"
+                            onPress={handleRandomMotivation}
+                        />
+                        <AdminButton
+                            title="Manage Sleep Music"
+                            icon="music-note"
+                            onPress={() => navigation.navigate('ManageSleepMusic')}
+                        />
+                    </View>
+                </ScrollView>
+            </View>
+        </SafeAreaView>
+
     );
 };
 
 const styles = StyleSheet.create({
+    safeArea: {
+        flex: 1,
+    },
     container: {
         flex: 1,
     },

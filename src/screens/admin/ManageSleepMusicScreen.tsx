@@ -7,6 +7,7 @@ import auth from '@react-native-firebase/auth';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import DocumentPicker, { DocumentPickerResponse } from 'react-native-document-picker';
 import RNFS from 'react-native-fs';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 interface SleepMusic {
     id: string;
@@ -80,7 +81,7 @@ const ManageSleepMusicScreen: React.FC = () => {
                 const task = reference.putFile(tempFilePath);
 
                 // Monitor the upload task
-                task.on('state_changed', 
+                task.on('state_changed',
                     (snapshot) => {
                         const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
                         setUploadProgress(progress);
@@ -197,8 +198,8 @@ const ManageSleepMusicScreen: React.FC = () => {
                     {selectedFile ? 'File selected' : 'Select MP3 File'}
                 </Text>
             </TouchableOpacity>
-            <TouchableOpacity 
-                style={[styles.addButton, { backgroundColor: colors.primary }]} 
+            <TouchableOpacity
+                style={[styles.addButton, { backgroundColor: colors.primary }]}
                 onPress={handleAddMusic}
                 disabled={isUploading}
             >
@@ -216,47 +217,52 @@ const ManageSleepMusicScreen: React.FC = () => {
     ), [newTitle, newArtist, selectedFile, isUploading, uploadProgress, colors]);
 
     return (
-        <View style={[styles.container, { backgroundColor: colors.background }]}>
-            <Text style={[styles.title, { color: colors.text }]}>Manage Sleep Music</Text>
-            <View style={styles.tabContainer}>
-                <TouchableOpacity
-                    style={[
-                        styles.tabButton,
-                        activeTab === 'list' && { backgroundColor: colors.primary },
-                    ]}
-                    onPress={() => setActiveTab('list')}
-                >
-                    <Text style={[styles.tabButtonText, { color: activeTab === 'list' ? colors.onPrimary : colors.text }]}>
-                        Music List
-                    </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                    style={[
-                        styles.tabButton,
-                        activeTab === 'add' && { backgroundColor: colors.primary },
-                    ]}
-                    onPress={() => setActiveTab('add')}
-                >
-                    <Text style={[styles.tabButtonText, { color: activeTab === 'add' ? colors.onPrimary : colors.text }]}>
-                        Add Music
-                    </Text>
-                </TouchableOpacity>
+        <SafeAreaView style={styles.safeArea} edges={['top']}>
+            <View style={[styles.container, { backgroundColor: colors.background }]}>
+                <Text style={[styles.title, { color: colors.text }]}>Manage Sleep Music</Text>
+                <View style={styles.tabContainer}>
+                    <TouchableOpacity
+                        style={[
+                            styles.tabButton,
+                            activeTab === 'list' && { backgroundColor: colors.primary },
+                        ]}
+                        onPress={() => setActiveTab('list')}
+                    >
+                        <Text style={[styles.tabButtonText, { color: activeTab === 'list' ? colors.onPrimary : colors.text }]}>
+                            Music List
+                        </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={[
+                            styles.tabButton,
+                            activeTab === 'add' && { backgroundColor: colors.primary },
+                        ]}
+                        onPress={() => setActiveTab('add')}
+                    >
+                        <Text style={[styles.tabButtonText, { color: activeTab === 'add' ? colors.onPrimary : colors.text }]}>
+                            Add Music
+                        </Text>
+                    </TouchableOpacity>
+                </View>
+                {activeTab === 'list' ? (
+                    <FlatList
+                        data={sleepMusic}
+                        renderItem={renderMusicItem}
+                        keyExtractor={(item) => item.id}
+                        style={styles.musicList}
+                    />
+                ) : (
+                    renderAddMusicForm()
+                )}
             </View>
-            {activeTab === 'list' ? (
-                <FlatList
-                    data={sleepMusic}
-                    renderItem={renderMusicItem}
-                    keyExtractor={(item) => item.id}
-                    style={styles.musicList}
-                />
-            ) : (
-                renderAddMusicForm()
-            )}
-        </View>
+        </SafeAreaView>
     );
 };
 
 const styles = StyleSheet.create({
+    safeArea: {
+        flex: 1,
+    },
     container: {
         flex: 1,
         padding: 20,

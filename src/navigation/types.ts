@@ -43,6 +43,7 @@ export interface UserData {
   goals?: string[];
   concerns?: string[];
   preferredTherapyType?: string;
+  photoURL?: string | null;
 }
 
 export type RootStackParamList = {

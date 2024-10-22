@@ -9,6 +9,7 @@ import { logout, useAuth } from '../utils/auth';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { getDatabase, ref, get } from 'firebase/database';
 import { FAB, Portal, Provider } from 'react-native-paper';
+import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 
 import DashboardScreen from './home/DashboardScreen';
 import LeaderboardScreen from './home/LeaderboardScreen';
@@ -60,67 +61,9 @@ type BottomTabNavigatorProps = {
 
 const Tab = createBottomTabNavigator();
 
-const TabNavigator = () => {
-  const { colors } = useTheme();
-  const navigation = useNavigation<HomeScreenNavigationProp>();
-
-  return (
-    <Provider>
-      <Tab.Navigator
-        screenOptions={({ route }) => ({
-          header: () => <Header />,
-          tabBarIcon: ({ color, size }) => {
-            let iconName: string = 'circle';
-
-            if (route.name === 'Dashboard') {
-              iconName = 'dashboard';
-            } else if (route.name === 'Journal') {
-              iconName = 'book';
-            } else if (route.name === 'Therapy') {
-              iconName = 'healing';
-            } else if (route.name === 'Support') {
-              iconName = 'group';
-            }
-
-            return <Icon name={iconName} size={size} color={color} />;
-          },
-          tabBarActiveTintColor: colors.primary,
-          tabBarInactiveTintColor: colors.text,
-          tabBarStyle: { 
-            backgroundColor: colors.background,
-            paddingBottom: 8, // Add padding to the bottom
-            height: 60, // Increase the height to accommodate the padding
-            paddingTop: 8,
-          },
-        })}
-      >
-        <Tab.Screen name="Dashboard" component={DashboardScreen} />
-        <Tab.Screen name="Journal" component={JournalScreen} />
-        <Tab.Screen
-          name=" "
-          options={{
-            tabBarIcon: () => (
-              <FAB
-                icon={() => <Icon name="mood" size={24} color={colors.primary} />}
-                onPress={() => navigation.navigate('MoodTracking')}
-                style={[styles.fab, {backgroundColor: colors.onPrimary}]}
-              />
-            ),
-          }}
-        >
-          {() => null}
-        </Tab.Screen>
-        <Tab.Screen name="Therapy" component={TherapyScreen} />
-        <Tab.Screen name="Support" component={SupportScreen} />
-      </Tab.Navigator>
-    </Provider>
-  );
-};
-
 const Header: React.FC = () => {
   const { colors } = useTheme();
   const navigation = useNavigation<HomeScreenNavigationProp>();
-
   return (
     <View style={[styles.header, { backgroundColor: colors.surface }]}>
       <View style={styles.headerItem}>
@@ -137,6 +80,68 @@ const Header: React.FC = () => {
   );
 };
 
+const TabNavigator = () => {
+  const { colors } = useTheme();
+  const navigation = useNavigation<HomeScreenNavigationProp>();
+
+  return (
+    <SafeAreaProvider>
+      <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }} edges={['top']}>
+        <View style={styles.container}>
+          <Header />
+          <Tab.Navigator
+            screenOptions={({ route }) => ({
+              headerShown: false, // Hide the default header
+              tabBarIcon: ({ color, size }) => {
+                let iconName: string = 'circle';
+
+                if (route.name === 'Dashboard') {
+                  iconName = 'dashboard';
+                } else if (route.name === 'Journal') {
+                  iconName = 'book';
+                } else if (route.name === 'Therapy') {
+                  iconName = 'healing';
+                } else if (route.name === 'Support') {
+                  iconName = 'group';
+                }
+
+                return <Icon name={iconName} size={size} color={color} />;
+              },
+              tabBarActiveTintColor: colors.primary,
+              tabBarInactiveTintColor: colors.text,
+              tabBarStyle: { 
+                backgroundColor: colors.background,
+                paddingBottom: 8,
+                height: 60,
+                paddingTop: 8,
+              },
+            })}
+          >
+            <Tab.Screen name="Dashboard" component={DashboardScreen} />
+            <Tab.Screen name="Journal" component={JournalScreen} />
+            <Tab.Screen
+              name=" "
+              options={{
+                tabBarIcon: () => (
+                  <FAB
+                    icon={() => <Icon name="mood" size={24} color={colors.primary} />}
+                    onPress={() => navigation.navigate('MoodTracking')}
+                    style={[styles.fab, {backgroundColor: colors.onPrimary}]}
+                  />
+                ),
+              }}
+            >
+              {() => null}
+            </Tab.Screen>
+            <Tab.Screen name="Therapy" component={TherapyScreen} />
+            <Tab.Screen name="Support" component={SupportScreen} />
+          </Tab.Navigator>
+        </View>
+      </SafeAreaView>
+    </SafeAreaProvider>
+  );
+};
+
 const MainScreen: React.FC = () => {
   return <TabNavigator />;
 };
@@ -144,12 +149,14 @@ const MainScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    paddingTop: 0, // Reduce top padding
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 16,
+    padding: 8, // Reduce padding
+    height: 50, // Set a fixed height for the header
   },
   headerItem: {
     width: 24, // Match the width of the profile icon

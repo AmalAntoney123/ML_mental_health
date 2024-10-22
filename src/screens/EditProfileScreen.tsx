@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView, SafeAreaView, Text, TouchableOpacity, Alert, Dimensions } from 'react-native';
+import { View, StyleSheet, ScrollView, Text, TouchableOpacity, Alert, Dimensions, Image } from 'react-native';
 import { TextInput, Chip, Provider as PaperProvider, DefaultTheme, Card, ActivityIndicator, FAB } from 'react-native-paper';
 import { useTheme } from '../context/ThemeContext';
 import { firebase } from '@react-native-firebase/database';
@@ -7,13 +7,15 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { NavigationProp } from '@react-navigation/native';
 import * as ImagePicker from 'react-native-image-picker';
 import storage from '@react-native-firebase/storage';
-import { Image } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const { width } = Dimensions.get('window');
+
 interface Props {
     navigation: NavigationProp<any, any>;
     route: any;
 }
+
 const EditProfileScreen = ({ navigation, route }: Props) => {
     const { userData } = route.params;
     const { colors } = useTheme();
@@ -142,7 +144,7 @@ const EditProfileScreen = ({ navigation, route }: Props) => {
 
     return (
         <PaperProvider theme={paperTheme}>
-            <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+            <SafeAreaView style={styles.safeArea} edges={['top']}>
                 <ScrollView contentContainerStyle={styles.scrollContent}>
                     <Text style={[styles.title, { color: colors.primary }]}>Edit Profile</Text>
 
@@ -323,7 +325,7 @@ const EditProfileScreen = ({ navigation, route }: Props) => {
 };
 
 const styles = StyleSheet.create({
-    container: {
+    safeArea: {
         flex: 1,
     },
     scrollContent: {

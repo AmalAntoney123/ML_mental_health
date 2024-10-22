@@ -8,6 +8,7 @@ import { RootStackParamList } from '../../../navigation/types';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Menu, MenuOptions, MenuOption, MenuTrigger } from 'react-native-popup-menu';
 import Toast from 'react-native-toast-message';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 type ChatScreenRouteProp = RouteProp<RootStackParamList, 'ChatScreen'>;
 
@@ -319,9 +320,9 @@ const ChatScreen: React.FC = () => {
     };
 
     return (
-        <UserContext.Provider value={{ users, setUsers }}>
+        <SafeAreaView style={styles.safeArea} edges={['top']}>
             <View style={[styles.container, { backgroundColor: colors.background }]}>
-                <View style={styles.header}>
+                <View style={[styles.header, { backgroundColor: colors.surface }]}>
                     <Text style={[styles.title, { color: colors.text }]}>{group.name}</Text>
                     <TouchableOpacity onPress={showChatDetails}>
                         <Icon name="info" size={24} color={colors.primary} />
@@ -371,11 +372,14 @@ const ChatScreen: React.FC = () => {
                     </View>
                 </>
             </View>
-        </UserContext.Provider>
+        </SafeAreaView>
     );
 };
 
 const styles = StyleSheet.create({
+    safeArea: {
+        flex: 1,
+    },
     container: {
         flex: 1,
     },

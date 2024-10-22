@@ -6,6 +6,7 @@ import { RootStackParamList } from '../../navigation/types';
 import { useTheme } from '../../context/ThemeContext';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { BarChart, PieChart } from 'react-native-chart-kit';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -119,6 +120,8 @@ const DetailedReportScreen: React.FC<Props> = ({ navigation, route }) => {
     };
 
     return (
+        <SafeAreaView style={styles.safeArea} edges={['top']}>
+
         <View style={[styles.container, { backgroundColor: colors.background }]}>
             <View style={[styles.header, { backgroundColor: colors.primary }]}>
                 <TouchableOpacity onPress={() => navigation.goBack()}>
@@ -132,11 +135,15 @@ const DetailedReportScreen: React.FC<Props> = ({ navigation, route }) => {
                     {renderContent()}
                 </View>
             </ScrollView>
-        </View>
+            </View>
+        </SafeAreaView>
     );
 };
 
 const styles = StyleSheet.create({
+    safeArea: {
+        flex: 1,
+    },
     container: {
         flex: 1,
     },

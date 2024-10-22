@@ -8,6 +8,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import auth from '@react-native-firebase/auth';
 import database from '@react-native-firebase/database';
 import CustomAlert from '../props/Alert';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const { width, height } = Dimensions.get('window');
 
@@ -68,20 +69,26 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
   const styles = StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: colors.background,
+    },
+    content: {
+      flex: 1,
       padding: 16,
       justifyContent: 'space-between',
     },
+    toggleThemeButton: {
+      position: 'absolute',
+      top: 16,
+      right: 16,
+    },
     titleContainer: {
-      marginTop: 40,
       alignItems: 'center',
+      marginTop: 40,
     },
     title: {
       fontSize: 40,
       fontWeight: 'bold',
-      color: colors.primary,
     },
-    content: {
+    logoContainer: {
       flex: 1,
       justifyContent: 'center',
       alignItems: 'center',
@@ -92,81 +99,73 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
       resizeMode: 'contain',
     },
     buttonContainer: {
-      alignItems: 'center',
       marginBottom: 40,
     },
     button: {
-      backgroundColor: colors.primary,
       borderRadius: 20,
       padding: 20,
       alignItems: 'center',
       flexDirection: 'row',
       justifyContent: 'center',
       marginBottom: 20,
-      width: '100%',
     },
     buttonText: {
-      color: colors.onBackground,
       fontSize: 20,
       marginLeft: 10,
     },
     signUpText: {
-      color: colors.onBackground,
       textAlign: 'center',
-    },
-    toggleThemeButton: {
-      position: 'absolute',
-      top: 16,
-      right: 16,
     },
   });
 
   return (
-    <View style={styles.container}>
-      <View style={styles.toggleThemeButton}>
-        <TouchableOpacity onPress={toggleTheme}>
-          <Icon name="brightness-6" size={24} color={colors.onBackground} />
-        </TouchableOpacity>
-      </View>
-      <View style={styles.titleContainer}>
-        <Text style={styles.title}>Emo</Text>
-      </View>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
       <View style={styles.content}>
-        <Image
-          source={require('../assets/icon.png')}
-          style={[styles.logo, { tintColor: colors.primary }]}
-        />
+        <View style={styles.toggleThemeButton}>
+          <TouchableOpacity onPress={toggleTheme}>
+            <Icon name="brightness-6" size={24} color={colors.onBackground} />
+          </TouchableOpacity>
+        </View>
+        <View style={styles.titleContainer}>
+          <Text style={[styles.title, { color: colors.primary }]}>Emo</Text>
+        </View>
+        <View style={styles.logoContainer}>
+          <Image
+            source={require('../assets/icon.png')}
+            style={[styles.logo, { tintColor: colors.primary }]}
+          />
+        </View>
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity
+            style={[styles.button, { backgroundColor: colors.primary }]}
+            onPress={() => navigation.navigate('SignIn')}
+          >
+            <Icon name="login" size={24} color={colors.onBackground} />
+            <Text style={[styles.buttonText, { color: colors.onBackground }]}>Login</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.button, { backgroundColor: colors.primary }]}
+            onPress={handleGoogleSignIn}
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <ActivityIndicator color={colors.onBackground} />
+            ) : (
+              <>
+                <Image
+                  source={require('../assets/google-icon.png')}
+                  style={{ width: 20, height: 20, tintColor: colors.onBackground }}
+                />
+                <Text style={[styles.buttonText, { color: colors.onBackground }]}>Continue with Google</Text>
+              </>
+            )}
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
+            <Text style={[styles.signUpText, { color: colors.text }]}>Don't have an account? Sign Up</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => navigation.navigate('SignIn')}
-        >
-          <Icon name="login" size={24} color={colors.onBackground} />
-          <Text style={styles.buttonText}>Login</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.button}
-          onPress={handleGoogleSignIn}
-          disabled={isLoading}
-        >
-          {isLoading ? (
-            <ActivityIndicator color={colors.onBackground} />
-          ) : (
-            <>
-              <Image
-                source={require('../assets/google-icon.png')}
-                style={{ width: 20, height: 20, tintColor: colors.onBackground }}
-              />
-              <Text style={styles.buttonText}>Continue with Google</Text>
-            </>
-          )}
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
-          <Text style={styles.signUpText}>Don't have an account? Sign Up</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+    </SafeAreaView>
   );
 };
 

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Dimensions, TouchableOpacity, SafeAreaView, Text, Alert, ActivityIndicator } from 'react-native';
+import { View, StyleSheet, Dimensions, TouchableOpacity, Text, Alert, ActivityIndicator, ScrollView } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/types';
 import { useTheme } from '../context/ThemeContext';
@@ -9,6 +9,7 @@ import { useFormValidation, login, resendVerificationEmail, resetPassword, logou
 import Snackbar from 'react-native-snackbar';
 import CustomAlert from '../props/Alert';
 import database from '@react-native-firebase/database';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const { width, height } = Dimensions.get('window');
 
@@ -56,6 +57,14 @@ const SignInScreen: React.FC<Props> = ({ navigation }) => {
     };
 
     const styles = StyleSheet.create({
+        safeArea: {
+            flex: 1,
+            backgroundColor: colors.background,
+        },
+        scrollContainer: {
+            flexGrow: 1,
+            justifyContent: 'space-between',
+        },
         container: {
             flex: 1,
             backgroundColor: colors.background,
@@ -67,8 +76,6 @@ const SignInScreen: React.FC<Props> = ({ navigation }) => {
             zIndex: 1,
         },
         topContent: {
-            flex: 1,
-            justifyContent: 'flex-start',
             alignItems: 'center',
             paddingTop: 60,
         },
@@ -79,7 +86,6 @@ const SignInScreen: React.FC<Props> = ({ navigation }) => {
             marginBottom: 20,
         },
         bottomContent: {
-            justifyContent: 'flex-end',
             paddingHorizontal: 16,
             paddingBottom: 40,
         },
@@ -254,95 +260,97 @@ const SignInScreen: React.FC<Props> = ({ navigation }) => {
 
     return (
         <PaperProvider theme={paperTheme}>
-            <SafeAreaView style={styles.container}>
-                <CustomAlert
-                    isVisible={alertVisible}
-                    title={alertConfig.title}
-                    message={alertConfig.message}
-                    buttons={alertConfig.buttons}
-                    onBackdropPress={() => setAlertVisible(false)}
-                />
-                <TouchableOpacity style={styles.toggleThemeButton} onPress={toggleTheme}>
-                    <Icon name="brightness-6" size={24} color={colors.onBackground} />
-                </TouchableOpacity>
-                <View style={styles.topContent}>
-                    <Text style={styles.title}>Emo</Text>
-                </View>
-                <View style={styles.bottomContent}>
-                    <View style={styles.inputContainer}>
-                        <TextInput
-                            testID="email-input"
-                            placeholder="Email"
-                            value={email}
-                            onChangeText={setEmail}
-                            mode="outlined"
-                            keyboardType="email-address"
-                            outlineColor={emailError ? colors.error : colors.onBackground}
-                            textColor={colors.onBackground}
-                            autoCapitalize="none"
-                            outlineStyle={{
-                                borderRadius: 12,
-                                borderWidth: 1,
-                            }}
-                            theme={{
-                                colors: {
-                                    primary: colors.primary,
-                                    onSurfaceVariant: colors.onBackground,
-                                    text: colors.text,
-                                    placeholder: colors.onBackground,
-                                    error: colors.error,
-                                }
-                            }}
-                            error={!!emailError}
-                        />
+            <SafeAreaView style={styles.safeArea}>
+                <ScrollView contentContainerStyle={styles.scrollContainer}>
+                    <CustomAlert
+                        isVisible={alertVisible}
+                        title={alertConfig.title}
+                        message={alertConfig.message}
+                        buttons={alertConfig.buttons}
+                        onBackdropPress={() => setAlertVisible(false)}
+                    />
+                    <TouchableOpacity style={styles.toggleThemeButton} onPress={toggleTheme}>
+                        <Icon name="brightness-6" size={24} color={colors.onBackground} />
+                    </TouchableOpacity>
+                    <View style={styles.topContent}>
+                        <Text style={styles.title}>Emo</Text>
                     </View>
-                    {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
+                    <View style={styles.bottomContent}>
+                        <View style={styles.inputContainer}>
+                            <TextInput
+                                testID="email-input"
+                                placeholder="Email"
+                                value={email}
+                                onChangeText={setEmail}
+                                mode="outlined"
+                                keyboardType="email-address"
+                                outlineColor={emailError ? colors.error : colors.onBackground}
+                                textColor={colors.onBackground}
+                                autoCapitalize="none"
+                                outlineStyle={{
+                                    borderRadius: 12,
+                                    borderWidth: 1,
+                                }}
+                                theme={{
+                                    colors: {
+                                        primary: colors.primary,
+                                        onSurfaceVariant: colors.onBackground,
+                                        text: colors.text,
+                                        placeholder: colors.onBackground,
+                                        error: colors.error,
+                                    }
+                                }}
+                                error={!!emailError}
+                            />
+                        </View>
+                        {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
 
-                    <View style={styles.inputContainer}>
-                        <TextInput
-                            testID="password-input"
-                            placeholder="Password"
-                            value={password}
-                            onChangeText={setPassword}
-                            mode="outlined"
-                            secureTextEntry
-                            outlineStyle={{
-                                borderRadius: 12,
-                                borderWidth: 1,
-                            }}
-                            outlineColor={passwordError ? colors.error : colors.onBackground}
-                            theme={{
-                                colors: {
-                                    primary: colors.primary,
-                                    onSurfaceVariant: colors.onBackground,
-                                    text: colors.text,
-                                    placeholder: colors.onBackground,
-                                    error: colors.error,
-                                }
-                            }}
-                            error={!!passwordError}
-                        />
+                        <View style={styles.inputContainer}>
+                            <TextInput
+                                testID="password-input"
+                                placeholder="Password"
+                                value={password}
+                                onChangeText={setPassword}
+                                mode="outlined"
+                                secureTextEntry
+                                outlineStyle={{
+                                    borderRadius: 12,
+                                    borderWidth: 1,
+                                }}
+                                outlineColor={passwordError ? colors.error : colors.onBackground}
+                                theme={{
+                                    colors: {
+                                        primary: colors.primary,
+                                        onSurfaceVariant: colors.onBackground,
+                                        text: colors.text,
+                                        placeholder: colors.onBackground,
+                                        error: colors.error,
+                                    }
+                                }}
+                                error={!!passwordError}
+                            />
+                        </View>
+                        {passwordError ? <Text style={styles.errorText}>{passwordError}</Text> : null}
+
+                        <TouchableOpacity onPress={handleForgotPassword} style={styles.forgotPasswordButton}>
+                            <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity onPress={handleSignIn} style={styles.button} disabled={isLoading}>
+                            {isLoading ? (
+                                <ActivityIndicator size="small" color={colors.onPrimary} />
+                            ) : (
+                                <>
+                                    <Icon name="login" size={24} color={colors.onPrimary} />
+                                    <Text style={styles.buttonText}>Sign In</Text>
+                                </>
+                            )}
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
+                            <Text style={styles.signupText}>Don't have an account? Sign Up</Text>
+                        </TouchableOpacity>
                     </View>
-                    {passwordError ? <Text style={styles.errorText}>{passwordError}</Text> : null}
-
-                    <TouchableOpacity onPress={handleForgotPassword} style={styles.forgotPasswordButton}>
-                        <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity onPress={handleSignIn} style={styles.button} disabled={isLoading}>
-                        {isLoading ? (
-                            <ActivityIndicator size="small" color={colors.onPrimary} />
-                        ) : (
-                            <>
-                                <Icon name="login" size={24} color={colors.onPrimary} />
-                                <Text style={styles.buttonText}>Sign In</Text>
-                            </>
-                        )}
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
-                        <Text style={styles.signupText}>Don't have an account? Sign Up</Text>
-                    </TouchableOpacity>
-                </View>
+                </ScrollView>
             </SafeAreaView>
         </PaperProvider>
     );

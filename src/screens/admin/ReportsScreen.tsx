@@ -7,6 +7,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import firebase from '@react-native-firebase/app';
 import '@react-native-firebase/database';
 import { useNavigation } from '@react-navigation/native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -60,8 +61,8 @@ const ReportsScreen: React.FC<Props> = () => {
     };
 
     const ReportCard: React.FC<ReportCardProps> = ({ title, icon, value, onPress }) => (
-        <TouchableOpacity 
-            style={[styles.reportCard, { backgroundColor: colors.surface }]} 
+        <TouchableOpacity
+            style={[styles.reportCard, { backgroundColor: colors.surface }]}
             onPress={onPress}
         >
             <Icon name={icon} size={24} color={colors.primary} />
@@ -223,77 +224,82 @@ const ReportsScreen: React.FC<Props> = () => {
     };
 
     return (
-        <View style={[styles.container, { backgroundColor: colors.background }]}>
-            <View style={[styles.header, { backgroundColor: colors.primary }]}>
-                <TouchableOpacity onPress={() => navigation.goBack()}>
-                    <Icon name="arrow-back" size={24} color={colors.onPrimary} />
-                </TouchableOpacity>
-                <Text style={[styles.headerText, { color: colors.onPrimary }]}>Admin Reports</Text>
+        <SafeAreaView style={styles.safeArea} edges={['top']}>
+            <View style={[styles.container, { backgroundColor: colors.background }]}>
+                <View style={[styles.header, { backgroundColor: colors.primary }]}>
+                    <TouchableOpacity onPress={() => navigation.goBack()}>
+                        <Icon name="arrow-back" size={24} color={colors.onPrimary} />
+                    </TouchableOpacity>
+                    <Text style={[styles.headerText, { color: colors.onPrimary }]}>Admin Reports</Text>
+                </View>
+                <ScrollView contentContainerStyle={styles.contentContainer}>
+                    <ReportCard
+                        title="Total Users"
+                        icon="people"
+                        value={`${users.length} users`}
+                        onPress={() => generateReport('User Overview')}
+                    />
+                    <ReportCard
+                        title="Gender Distribution"
+                        icon="wc"
+                        value="View"
+                        onPress={() => generateReport('Gender Distribution')}
+                    />
+                    <ReportCard
+                        title="Age Distribution"
+                        icon="calendar-today"
+                        value="View"
+                        onPress={() => generateReport('Age Distribution')}
+                    />
+                    <ReportCard
+                        title="User Interests"
+                        icon="interests"
+                        value="View"
+                        onPress={() => generateReport('User Interests')}
+                    />
+                    <ReportCard
+                        title="User Concerns"
+                        icon="report-problem"
+                        value="View"
+                        onPress={() => generateReport('User Concerns')}
+                    />
+                    <ReportCard
+                        title="Therapy Preferences"
+                        icon="favorite"
+                        value="View"
+                        onPress={() => generateReport('Therapy Preferences')}
+                    />
+                    <ReportCard
+                        title="Challenge Completion"
+                        icon="flag"
+                        value="View"
+                        onPress={() => generateReport('Challenge Completion')}
+                    />
+                    <ReportCard
+                        title="Sleep Habits"
+                        icon="bedtime"
+                        value="View"
+                        onPress={() => generateReport('Sleep Habits')}
+                    />
+                    <ReportCard
+                        title="Language Preferences"
+                        icon="language"
+                        value="View"
+                        onPress={() => generateReport('Language Preferences')}
+                    />
+                </ScrollView>
+                {loading && (
+                    <ActivityIndicator size="large" color={colors.primary} style={styles.loadingIndicator} />
+                )}
             </View>
-            <ScrollView contentContainerStyle={styles.contentContainer}>
-                <ReportCard
-                    title="Total Users"
-                    icon="people"
-                    value={`${users.length} users`}
-                    onPress={() => generateReport('User Overview')}
-                />
-                <ReportCard
-                    title="Gender Distribution"
-                    icon="wc"
-                    value="View"
-                    onPress={() => generateReport('Gender Distribution')}
-                />
-                <ReportCard
-                    title="Age Distribution"
-                    icon="calendar-today"
-                    value="View"
-                    onPress={() => generateReport('Age Distribution')}
-                />
-                <ReportCard
-                    title="User Interests"
-                    icon="interests"
-                    value="View"
-                    onPress={() => generateReport('User Interests')}
-                />
-                <ReportCard
-                    title="User Concerns"
-                    icon="report-problem"
-                    value="View"
-                    onPress={() => generateReport('User Concerns')}
-                />
-                <ReportCard
-                    title="Therapy Preferences"
-                    icon="favorite"
-                    value="View"
-                    onPress={() => generateReport('Therapy Preferences')}
-                />
-                <ReportCard
-                    title="Challenge Completion"
-                    icon="flag"
-                    value="View"
-                    onPress={() => generateReport('Challenge Completion')}
-                />
-                <ReportCard
-                    title="Sleep Habits"
-                    icon="bedtime"
-                    value="View"
-                    onPress={() => generateReport('Sleep Habits')}
-                />
-                <ReportCard
-                    title="Language Preferences"
-                    icon="language"
-                    value="View"
-                    onPress={() => generateReport('Language Preferences')}
-                />
-            </ScrollView>
-            {loading && (
-                <ActivityIndicator size="large" color={colors.primary} style={styles.loadingIndicator} />
-            )}
-        </View>
+        </SafeAreaView>
     );
 };
 
 const styles = StyleSheet.create({
+    safeArea: {
+        flex: 1,
+    },
     container: {
         flex: 1
     },
