@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { AppRegistry, Platform } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { AppRegistry, View, Image, Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ThemeProvider } from './src/context/ThemeContext';
 import Navigation from './src/navigation/Navigation';
@@ -10,6 +10,7 @@ import { scheduleNotification, scheduleMorningNotification, scheduleRandomMotiva
 import PushNotification from 'react-native-push-notification';
 import TrackPlayer from 'react-native-track-player';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import AnimatedSplash from "react-native-animated-splash-screen";
 
 // Add this function to create the notification channel
 const createNotificationChannel = () => {
@@ -91,6 +92,8 @@ PushNotification.configure({
 });
 
 const App: React.FC = () => {
+  const [isLoaded, setIsLoaded] = useState(false);
+
   useEffect(() => {
     const setupApp = async () => {
       try {
@@ -115,6 +118,10 @@ const App: React.FC = () => {
           console.log('Notification permissions not granted');
         }
       } catch (error) {
+        console.error('Error setting up app:', error);
+      } finally {
+        // Delay hiding the splash screen to ensure it's visible for a minimum time
+        setTimeout(() => setIsLoaded(true), 2000);
       }
     };
 
@@ -135,14 +142,27 @@ const App: React.FC = () => {
   }, []);
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <ThemeProvider>
-        <MenuProvider>
-          <Navigation />
-          <Toast />
-        </MenuProvider>
-      </ThemeProvider>
-    </GestureHandlerRootView>
+    <AnimatedSplash
+      translucent={true}
+      isLoaded={isLoaded}
+      logoImage={require("./src/assets/logo.png")}
+      backgroundColor={"#1E1E1E"}
+      logoHeight={200}
+      logoWidth={200}
+      logoOpacity={0}
+      disableBackgroundImage={false}
+      duration={2000}
+      animationDuration={1500}
+    >
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <ThemeProvider>
+          <MenuProvider>
+            <Navigation />
+            <Toast />
+          </MenuProvider>
+        </ThemeProvider>
+      </GestureHandlerRootView>
+    </AnimatedSplash>
   );
 };
 
