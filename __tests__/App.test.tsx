@@ -8,12 +8,15 @@ import App from '../App';
 import { NavigationContainer } from '@react-navigation/native';
 import { MenuProvider } from 'react-native-popup-menu';
 import { ThemeProvider } from '../src/context/ThemeContext';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
+// Ensure NavigationContainer is correctly mocked
 jest.mock('@react-navigation/native', () => ({
   ...jest.requireActual('@react-navigation/native'),
-  NavigationContainer: ({ children }: { children: React.ReactNode }) => children,
+  NavigationContainer: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
+// Ensure GoogleSignin is correctly mocked
 jest.mock('@react-native-google-signin/google-signin', () => ({
   GoogleSignin: {
     configure: jest.fn(),
@@ -30,9 +33,34 @@ jest.mock('@react-native-google-signin/google-signin', () => ({
 
 jest.mock('../src/navigation/Navigation', () => {
   return function MockNavigation() {
-    return null;
+    return <div>MockNavigation</div>;
   };
 });
+
+// Add this mock for GestureHandlerRootView
+jest.mock('react-native-gesture-handler', () => ({
+  GestureHandlerRootView: ({ children }: { children: React.ReactNode }) => children,
+}));
+
+// Mock AnimatedSplash
+jest.mock("react-native-animated-splash-screen", () => {
+  return function MockAnimatedSplash({ children }: { children: React.ReactNode }) {
+    return children;
+  };
+});
+
+// Mock TrackPlayer
+jest.mock('react-native-track-player', () => ({
+  setupPlayer: jest.fn(),
+  // Add other TrackPlayer methods you're using
+}));
+
+// Mock PushNotification
+jest.mock('react-native-push-notification', () => ({
+  configure: jest.fn(),
+  createChannel: jest.fn(),
+  // Add other PushNotification methods you're using
+}));
 
 describe('App', () => {
   it('renders correctly', () => {

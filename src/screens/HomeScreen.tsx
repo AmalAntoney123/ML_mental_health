@@ -22,6 +22,7 @@ type CounterProps = {
   icon: string;
   count: number;
   color: string;
+  testID?: string; // Add this line
 };
 
 type BottomNavItemProps = {
@@ -31,10 +32,10 @@ type BottomNavItemProps = {
   onPress: () => void;
 };
 
-const Counter: React.FC<CounterProps> = ({ icon, count, color }) => {
+const Counter: React.FC<CounterProps> = ({ icon, count, color, testID }) => {
   const { colors } = useTheme();
   return (
-    <View style={styles.counter}>
+    <View style={styles.counter} testID={testID}>
       <Icon name={icon} size={20} color={color} />
       <Text style={{ ...styles.counterText, color: colors.text }}>{count}</Text>
     </View>
@@ -65,15 +66,15 @@ const Header: React.FC = () => {
   const { colors } = useTheme();
   const navigation = useNavigation<HomeScreenNavigationProp>();
   return (
-    <View style={[styles.header, { backgroundColor: colors.surface }]}>
+    <View style={[styles.header, { backgroundColor: colors.surface }]} testID="header">
       <View style={styles.headerItem}>
         {/* Empty view for spacing */}
       </View>
       <View style={styles.counterContainer}>
-        <Counter icon="local-fire-department" count={5} color={colors.primary} />
-        <Counter icon="money" count={100} color={colors.secondary} />
+        <Counter icon="local-fire-department" count={5} color={colors.primary} testID="fire-counter" />
+        <Counter icon="money" count={100} color={colors.secondary} testID="money-counter" />
       </View>
-      <TouchableOpacity onPress={() => navigation.navigate('Profile')} style={styles.headerItem}>
+      <TouchableOpacity onPress={() => navigation.navigate('Profile')} style={styles.headerItem} testID="profile-icon">
         <Icon name="person" size={24} color={colors.onSurface} />
       </TouchableOpacity>
     </View>
@@ -116,9 +117,10 @@ const TabNavigator = () => {
                 paddingTop: 8,
               },
             })}
+            initialRouteName="Dashboard"
           >
-            <Tab.Screen name="Dashboard" component={DashboardScreen} />
-            <Tab.Screen name="Journal" component={JournalScreen} />
+            <Tab.Screen name="Dashboard" component={DashboardScreen} options={{ tabBarTestID: "dashboard-tab" }} />
+            <Tab.Screen name="Journal" component={JournalScreen} options={{ tabBarTestID: "journal-tab" }} />
             <Tab.Screen
               name=" "
               options={{
@@ -127,14 +129,15 @@ const TabNavigator = () => {
                     icon={() => <Icon name="mood" size={24} color={colors.primary} />}
                     onPress={() => navigation.navigate('MoodTracking')}
                     style={[styles.fab, {backgroundColor: colors.onPrimary}]}
+                    testID="mood-tracking-fab"
                   />
                 ),
               }}
             >
               {() => null}
             </Tab.Screen>
-            <Tab.Screen name="Therapy" component={TherapyScreen} />
-            <Tab.Screen name="Support" component={SupportScreen} />
+            <Tab.Screen name="Therapy" component={TherapyScreen} options={{ tabBarTestID: "therapy-tab" }} />
+            <Tab.Screen name="Support" component={SupportScreen} options={{ tabBarTestID: "support-tab" }} />
           </Tab.Navigator>
         </View>
       </SafeAreaView>

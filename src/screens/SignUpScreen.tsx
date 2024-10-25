@@ -201,6 +201,7 @@ const SignupScreen: React.FC<Props> = ({ navigation }) => {
                         {/* Email input */}
                         <View style={styles.inputContainer}>
                             <TextInput
+                                testID="email-input"
                                 label="Email"
                                 value={email}
                                 onChangeText={setEmail}
@@ -230,6 +231,7 @@ const SignupScreen: React.FC<Props> = ({ navigation }) => {
                         {/* Password input */}
                         <View style={styles.inputContainer}>
                             <TextInput
+                                testID="password-input"
                                 label="Password"
                                 value={password}
                                 onChangeText={setPassword}
@@ -257,6 +259,7 @@ const SignupScreen: React.FC<Props> = ({ navigation }) => {
                         {/* Confirm Password input */}
                         <View style={styles.inputContainer}>
                             <TextInput
+                                testID="confirm-password-input"
                                 label="Confirm Password"
                                 value={confirmPassword}
                                 onChangeText={setConfirmPassword}

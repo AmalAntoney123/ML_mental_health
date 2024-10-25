@@ -27,6 +27,7 @@ jest.mock('@react-native-firebase/database', () => ({
       once: jest.fn(),
       set: jest.fn(),
       push: jest.fn(),
+      update: jest.fn(),
     })),
   })),
 }));
@@ -178,4 +179,48 @@ jest.mock('react-native-paper', () => {
   return MockedModule;
 });
 
-// Add any other mocks or setup code you need for your tests
+// Mock react-native-track-player
+jest.mock('react-native-track-player', () => ({
+  CAPABILITY_PLAY: 'CAPABILITY_PLAY',
+  CAPABILITY_PAUSE: 'CAPABILITY_PAUSE',
+  CAPABILITY_STOP: 'CAPABILITY_STOP',
+  CAPABILITY_SEEK_TO: 'CAPABILITY_SEEK_TO',
+  CAPABILITY_SKIP_TO_NEXT: 'CAPABILITY_SKIP_TO_NEXT',
+  CAPABILITY_SKIP_TO_PREVIOUS: 'CAPABILITY_SKIP_TO_PREVIOUS',
+  CAPABILITY_JUMP_FORWARD: 'CAPABILITY_JUMP_FORWARD',
+  CAPABILITY_JUMP_BACKWARD: 'CAPABILITY_JUMP_BACKWARD',
+  CAPABILITY_SET_RATING: 'CAPABILITY_SET_RATING',
+  CAPABILITY_LIKE: 'CAPABILITY_LIKE',
+  CAPABILITY_DISLIKE: 'CAPABILITY_DISLIKE',
+  CAPABILITY_BOOKMARK: 'CAPABILITY_BOOKMARK',
+  TrackPlayer: {
+    setupPlayer: jest.fn(),
+    destroy: jest.fn(),
+    updateOptions: jest.fn(),
+    add: jest.fn(),
+    remove: jest.fn(),
+    removeUpcomingTracks: jest.fn(),
+    skip: jest.fn(),
+    skipToNext: jest.fn(),
+    skipToPrevious: jest.fn(),
+    reset: jest.fn(),
+    play: jest.fn(),
+    pause: jest.fn(),
+    stop: jest.fn(),
+    seekTo: jest.fn(),
+    setVolume: jest.fn(),
+    setRate: jest.fn(),
+    getTrack: jest.fn(),
+    getQueue: jest.fn(),
+    getCurrentTrack: jest.fn(),
+    getDuration: jest.fn(),
+    getBufferedPosition: jest.fn(),
+    getPosition: jest.fn(),
+    getState: jest.fn(),
+    getVolume: jest.fn(),
+    getRate: jest.fn(),
+  },
+}));
+
+jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper');
+

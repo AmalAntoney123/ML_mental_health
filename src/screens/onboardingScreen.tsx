@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView, SafeAreaView, Text, TouchableOpacity, Alert, Dimensions } from 'react-native';
+import { View, StyleSheet, ScrollView, SafeAreaView, Text, TouchableOpacity, Alert, Dimensions, Button } from 'react-native';
 import { TextInput, Chip, ProgressBar, Provider as PaperProvider, DefaultTheme } from 'react-native-paper';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/types';
@@ -244,6 +244,7 @@ const OnboardingScreen: React.FC<Props> = ({ navigation }) => {
                                         error: colors.error,
                                     }
                                 }}
+                                testID="name-input"
                             />
                         </View>
                         <View style={styles.inputContainer}>
@@ -266,6 +267,7 @@ const OnboardingScreen: React.FC<Props> = ({ navigation }) => {
                                         error: colors.error,
                                     }
                                 }}
+                                testID="age-input"
                             />
                         </View>
                     </>

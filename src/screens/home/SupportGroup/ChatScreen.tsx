@@ -324,7 +324,7 @@ const ChatScreen: React.FC = () => {
             <View style={[styles.container, { backgroundColor: colors.background }]}>
                 <View style={[styles.header, { backgroundColor: colors.surface }]}>
                     <Text style={[styles.title, { color: colors.text }]}>{group.name}</Text>
-                    <TouchableOpacity onPress={showChatDetails}>
+                    <TouchableOpacity onPress={showChatDetails} testID="chat-details-button">
                         <Icon name="info" size={24} color={colors.primary} />
                     </TouchableOpacity>
                 </View>
