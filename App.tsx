@@ -118,7 +118,7 @@ const App: React.FC = () => {
           console.log('Notification permissions not granted');
         }
       } catch (error) {
-        console.error('Error setting up app:', error);
+        // console.error('Error setting up app:', error);
       } finally {
         // Delay hiding the splash screen to ensure it's visible for a minimum time
         setTimeout(() => setIsLoaded(true), 2000);

@@ -8,6 +8,7 @@ import { useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../../../navigation/types';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Toast from 'react-native-toast-message';
 
 interface SupportGroup {
   id: string;
@@ -63,10 +64,48 @@ const FindGroupsScreen: React.FC = () => {
       const currentUser = auth().currentUser;
       if (!currentUser) return;
 
-      await database().ref(`supportGroups/${group.id}/members/${currentUser.uid}`).set(true);
-      navigation.goBack();
+      // Get user name before joining group
+      const userRef = database().ref(`users/${currentUser.uid}`);
+      const userSnapshot = await userRef.once('value');
+      const userName = userSnapshot.val()?.name || 'Unknown';
+
+      // Add the user to the group
+      await database()
+        .ref(`supportGroups/${group.id}/members/${currentUser.uid}`)
+        .set(true);
+
+      // Add system message about user joining
+      const messagesRef = database().ref(`supportGroups/${group.id}/messages`);
+      await messagesRef.push({
+        text: `${userName} has joined the group`,
+        userId: 'system',
+        userName: 'System',
+        timestamp: database.ServerValue.TIMESTAMP,
+        isSystemMessage: true,
+        readBy: { [currentUser.uid]: true },
+      });
+
+      // Navigate to the chat screen
+      navigation.replace('ChatScreen', { 
+        group: {
+          ...group,
+          members: {
+            ...group.members,
+            [currentUser.uid]: true
+          },
+          lastMessage: null,
+          lastMessageTimestamp: null
+        }
+      });
     } catch (error) {
       console.error('Failed to join group:', error);
+      Toast.show({
+        type: 'error',
+        text1: 'Failed to join group',
+        text2: 'Please try again',
+        position: 'bottom',
+        visibilityTime: 3000,
+      });
     }
   };
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, createContext, useContext } from 'react';
+import React, { useState, useEffect, createContext, useContext, useRef } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, FlatList, TextInput, Alert } from 'react-native';
 import { useTheme } from '../../../context/ThemeContext';
 import database from '@react-native-firebase/database';
@@ -9,6 +9,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Menu, MenuOptions, MenuOption, MenuTrigger } from 'react-native-popup-menu';
 import Toast from 'react-native-toast-message';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Swipeable, TouchableWithoutFeedback } from 'react-native-gesture-handler';
 
 type ChatScreenRouteProp = RouteProp<RootStackParamList, 'ChatScreen'>;
 
@@ -21,6 +22,7 @@ interface Message {
     replyTo?: string;
     deletedAt?: number;
     readBy: { [userId: string]: boolean };
+    isSystemMessage?: boolean;
 }
 
 interface User {
@@ -67,6 +69,7 @@ const ChatScreen: React.FC = () => {
   const [typingUsers, setTypingUsers] = useState<string[]>([]);
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { colors } = useTheme();
+  const swipeableRefs = useRef<{ [key: string]: Swipeable | null }>({});
 
     useEffect(() => {
         const currentUser = auth().currentUser;
@@ -239,83 +242,138 @@ const ChatScreen: React.FC = () => {
         }
     };
 
+    const handleSwipeOpen = (message: Message, direction: 'left' | 'right') => {
+        handleReply(message);
+        // Close the swipeable after triggering reply
+        if (message.id && swipeableRefs.current[message.id]) {
+            swipeableRefs.current[message.id]?.close();
+        }
+    };
+
     const renderMessage = ({ item }: { item: Message }) => {
         const isCurrentUser = item.userId === auth().currentUser?.uid;
+        const isSystemMessage = item.isSystemMessage;
         const isDeleted = item.text === "Message deleted";
         const readStatus = getReadStatus(item, users);
 
-        return (
-            <Menu>
-                <MenuTrigger
-                    triggerOnLongPress
-                    customStyles={{
-                        triggerWrapper: {
-                            flex: 1,
-                        },
-                    }}
-                >
-                    <View
-                        style={[
-                            styles.messageContainer,
-                            isCurrentUser ? styles.currentUserMessage : styles.otherUserMessage,
-                            { backgroundColor: isCurrentUser ? colors.primary : colors.surface },
-                        ]}
-                    >
-                        {!isCurrentUser && (
-                            <Text style={[styles.userName, { color: colors.primary }]}>{item.userName}</Text>
-                        )}
-                        {item.replyTo && (
-                            <Text style={[styles.replyToText, { color: colors.primaryLight }]}>
-                                Replying to: {messages.find(m => m.id === item.replyTo)?.text.substring(0, 30)}...
-                            </Text>
-                        )}
+        if (isSystemMessage) {
+            const isJoinMessage = item.text.includes("has joined");
+            return (
+                <View style={styles.systemMessageContainer}>
+                    <View style={[
+                        styles.systemMessagePill,
+                        { 
+                            backgroundColor: colors.surface,
+                            borderWidth: 1,
+                            borderColor: isJoinMessage 
+                                ? colors.success + '20' // 20 is hex for 12% opacity
+                                : colors.error + '20',
+                        }
+                    ]}>
+                        <Icon 
+                            name={isJoinMessage ? "person-add" : "person-remove"} 
+                            size={12} 
+                            color={isJoinMessage ? colors.success : colors.error}
+                            style={styles.systemMessageIcon}
+                        />
                         <Text style={[
-                            styles.messageText,
-                            { color: isCurrentUser ? colors.onPrimary : colors.text },
-                            isDeleted && styles.deletedMessageText
+                            styles.systemMessageText,
+                            {
+                                color: isJoinMessage ? colors.success : colors.error,
+                                fontSize: 10,
+                            }
                         ]}>
                             {item.text}
                         </Text>
-                        <View style={styles.messageFooter}>
-            <Text style={[styles.messageTime, { color: colors.gray }]}>
-              {new Date(item.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-            </Text>
-            {isCurrentUser && (
-              <View style={styles.readReceipt}>
-                {readStatus === 'sent' && (
-                  <Icon name="check" size={16} color={colors.gray} />
+                    </View>
+                </View>
+            );
+        }
+
+        return (
+            <Swipeable
+                ref={(ref) => {
+                    if (item.id) {
+                        swipeableRefs.current[item.id] = ref;
+                    }
+                }}
+                renderRightActions={() => (
+                    <View style={styles.swipeActionContainer}>
+                        <Icon name="reply" size={20} color={colors.primary} />
+                    </View>
                 )}
-                {readStatus === 'delivered' && (
-                  <Icon name="done-all" size={16} color={colors.gray} />
+                renderLeftActions={() => (
+                    <View style={styles.swipeActionContainer}>
+                        <Icon name="reply" size={20} color={colors.primary} />
+                    </View>
                 )}
-                {readStatus === 'read' && (
-                  <Icon name="done-all" size={16} color={colors.secondary} />
-                )}
-              </View>
-            )}
-          </View>
-        </View>
-      </MenuTrigger>
-                <MenuOptions optionsContainerStyle={{ backgroundColor: colors.secondaryBackground, borderRadius: 30 }}>
-                    {!isDeleted && (
-                        <>
-                            <MenuOption onSelect={() => handleReply(item)}>
-                                <Text style={styles.menuOptionText}>Reply</Text>
-                            </MenuOption>
-                            {isCurrentUser && (
-                                <MenuOption onSelect={() => handleDeleteMessage(item.id)}>
-                                    <Text style={[styles.menuOptionText, { color: 'red' }]}>Delete</Text>
-                                </MenuOption>
+                onSwipeableOpen={(direction) => handleSwipeOpen(item, direction)}
+                overshootRight={false}
+                overshootLeft={false}
+                rightThreshold={40}
+                leftThreshold={40}
+            >
+                <Menu>
+                    <MenuTrigger
+                        triggerOnLongPress
+                        customStyles={{
+                            triggerTouchable: {
+                                component: TouchableWithoutFeedback // Use TouchableWithoutFeedback
+                            },
+                        }}
+                    >
+                        <View style={[
+                            styles.messageContainer,
+                            isCurrentUser ? styles.currentUserMessage : styles.otherUserMessage,
+                            { backgroundColor: isCurrentUser ? colors.primary : colors.surface }
+                        ]}>
+                            {!isCurrentUser && (
+                                <Text style={[styles.userName, { color: colors.primary }]}>{item.userName}</Text>
                             )}
-                        </>
-                    )}
-                    <MenuOption>
-                        <Text style={[styles.menuFooterText, { color: colors.gray }]}>
-                            Sent at {new Date(item.timestamp).toLocaleTimeString()} on {new Date(item.timestamp).toLocaleDateString()}
-                        </Text>
-                    </MenuOption>
-                </MenuOptions>
-            </Menu>
+                            {item.replyTo && (
+                                <Text style={[styles.replyToText, { color: colors.primaryLight }]}>
+                                    Replying to: {messages.find(m => m.id === item.replyTo)?.text.substring(0, 30)}...
+                                </Text>
+                            )}
+                            <Text style={[
+                                styles.messageText,
+                                { color: isCurrentUser ? colors.onPrimary : colors.text },
+                                isDeleted && styles.deletedMessageText
+                            ]}>
+                                {item.text}
+                            </Text>
+                            <View style={styles.messageFooter}>
+                                <Text style={[styles.messageTime, { color: colors.gray }]}>
+                                    {new Date(item.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                </Text>
+                                {isCurrentUser && (
+                                    <View style={styles.readReceipt}>
+                                        {readStatus === 'sent' && <Icon name="check" size={16} color={colors.gray} />}
+                                        {readStatus === 'delivered' && <Icon name="done-all" size={16} color={colors.gray} />}
+                                        {readStatus === 'read' && <Icon name="done-all" size={16} color={colors.secondary} />}
+                                    </View>
+                                )}
+                            </View>
+                        </View>
+                    </MenuTrigger>
+                    <MenuOptions customStyles={{
+                        optionsContainer: {
+                            borderRadius: 8,
+                            padding: 4,
+                            backgroundColor: colors.surface,
+                        },
+                    }}>
+                        <MenuOption onSelect={() => handleReply(item)}>
+                            <Text style={[styles.menuOptionText, { color: colors.text }]}>Reply</Text>
+                        </MenuOption>
+                        {isCurrentUser && (
+                            <MenuOption onSelect={() => handleDeleteMessage(item.id)}>
+                                <Text style={[styles.menuOptionText, { color: 'red' }]}>Delete</Text>
+                            </MenuOption>
+                        )}
+                    </MenuOptions>
+                </Menu>
+            </Swipeable>
         );
     };
 
@@ -502,6 +560,60 @@ const styles = StyleSheet.create({
     },
     readReceiptIcon: {
         height: 13, // Half the size of the icon to create overlap
+    },
+    swipeableContainer: {
+        marginVertical: 4,
+    },
+    swipeActionContainer: {
+        width: 60,
+        height: '100%',
+        justifyContent: 'center',
+        alignItems: 'center',
+        opacity: 0.5,
+    },
+    swipeAction: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: '100%',
+        height: '100%',
+        borderRadius: 8,
+        flexDirection: 'row',
+        gap: 4,
+        paddingHorizontal: 8,
+    },
+    swipeActionText: {
+        fontSize: 12,
+        fontWeight: 'bold',
+    },
+    systemMessageContainer: {
+        alignItems: 'center',
+        marginVertical: 8,
+        paddingHorizontal: 16,
+    },
+    systemMessagePill: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        borderRadius: 20,
+        paddingVertical: 8,
+        paddingHorizontal: 16,
+        maxWidth: '85%',
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 1,
+        },
+        shadowOpacity: 0.05,
+        shadowRadius: 2,
+        elevation: 1,
+    },
+    systemMessageText: {
+        fontSize: 13,
+        fontWeight: '500',
+        textAlign: 'center',
+        letterSpacing: 0.1,
+    },
+    systemMessageIcon: {
+        marginRight: 8,
     },
 });
 

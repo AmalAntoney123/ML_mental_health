@@ -17,7 +17,7 @@ import {
 type SettingsScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Settings'>;
 
 const SettingsScreen = () => {
-    const { colors, toggleTheme, isDarkMode } = useTheme();
+    const { colors, themeMode, setThemeMode } = useTheme();
     const { user, isAdmin } = useAuth();
     const navigation = useNavigation<SettingsScreenNavigationProp>();
     const [dailyReminders, setDailyReminders] = useState(true);
@@ -88,7 +88,6 @@ const SettingsScreen = () => {
         }
     };
 
-
     const SettingsCard: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => (
         <View style={[styles.card, { backgroundColor: colors.surface }]}>
             <Text style={[styles.sectionTitle, { color: colors.text }]}>{title}</Text>
@@ -96,16 +95,52 @@ const SettingsScreen = () => {
         </View>
     );
 
+    const ThemeOption: React.FC<{ 
+        label: string; 
+        mode: 'light' | 'dark' | 'system';
+        isSelected: boolean;
+        onSelect: () => void;
+    }> = ({ label, isSelected, onSelect }) => (
+        <TouchableOpacity 
+            style={[
+                styles.themeOption,
+                { 
+                    backgroundColor: isSelected ? colors.primary : colors.surface,
+                    borderColor: colors.border
+                }
+            ]}
+            onPress={onSelect}
+        >
+            <Text style={[
+                styles.themeOptionText,
+                { color: isSelected ? colors.onPrimary : colors.text }
+            ]}>
+                {label}
+            </Text>
+        </TouchableOpacity>
+    );
+
     return (
         <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
             <SettingsCard title="Appearance">
-                <View style={styles.settingItem}>
-                    <Text style={[styles.settingLabel, { color: colors.text }]}>Dark Mode</Text>
-                    <Switch
-                        value={isDarkMode}
-                        onValueChange={toggleTheme}
-                        trackColor={{ false: colors.gray, true: colors.primary }}
-                        thumbColor={isDarkMode ? colors.primary : colors.gray}
+                <View style={styles.themeOptionsContainer}>
+                    <ThemeOption
+                        label="Light"
+                        mode="light"
+                        isSelected={themeMode === 'light'}
+                        onSelect={() => setThemeMode('light')}
+                    />
+                    <ThemeOption
+                        label="Dark"
+                        mode="dark"
+                        isSelected={themeMode === 'dark'}
+                        onSelect={() => setThemeMode('dark')}
+                    />
+                    <ThemeOption
+                        label="System"
+                        mode="system"
+                        isSelected={themeMode === 'system'}
+                        onSelect={() => setThemeMode('system')}
                     />
                 </View>
             </SettingsCard>
@@ -190,6 +225,23 @@ const styles = StyleSheet.create({
     },
     settingLabel: {
         fontSize: 16,
+    },
+    themeOptionsContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        paddingVertical: 12,
+    },
+    themeOption: {
+        flex: 1,
+        padding: 12,
+        borderRadius: 8,
+        marginHorizontal: 4,
+        borderWidth: 1,
+        alignItems: 'center',
+    },
+    themeOptionText: {
+        fontSize: 14,
+        fontWeight: '500',
     },
 });
 

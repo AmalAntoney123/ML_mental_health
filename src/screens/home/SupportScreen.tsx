@@ -17,6 +17,15 @@ interface SupportGroup {
   members: { [key: string]: boolean };
   lastMessage: string | null;
   lastMessageTimestamp: number | null;
+  messages?: {
+    [key: string]: {
+      readBy: { [key: string]: boolean };
+      text: string;
+      timestamp: number;
+      userId: string;
+      userName: string;
+    };
+  };
 }
 
 type SupportScreenNavigationProp = StackNavigationProp<RootStackParamList, 'SupportScreen'>;
@@ -57,7 +66,8 @@ const SupportScreen: React.FC = () => {
             createdBy: data.createdBy || '',
             members: data.members || {},
             lastMessage: data.lastMessage || null,
-            lastMessageTimestamp: data.lastMessageTimestamp || null
+            lastMessageTimestamp: data.lastMessageTimestamp || null,
+            messages: data.messages || {}
           }))
           .filter(group => group.members[currentUser.uid]);
 
@@ -98,6 +108,15 @@ const SupportScreen: React.FC = () => {
     );
   };
 
+  const getUnreadCount = (group: SupportGroup) => {
+    const currentUser = auth().currentUser;
+    if (!currentUser || !group.messages) return 0;
+
+    return Object.values(group.messages).filter(
+      message => !message.readBy?.[currentUser.uid]
+    ).length;
+  };
+
   const renderGroupItem = ({ item }: { item: SupportGroup }) => (
     <TouchableOpacity
       style={[styles.option, { backgroundColor: colors.surface }]}
@@ -105,7 +124,16 @@ const SupportScreen: React.FC = () => {
     >
       <Icon name="group" size={24} color={colors.primary} />
       <View style={styles.groupInfo}>
-        <Text style={[styles.optionTitle, { color: colors.text }]}>{item.name}</Text>
+        <View style={styles.groupHeader}>
+          <Text style={[styles.optionTitle, { color: colors.text }]}>{item.name}</Text>
+          {getUnreadCount(item) > 0 && (
+            <View style={[styles.unreadBadge, { backgroundColor: colors.primary }]}>
+              <Text style={[styles.unreadCount, { color: colors.background }]}>
+                {getUnreadCount(item)}
+              </Text>
+            </View>
+          )}
+        </View>
         <Text style={[styles.optionDescription, { color: colors.text }]}>{item.description}</Text>
       </View>
     </TouchableOpacity>
@@ -226,6 +254,23 @@ const styles = StyleSheet.create({
   optionDescription: {
     fontSize: 14,
     marginTop: 4,
+  },
+  groupHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  unreadBadge: {
+    minWidth: 20,
+    height: 20,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 6,
+  },
+  unreadCount: {
+    fontSize: 12,
+    fontWeight: 'bold',
   },
 });
 
