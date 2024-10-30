@@ -8,6 +8,7 @@ import auth from '@react-native-firebase/auth';
 import Toast from 'react-native-toast-message';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import LeaveGroupModal from './LeaveGroupModal';
+import VerifiedBadge from '../../../components/VerifiedBadge';
 
 type ChatDetailsScreenRouteProp = RouteProp<RootStackParamList, 'ChatDetailsScreen'>;
 
@@ -24,7 +25,10 @@ const ChatDetailsScreen: React.FC = () => {
   const route = useRoute<ChatDetailsScreenRouteProp>();
   const { group } = route.params;
   const [groupDetails, setGroupDetails] = useState<GroupDetails | null>(null);
-  const [memberNames, setMemberNames] = useState<{ [key: string]: string }>({});
+  const [memberData, setMemberData] = useState<{ [key: string]: { 
+    name: string;
+    emoElevate?: { active: boolean; }
+  } }>({});
   const navigation = useNavigation();
   const currentUser = auth().currentUser;
   const [isLeaveModalVisible, setIsLeaveModalVisible] = useState(false);
@@ -39,19 +43,19 @@ const ChatDetailsScreen: React.FC = () => {
         if (data) {
           setGroupDetails(data);
           
-          // Fetch member names
           const memberIds = Object.keys(data.members || {});
           if (memberIds.length > 0) {
             memberIds.forEach((id) => {
-              usersRef.child(id).child('name').once('value', (snapshot) => {
-                const name = snapshot.val();
-                if (name) {
-                  setMemberNames((prevNames) => ({
-                    ...prevNames,
-                    [id]: name
+              usersRef.child(id).once('value', (snapshot) => {
+                const userData = snapshot.val();
+                if (userData) {
+                  setMemberData((prevData) => ({
+                    ...prevData,
+                    [id]: {
+                      name: userData.name || 'Unknown',
+                      emoElevate: userData.emoElevate
+                    }
                   }));
-                } else {
-                  console.log(`Name not found for user ${id}`);
                 }
               });
             });
@@ -67,7 +71,14 @@ const ChatDetailsScreen: React.FC = () => {
 
   const renderMember = ({ item }: { item: string }) => (
     <View style={[styles.memberItem, { backgroundColor: colors.surface }]}>
-      <Text style={[styles.memberName, { color: colors.text }]}>{memberNames[item] || item}</Text>
+      <View style={styles.memberNameContainer}>
+        <Text style={[styles.memberName, { color: colors.text }]}>
+          {memberData[item]?.name || item}
+        </Text>
+        {memberData[item]?.emoElevate?.active && (
+          <VerifiedBadge size={16} style={styles.memberBadge} />
+        )}
+      </View>
     </View>
   );
 
@@ -247,6 +258,13 @@ const styles = StyleSheet.create({
   },
   leaveIcon: {
     marginRight: 4,
+  },
+  memberNameContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  memberBadge: {
+    marginLeft: 6,
   },
 });
 

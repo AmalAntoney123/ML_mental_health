@@ -10,6 +10,7 @@ import { Menu, MenuOptions, MenuOption, MenuTrigger } from 'react-native-popup-m
 import Toast from 'react-native-toast-message';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Swipeable, TouchableWithoutFeedback } from 'react-native-gesture-handler';
+import VerifiedBadge from '../../../components/VerifiedBadge';
 
 type ChatScreenRouteProp = RouteProp<RootStackParamList, 'ChatScreen'>;
 
@@ -28,6 +29,9 @@ interface Message {
 interface User {
     id: string;
     name: string;
+    emoElevate?: {
+        active: boolean;
+    };
 }
 
 interface UserContextType {
@@ -111,7 +115,12 @@ const ChatScreen: React.FC = () => {
                     const usersList = await Promise.all(
                         Object.keys(membersData).map(async (userId) => {
                             const userSnapshot = await database().ref(`users/${userId}`).once('value');
-                            return { id: userId, name: userSnapshot.val()?.name || 'Unknown' };
+                            const userData = userSnapshot.val();
+                            return { 
+                                id: userId, 
+                                name: userData?.name || 'Unknown',
+                                emoElevate: userData?.emoElevate || null
+                            };
                         })
                     );
                     setUsers(usersList);
@@ -328,7 +337,14 @@ const ChatScreen: React.FC = () => {
                             { backgroundColor: isCurrentUser ? colors.primary : colors.surface }
                         ]}>
                             {!isCurrentUser && (
-                                <Text style={[styles.userName, { color: colors.primary }]}>{item.userName}</Text>
+                                <View style={styles.userNameContainer}>
+                                    <Text style={[styles.userName, { color: colors.primary }]}>
+                                        {item.userName}
+                                    </Text>
+                                    {users.find(u => u.id === item.userId)?.emoElevate?.active && (
+                                        <VerifiedBadge size={10} style={styles.messageBadge} />
+                                    )}
+                                </View>
                             )}
                             {item.replyTo && (
                                 <Text style={[styles.replyToText, { color: colors.primaryLight }]}>
@@ -614,6 +630,14 @@ const styles = StyleSheet.create({
     },
     systemMessageIcon: {
         marginRight: 8,
+    },
+    userNameContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 4,
+    },
+    messageBadge: {
+        marginLeft: 4,
     },
 });
 

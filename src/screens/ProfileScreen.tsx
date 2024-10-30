@@ -12,6 +12,7 @@ import { NativeStackNavigationProp } from 'react-native-screens/lib/typescript/n
 import { RootStackParamList } from '../navigation/types';
 import { useFocusEffect } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import VerifiedBadge from '../components/VerifiedBadge';
 
 interface UserData {
     name?: string;
@@ -26,6 +27,11 @@ interface UserData {
     goals?: string[];
     concerns?: string[];
     preferredTherapyType?: string;
+    emoElevate?: {
+        active: boolean;
+        expiryDate?: string;
+        startDate?: string;
+    };
 }
 
 const ProfileScreen = () => {
@@ -63,6 +69,7 @@ const ProfileScreen = () => {
                                 goals: data.goals,
                                 concerns: data.concerns,
                                 preferredTherapyType: data.preferredTherapyType,
+                                emoElevate: data.emoElevate,
                             });
                         }
                         setLoading(false);
@@ -124,6 +131,7 @@ const ProfileScreen = () => {
                         goals: data.goals,
                         concerns: data.concerns,
                         preferredTherapyType: data.preferredTherapyType,
+                        emoElevate: data.emoElevate,
                     });
                 }
                 setLoading(false);
@@ -243,7 +251,16 @@ const ProfileScreen = () => {
                                 <Text style={[styles.avatarPlaceholderText, { color: colors.text }]}>Add Photo</Text>
                             </TouchableOpacity>
                         )}
-                        <Text style={[styles.name, { color: colors.text }]}>{userName || 'User'}</Text>
+                        <View style={styles.nameContainer}>
+                            {userData?.emoElevate?.active && (
+                                <VerifiedBadge
+                                    size={14}
+                                    style={styles.verifiedBadge}
+                                />
+                            )}
+                            <Text style={[styles.name, { color: colors.text }]}>{userName || 'User'}</Text>
+
+                        </View>
                         <Text style={[styles.membership, { color: colors.gray }]}>
                             Age: {userData.age || 'N/A'} • Gender: {userData.gender || 'N/A'}
                         </Text>
@@ -370,9 +387,8 @@ const styles = StyleSheet.create({
         fontSize: 14,
     },
     name: {
-        fontSize: 22,
+        fontSize: 24,
         fontWeight: 'bold',
-        marginTop: -20,
     },
     membership: {
         fontSize: 14,
@@ -475,6 +491,15 @@ const styles = StyleSheet.create({
     },
     bottomSpacer: {
         height: 32,
+    },
+    nameContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginVertical: 8,
+    },
+    verifiedBadge: {
+        marginRight: 6,
     },
 });
 
