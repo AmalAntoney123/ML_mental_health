@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert, ActivityIndicator, Dimensions, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert, ActivityIndicator, Dimensions, Image, ScrollView } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../utils/auth';
 import database from '@react-native-firebase/database';
@@ -7,8 +7,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import PagerView from 'react-native-pager-view';
 import RazorpayCheckout from 'react-native-razorpay';
-import { RAZORPAY_KEY_ID } from '../config';
-import Animated from 'react-native-reanimated';
+import { RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET } from '../config';
+import VerifiedBadge from '../components/VerifiedBadge';
 // Add type definition for Razorpay options
 type RazorpayLanguage = 'en' | 'ben' | 'hi' | 'mar' | 'guj' | 'tam' | 'tel';
 
@@ -69,6 +69,14 @@ interface BenefitItem {
   color: string;
 }
 
+// Add interface for membership plans
+interface MembershipPlan {
+  duration: number; // months
+  price: string;
+  savings?: string;
+  isPopular?: boolean;
+}
+
 const EmoElevateScreen = () => {
   const { colors } = useTheme();
   const { user } = useAuth();
@@ -78,6 +86,7 @@ const EmoElevateScreen = () => {
   const [elevateData, setElevateData] = useState<ElevateData | null>(null);
   const pagerRef = useRef<PagerView>(null);
   const [currentPage, setCurrentPage] = useState(0);
+  const [selectedPlan, setSelectedPlan] = useState<number>(1); // default to 1 month
 
   const width = Dimensions.get('window').width;
   const PAGE_WIDTH = width * 0.8;
@@ -106,6 +115,19 @@ const EmoElevateScreen = () => {
       description: 'Access to premium features and early access to new updates',
       icon: 'star',
       color: '#FFC107',
+    },
+  ];
+
+  const membershipPlans: MembershipPlan[] = [
+    {
+      duration: 1,
+      price: price,
+    },
+    {
+      duration: 3,
+      price: (Number(price) * 2.5).toString(), // 3 months for the price of 2.5
+      savings: '17%',
+      isPopular: true,
     },
   ];
 
@@ -181,90 +203,79 @@ const EmoElevateScreen = () => {
       return;
     }
 
+    const selectedMembershipPlan = membershipPlans.find(plan => plan.duration === selectedPlan);
+    if (!selectedMembershipPlan) return;
+
     try {
       setLoading(true);
-      
-      // Fetch user details for Razorpay
-      const userRef = database().ref(`users/${user.uid}`);
-      const snapshot = await userRef.once('value');
-      const userData = snapshot.val();
+      const auth = btoa(`${RAZORPAY_KEY_ID}:${RAZORPAY_KEY_SECRET}`);
 
-      // Create an order ID (you should implement this on your backend)
-      const order_id = `order_${Date.now()}`; // Replace this with actual order creation from your backend
+      // First create an order
+      const orderResponse = await fetch('https://api.razorpay.com/v1/orders', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Basic ${auth}`,
+        },
+        body: JSON.stringify({
+          amount: Math.round(Number(selectedMembershipPlan.price) * 100), // Convert to paise
+          currency: 'INR',
+          receipt: `receipt_${Date.now()}`,
+        }),
+      });
 
-      const options: RazorpayOptions = {
-        description: 'Emo Elevate Monthly Subscription',
+      if (!orderResponse.ok) {
+        const errorData = await orderResponse.json();
+        console.error('Order creation failed:', errorData);
+        throw new Error('Failed to create order');
+      }
+
+      const orderData = await orderResponse.json();
+      console.log('Order created:', orderData);
+
+      // Then initiate payment
+      const options = {
+        description: `Emo Elevate ${selectedPlan} Month${selectedPlan > 1 ? 's' : ''} Subscription`,
         currency: 'INR',
         key: RAZORPAY_KEY_ID,
-        amount: Number(price) * 100,
+        amount: Math.round(Number(selectedMembershipPlan.price) * 100),
         name: 'Emo Elevate',
-        order_id: order_id,
+        order_id: orderData.id,
         prefill: {
-          email: user.email || '',
-          contact: userData?.phone || '',
-          name: userData?.name || user.displayName || '',
+          email: user.email || 'undefined',
+          contact: user.phoneNumber || '',
+          name: user.displayName || '',
         },
+
         theme: { color: '#5E72E4' },
-        retry: {
-          enabled: true,
-          max_count: 3
-        },
-        send_sms_hash: true,
-        remember_customer: true,
-        notes: {
-          user_id: user.uid
-        },
-        config: {
-          display: {
-            language: 'en',
-            hide: [],
-            preferences: {
-              show_default_blocks: true
-            },
-            sequence: ['card', 'netbanking', 'upi', 'wallet'],
-            blocks: {
-              banks: {
-                name: 'Pay via Bank',
-                instruments: [
-                  { method: 'card' },
-                  { method: 'netbanking' },
-                  { method: 'upi' }
-                ],
-              }
-            }
-          }
-        }
       };
 
       console.log('Initiating payment with options:', options);
       const paymentData = await RazorpayCheckout.open(options);
       console.log('Payment Success:', paymentData);
-      
-      // Payment successful, update user subscription
+
+      // Update subscription in database
       const expiryDate = new Date();
-      expiryDate.setMonth(expiryDate.getMonth() + 1);
-      
+      expiryDate.setMonth(expiryDate.getMonth() + selectedPlan);
+
       await database().ref(`users/${user.uid}/emoElevate`).set({
         active: true,
         startDate: new Date().toISOString(),
         expiryDate: expiryDate.toISOString(),
-        subscriptionType: 'monthly',
+        subscriptionType: `${selectedPlan}_month`,
         paymentId: paymentData.razorpay_payment_id,
-        orderId: order_id,
+        orderId: orderData.id,
         lastPaymentDate: new Date().toISOString(),
-        amount: price
+        amount: selectedMembershipPlan.price
       });
-      
+
       Alert.alert('Success', 'Welcome to Emo Elevate Membership!');
+
     } catch (error: any) {
-      console.error('Payment failed:', {
-        errorCode: error.code,
-        errorDescription: error.description,
-        fullError: error
-      });
-      
+      console.error('Payment failed:', error);
+
       if (error.code === 'PAYMENT_CANCELLED') {
-        Alert.alert('Payment Cancelled', 'Would you like to try a different payment method?', [
+        Alert.alert('Payment Cancelled', 'Would you like to try again?', [
           {
             text: 'Try Again',
             onPress: () => handleSubscribe()
@@ -274,150 +285,159 @@ const EmoElevateScreen = () => {
             style: 'cancel'
           }
         ]);
-      } else if (error.description) {
-        try {
-          const errorDetails = JSON.parse(error.description);
-          console.log('Parsed error details:', errorDetails);
-          
-          let errorMessage = 'Payment failed. Please try again.';
-          let showRetry = true;
-          
-          if (errorDetails.error?.step === 'payment_authentication') {
-            errorMessage = 'Your payment could not be authenticated. Please ensure you have:' +
-              '\n• Sufficient balance' +
-              '\n• Enabled online transactions' +
-              '\n• Entered correct card details' +
-              '\n\nWould you like to try a different payment method?';
-          } else if (errorDetails.error?.reason === 'payment_error') {
-            errorMessage = 'Payment authentication failed. Would you like to try a different payment method?';
-          } else if (errorDetails.error?.description) {
-            errorMessage = errorDetails.error.description;
-            showRetry = false;
-          }
-          
-          Alert.alert('Payment Failed', errorMessage, [
-            ...(showRetry ? [{
-              text: 'Try Again',
-              onPress: () => handleSubscribe()
-            }] : []),
+      } else {
+        Alert.alert(
+          'Payment Failed',
+          'There was an error processing your payment. Please try again.',
+          [
             {
-              text: 'Cancel',
+              text: 'OK',
               style: 'cancel'
             }
-          ]);
-        } catch (parseError) {
-          console.error('Error parsing error details:', parseError);
-          Alert.alert('Error', error.description);
-        }
-      } else {
-        Alert.alert('Error', 'Failed to process payment. Please try again.');
+          ]
+        );
       }
     } finally {
       setLoading(false);
     }
   };
 
+  const renderMembershipOption = (plan: MembershipPlan) => {
+    const isSelected = selectedPlan === plan.duration;
+    return (
+      <TouchableOpacity
+        style={[
+          styles.membershipOption,
+          { backgroundColor: colors.surface },
+          isSelected && { borderColor: colors.primary, borderWidth: 2 },
+        ]}
+        onPress={() => setSelectedPlan(plan.duration)}
+      >
+        {plan.isPopular && (
+          <View style={[styles.popularBadge, { backgroundColor: colors.primary }]}>
+            <Text style={styles.popularText}>Popular</Text>
+          </View>
+        )}
+        <Text style={[styles.durationText, { color: colors.text }]}>
+          {plan.duration} Month{plan.duration > 1 ? 's' : ''}
+        </Text>
+        <Text style={[styles.priceText, { color: colors.text }]}>
+          ₹{plan.price}
+        </Text>
+        {plan.savings && (
+          <Text style={[styles.savingsText, { color: colors.primary }]}>
+            Save {plan.savings}
+          </Text>
+        )}
+      </TouchableOpacity>
+    );
+  };
+
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-      <View style={styles.header}>
-        <Text style={[styles.title, { color: colors.text }]}>Emo Elevate</Text>
-        <Text style={[styles.subtitle, { color: colors.text }]}>Premium Benefits</Text>
-      </View>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <View style={styles.header}>
+          <Text style={[styles.title, { color: colors.primary }]}>Emo Elevate</Text>
+          <Text style={[styles.subtitle, { color: colors.text }]}>Premium Benefits</Text>
+        </View>
 
-      <View style={styles.carouselContainer}>
-        <PagerView
-          ref={pagerRef}
-          style={styles.pagerView}
-          initialPage={0}
-          onPageSelected={(e) => setCurrentPage(e.nativeEvent.position)}
-          pageMargin={10}
-        >
-          {benefits.map((item, index) => (
-            <View key={index} style={styles.pageContainer}>
-              <View style={[styles.benefitCard, { backgroundColor: colors.surface }]}>
-                <View style={[styles.iconContainer, { backgroundColor: `${item.color}20` }]}>
-                  {item.icon === 'premium' ? (
-                    <Image 
-                      source={require('../assets/premium.png')} 
-                      style={styles.benefitPremiumIcon}
-                      resizeMode="contain"
-                      tintColor={item.color}
-                    />
-                  ) : (
-                    <Icon 
-                      name={item.icon} 
-                      size={60} 
-                      color={item.color}
-                    />
-                  )}
+        <View style={[styles.carouselContainer, { height: 340 }]}>
+          <PagerView
+            ref={pagerRef}
+            style={[styles.pagerView]}
+            initialPage={0}
+            onPageSelected={(e) => setCurrentPage(e.nativeEvent.position)}
+            pageMargin={10}
+          >
+            {benefits.map((item, index) => (
+              <View key={index} style={styles.pageContainer}>
+                <View style={[styles.benefitCard, { backgroundColor: colors.surface }]}>
+                  <View style={[styles.iconContainer, { backgroundColor: `${item.color}20` }]}>
+                    {item.icon === 'premium' ? (
+                      <Image
+                        source={require('../assets/premium.png')}
+                        style={styles.benefitPremiumIcon}
+                        resizeMode="contain"
+                        tintColor={item.color}
+                      />
+                    ) : (
+                      <Icon
+                        name={item.icon}
+                        size={60}
+                        color={item.color}
+                      />
+                    )}
+                  </View>
+                  <Text style={[styles.benefitTitle, { color: colors.text }]}>
+                    {item.title}
+                  </Text>
+                  <Text style={[styles.benefitDescription, { color: colors.text }]}>
+                    {item.description}
+                  </Text>
                 </View>
-                <Text style={[styles.benefitTitle, { color: colors.text }]}>
-                  {item.title}
+              </View>
+            ))}
+          </PagerView>
+
+          {/* Pagination dots */}
+          <View style={styles.pagination}>
+            {benefits.map((_, index) => (
+              <View
+                key={index}
+                style={[
+                  styles.paginationDot,
+                  {
+                    backgroundColor: currentPage === index ? colors.primary : colors.text,
+                    opacity: currentPage === index ? 1 : 0.2,
+                  },
+                ]}
+              />
+            ))}
+          </View>
+        </View>
+
+        {loading ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color={colors.primary} />
+          </View>
+        ) : (
+          <>
+            {!isElevated && (
+              <View style={[styles.membershipContainer, { marginTop: 0 }]}>
+                <Text style={[styles.membershipTitle, { color: colors.text }]}>
+                  Choose Your Plan
                 </Text>
-                <Text style={[styles.benefitDescription, { color: colors.text }]}>
-                  {item.description}
+                <View style={styles.membershipOptions}>
+                  {membershipPlans.map((plan) => renderMembershipOption(plan))}
+                </View>
+                <TouchableOpacity
+                  style={[styles.subscribeButton, { backgroundColor: colors.primary }]}
+                  onPress={handleSubscribe}
+                  disabled={loading}
+                >
+                  <Text style={styles.subscribeButtonText}>
+                    Join Emo Elevate
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            )}
+
+            {isElevated && elevateData && (
+              <View style={styles.elevateStatus}>
+                <VerifiedBadge size={64} style={styles.elevateStatusBadge} />
+                <View style={styles.elevateStatusContent}>
+                  <Text style={[styles.elevateText, { color: colors.text }]}>
+                    You're an Elevated Member!
+                  </Text>
+                </View>
+                <Text style={[styles.expiryText, { color: colors.text }]}>
+                  Valid until {new Date(elevateData.expiryDate).toLocaleDateString()}
                 </Text>
               </View>
-            </View>
-          ))}
-        </PagerView>
-
-        {/* Pagination dots */}
-        <View style={styles.pagination}>
-          {benefits.map((_, index) => (
-            <View
-              key={index}
-              style={[
-                styles.paginationDot,
-                {
-                  backgroundColor: currentPage === index ? colors.primary : colors.text,
-                  opacity: currentPage === index ? 1 : 0.2,
-                },
-              ]}
-            />
-          ))}
-        </View>
-      </View>
-
-      {loading ? (
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={colors.primary} />
-        </View>
-      ) : (
-        <>
-          {!isElevated && (
-            <View style={styles.buttonContainer}>
-              <TouchableOpacity
-                style={[styles.subscribeButton, { backgroundColor: colors.primary }]}
-                onPress={handleSubscribe}
-                disabled={loading}
-              >
-                <Text style={styles.subscribeButtonText}>
-                  Join Emo Elevate - ₹{price}/month
-                </Text>
-              </TouchableOpacity>
-            </View>
-          )}
-
-          {isElevated && elevateData && (
-            <View style={styles.elevateStatus}>
-              <View style={styles.elevateStatusContent}>
-                <Image 
-                  source={require('../assets/premium.png')} 
-                  style={styles.statusPremiumIcon}
-                  resizeMode="contain"
-                />
-                <Text style={[styles.elevateText, { color: colors.text }]}>
-                  You're an Elevated Member!
-                </Text>
-              </View>
-              <Text style={[styles.expiryText, { color: colors.text }]}>
-                Valid until {new Date(elevateData.expiryDate).toLocaleDateString()}
-              </Text>
-            </View>
-          )}
-        </>
-      )}
+            )}
+          </>
+        )}
+      </ScrollView>
     </SafeAreaView>
   );
 };
@@ -428,7 +448,6 @@ const styles = StyleSheet.create({
   },
   header: {
     alignItems: 'center',
-    paddingVertical: 20,
   },
   title: {
     fontSize: 28,
@@ -437,43 +456,48 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 16,
     opacity: 0.8,
-    marginTop: 4,
+    marginTop: 2,
   },
   carouselContainer: {
-    height: 380, // Increased to accommodate pagination dots
     justifyContent: 'center',
   },
   pagerView: {
     height: 320,
   },
   pageContainer: {
+    flex: 1,
     paddingHorizontal: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   benefitCard: {
     borderRadius: 20,
-    padding: 20,
-    height: '100%',
-    width: '100%',
+    height: 280,
     alignItems: 'center',
     justifyContent: 'center',
+    elevation: 2,
     shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  subscribeButton: {
+    padding: 16,
+    borderRadius: 25,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 16,
+  },
+  subscribeButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
   iconContainer: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
+    width: 100,
+    height: 100,
+    borderRadius: 50,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 15,
   },
   benefitTitle: {
     fontSize: 24,
@@ -491,17 +515,6 @@ const styles = StyleSheet.create({
   buttonContainer: {
     paddingHorizontal: 40,
     marginTop: 20,
-  },
-  subscribeButton: {
-    padding: 12,
-    borderRadius: 25,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  subscribeButtonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: 'bold',
   },
   elevateStatus: {
     alignItems: 'center',
@@ -536,7 +549,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 16,
   },
   paginationDot: {
     width: 8,
@@ -554,6 +566,73 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     opacity: 0.9,
+  },
+  membershipContainer: {
+    paddingHorizontal: 20,
+    minHeight: 200,
+  },
+  membershipTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 16,
+    textAlign: 'center',
+    marginTop: 16,
+  },
+  membershipOptions: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 20,
+    height: 120,
+  },
+  membershipOption: {
+    flex: 1,
+    margin: 8,
+    padding: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+    height: '100%',
+    justifyContent: 'space-between',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  popularBadge: {
+    position: 'absolute',
+    top: -12,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  popularText: {
+    color: 'white',
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  durationText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 8,
+  },
+  priceText: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 4,
+  },
+  savingsText: {
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+  scrollContent: {
+    flexGrow: 1,
+    paddingBottom: 20, // Add some padding at the bottom
+  },
+  elevateStatusBadge: {
+    marginBottom: 16, // Add space between badge and text
   },
 });
 

@@ -9,7 +9,7 @@ interface VerifiedBadgeProps {
 
 const VerifiedBadge = ({ size = 12, style }: VerifiedBadgeProps) => {
   const { colors } = useTheme();
-  const containerSize = size + 10; // Make container slightly larger than the icon
+  const containerSize = size * 1.6; // Container is 40% larger than the icon instead of fixed +10px
 
   return (
     <View style={[
@@ -17,10 +17,10 @@ const VerifiedBadge = ({ size = 12, style }: VerifiedBadgeProps) => {
       { 
         width: containerSize,
         height: containerSize,
-        backgroundColor: colors.background + '10', // Reduced opacity to 10%
+        backgroundColor: colors.background + '10',
         borderRadius: containerSize / 2,
-        borderWidth: 1.5,  // Add border
-        borderColor: colors.primary + '50', // Border with 50% opacity
+        borderWidth: size * 0.08, // Border width scales with size (about 1/8th)
+        borderColor: colors.primary + '50',
       },
       style
     ]}>
