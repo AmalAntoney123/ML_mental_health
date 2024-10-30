@@ -54,6 +54,7 @@
     "react-native-linear-gradient": "^2.8.3",
     "react-native-modal": "^13.0.1",
     "react-native-onboarding-swiper": "^1.2.0",
+    "react-native-pager-view": "^6.4.1",
     "react-native-paper": "^5.12.3",
     "react-native-permissions": "^5.0.1",
     "react-native-popup-menu": "^0.16.1",
