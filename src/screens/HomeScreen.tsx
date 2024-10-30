@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Switch } from 'react-native';
+import React, { useEffect, useState, useRef } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Switch, Image, Animated } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -10,6 +10,8 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { getDatabase, ref, get } from 'firebase/database';
 import { FAB, Portal, Provider } from 'react-native-paper';
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
+import auth from '@react-native-firebase/auth';
+import database from '@react-native-firebase/database';
 
 import DashboardScreen from './home/DashboardScreen';
 import LeaderboardScreen from './home/LeaderboardScreen';
@@ -65,11 +67,68 @@ const Tab = createBottomTabNavigator();
 const Header: React.FC = () => {
   const { colors } = useTheme();
   const navigation = useNavigation<HomeScreenNavigationProp>();
+  const [isElevated, setIsElevated] = useState(false);
+  const { user } = useAuth();
+
+  const bounceAnim = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    const checkElevateStatus = async () => {
+      if (!user) return;
+
+      const userRef = database().ref(`users/${user.uid}/emoElevate`);
+      const unsubscribe = userRef.on('value', (snapshot) => {
+        const elevateData = snapshot.val();
+        setIsElevated(elevateData?.active && new Date(elevateData.expiryDate) > new Date());
+      });
+
+      return () => userRef.off('value', unsubscribe);
+    };
+    
+    checkElevateStatus();
+  }, [user]);
+
+  useEffect(() => {
+    const bounceAnimation = Animated.sequence([
+      Animated.timing(bounceAnim, {
+        toValue: 1.2,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+      Animated.timing(bounceAnim, {
+        toValue: 1,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+    ]);
+
+    const loopAnimation = Animated.loop(
+      Animated.sequence([
+        Animated.delay(5000),
+        bounceAnimation,
+      ])
+    );
+
+    loopAnimation.start();
+
+    return () => loopAnimation.stop();
+  }, [bounceAnim]);
+
   return (
     <View style={[styles.header, { backgroundColor: colors.surface }]} testID="header">
-      <View style={styles.headerItem}>
-        {/* Empty view for spacing */}
-      </View>
+      <TouchableOpacity 
+        onPress={() => navigation.navigate('EmoElevate')}
+        style={[styles.headerItem, styles.elevateButton]}
+        testID="elevate-icon"
+      >
+        <Animated.View style={{ transform: [{ scale: bounceAnim }] }}>
+          <Image
+            source={isElevated ? require('../assets/premium.png') : require('../assets/no-premium.png')}
+            style={styles.elevateImage}
+            resizeMode="contain"
+          />
+        </Animated.View>
+      </TouchableOpacity>
       <View style={styles.counterContainer}>
         <Counter icon="local-fire-department" count={5} color={colors.primary} testID="fire-counter" />
         <Counter icon="money" count={100} color={colors.secondary} testID="money-counter" />
@@ -229,6 +288,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 100,
     padding: 6,
+  },
+  elevateButton: {
+    width: 32,
+    height: 32,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  elevateImage: {
+    width: 24,
+    height: 24,
   },
 });
 

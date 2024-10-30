@@ -38,6 +38,9 @@ import ManageSleepMusicScreen from '../screens/admin/ManageSleepMusicScreen';
 import PositivityScreen from '../screens/challenges/PositivityScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import JournalHistoryScreen from '../screens/home/JournalHistoryScreen';
+import PremiumBenefitsScreen from '../screens/PremiumBenefitsScreen';
+import EmoElevateScreen from '../screens/PremiumBenefitsScreen';
+import ManageElevateScreen from '../screens/admin/ManageElevateScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -175,7 +178,8 @@ const Navigation: React.FC = () => {
         />
         <Stack.Screen name="Settings" component={SettingsScreen} />
         <Stack.Screen name="JournalHistory" component={JournalHistoryScreen} />
-
+        <Stack.Screen name="EmoElevate" component={EmoElevateScreen} />
+        <Stack.Screen name="ManageElevate" component={ManageElevateScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

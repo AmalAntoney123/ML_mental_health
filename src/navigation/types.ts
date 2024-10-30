@@ -87,4 +87,6 @@ export type RootStackParamList = {
   ChatDetailsScreen: { group: SupportGroup };
   Settings: undefined;
   JournalHistory: undefined;
+  EmoElevate: undefined;
+  ManageElevate: undefined;
 };

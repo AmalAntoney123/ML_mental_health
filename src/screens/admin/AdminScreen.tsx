@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator, Modal, TextInput } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/types';
 import { useAuth, logout } from '../../utils/auth';
@@ -8,6 +8,7 @@ import { useTheme } from '../../context/ThemeContext';
 import { triggerManualNotification, triggerMorningMotivation, triggerRandomMotivation } from '../../utils/notificationService';
 import Toast from 'react-native-toast-message';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import database from '@react-native-firebase/database';
 
 type AdminScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'AdminPanel'>;
 
@@ -72,8 +73,7 @@ const AdminScreen: React.FC<Props> = ({ navigation }) => {
     );
 
     return (
-        <SafeAreaView style={styles.safeArea} edges={['top']}>
-
+        <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
             <View style={[styles.container, { backgroundColor: colors.background }]}>
                 <View style={[styles.header, { backgroundColor: colors.primary }]}>
                     <Text style={[styles.headerText, { color: colors.onPrimary }]}>Admin Panel</Text>
@@ -133,11 +133,15 @@ const AdminScreen: React.FC<Props> = ({ navigation }) => {
                             icon="music-note"
                             onPress={() => navigation.navigate('ManageSleepMusic')}
                         />
+                        <AdminButton
+                            title="Manage Elevate"
+                            icon="diamond"
+                            onPress={() => navigation.navigate('ManageElevate')}
+                        />
                     </View>
                 </ScrollView>
             </View>
         </SafeAreaView>
-
     );
 };
 
@@ -184,6 +188,50 @@ const styles = StyleSheet.create({
     adminButtonText: {
         fontSize: 16,
         marginTop: 5,
+        fontWeight: 'bold',
+    },
+    modalOverlay: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    modalContent: {
+        width: '80%',
+        padding: 20,
+        borderRadius: 10,
+        elevation: 5,
+    },
+    modalTitle: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        marginBottom: 10,
+        textAlign: 'center',
+    },
+    modalSubtitle: {
+        fontSize: 16,
+        marginBottom: 20,
+        textAlign: 'center',
+    },
+    priceInput: {
+        borderWidth: 1,
+        borderRadius: 8,
+        padding: 10,
+        marginBottom: 20,
+        fontSize: 16,
+    },
+    modalButtons: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+    },
+    modalButton: {
+        flex: 1,
+        padding: 12,
+        borderRadius: 8,
+        marginHorizontal: 5,
+        alignItems: 'center',
+    },
+    modalButtonText: {
+        fontSize: 16,
         fontWeight: 'bold',
     },
 });
