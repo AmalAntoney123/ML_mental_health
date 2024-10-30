@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Image } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Image, Animated } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../utils/auth';
 import  database  from '@react-native-firebase/database';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import RazorpayCheckout from 'react-native-razorpay';
+import { RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET } from '../config';
 
 const EmoElevateScreen = () => {
   const { colors } = useTheme();
@@ -12,10 +14,83 @@ const EmoElevateScreen = () => {
   const [isElevated, setIsElevated] = useState(false);
   const [loading, setLoading] = useState(false);
   const [price, setPrice] = useState('999'); // Default price in INR
+  const scaleValue = useRef(new Animated.Value(1)).current;
+  const opacityValue = useRef(new Animated.Value(1)).current;
+  const benefitsAnimatedValues = useRef([...Array(4)].map(() => new Animated.Value(0))).current;
+  const buttonAnimatedValue = useRef(new Animated.Value(0)).current;
+  const fadeAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     checkElevateStatus();
     fetchPrice();
+
+    // Start animations after a short delay to ensure component is mounted
+    setTimeout(() => {
+      // Staggered animation for benefits
+      Animated.stagger(150, [
+        ...benefitsAnimatedValues.map(value =>
+          Animated.spring(value, {
+            toValue: 1,
+            friction: 8,
+            tension: 40,
+            useNativeDriver: true,
+          })
+        ),
+        // Button animation
+        Animated.spring(buttonAnimatedValue, {
+          toValue: 1,
+          friction: 8,
+          tension: 40,
+          useNativeDriver: true,
+        })
+      ]).start();
+    }, 100);
+
+    // Animate button
+    Animated.spring(buttonAnimatedValue, {
+      toValue: 1,
+      friction: 8,
+      tension: 40,
+      useNativeDriver: true,
+    }).start();
+
+    // Simple fade in animation
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 500,
+      useNativeDriver: true,
+    }).start();
+  }, []);
+
+  useEffect(() => {
+    const pulseAnimation = Animated.sequence([
+      Animated.parallel([
+        Animated.timing(scaleValue, {
+          toValue: 1.1,
+          duration: 1500,
+          useNativeDriver: true,
+        }),
+        Animated.timing(opacityValue, {
+          toValue: 0.7,
+          duration: 1500,
+          useNativeDriver: true,
+        }),
+      ]),
+      Animated.parallel([
+        Animated.timing(scaleValue, {
+          toValue: 1,
+          duration: 1500,
+          useNativeDriver: true,
+        }),
+        Animated.timing(opacityValue, {
+          toValue: 1,
+          duration: 1500,
+          useNativeDriver: true,
+        }),
+      ]),
+    ]);
+
+    Animated.loop(pulseAnimation).start();
   }, []);
 
   const fetchPrice = async () => {
@@ -50,6 +125,43 @@ const EmoElevateScreen = () => {
 
     try {
       setLoading(true);
+
+      // Create base64 encoded auth string using btoa
+      const auth = btoa(`${RAZORPAY_KEY_ID}:${RAZORPAY_KEY_SECRET}`);
+
+      // Create order
+      const orderResponse = await fetch('https://api.razorpay.com/v1/orders', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Basic ${auth}`,
+        },
+        body: JSON.stringify({
+          amount: parseInt(price) * 100,
+          currency: 'INR',
+          receipt: `receipt_${Date.now()}`,
+        }),
+      });
+
+      const orderData = await orderResponse.json();
+      
+      const options = {
+        description: 'Emo Elevate Monthly Subscription',
+        currency: 'INR',
+        key: RAZORPAY_KEY_ID,
+        amount: parseInt(price) * 100,
+        name: 'Emo Elevate',
+        order_id: orderData.id, // Add the order_id here
+        prefill: {
+          email: user.email || 'undefined',
+          contact: user.phoneNumber || '',
+          name: user.displayName || '',
+        },
+      };
+
+      const paymentData = await RazorpayCheckout.open(options);
+      
+      // Payment successful
       const expiryDate = new Date();
       expiryDate.setMonth(expiryDate.getMonth() + 1);
       
@@ -57,12 +169,19 @@ const EmoElevateScreen = () => {
         active: true,
         startDate: new Date().toISOString(),
         expiryDate: expiryDate.toISOString(),
-        subscriptionType: 'monthly'
+        subscriptionType: 'monthly',
+        paymentId: paymentData.razorpay_payment_id,
+        orderId: orderData.id,
       });
       
       Alert.alert('Success', 'Welcome to Emo Elevate Membership!');
-    } catch (error) {
-      Alert.alert('Error', 'Failed to process subscription');
+    } catch (error: any) {
+      if (error.code === 'PAYMENT_CANCELLED') {
+        Alert.alert('Payment Cancelled', 'You cancelled the payment');
+      } else {
+        Alert.alert('Error', 'Payment failed. Please try again.');
+        console.error('Payment error:', error);
+      }
     } finally {
       setLoading(false);
     }
@@ -74,7 +193,12 @@ const EmoElevateScreen = () => {
   }
 
   const BenefitItem: React.FC<BenefitItemProps> = ({ iconName, text }) => (
-    <View style={[styles.benefitItem, { backgroundColor: colors.surface }]}>
+    <View
+      style={[
+        styles.benefitItem,
+        { backgroundColor: colors.surface }
+      ]}
+    >
       <Icon 
         name={iconName}
         size={24}
@@ -89,53 +213,73 @@ const EmoElevateScreen = () => {
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <ScrollView>
         <View style={styles.header}>
-          <Image
+          <Animated.Image
             source={require('../assets/premium.png')}
-            style={styles.elevateImage}
+            style={[
+              styles.elevateImage,
+              {
+                transform: [{ scale: scaleValue }],
+                opacity: opacityValue,
+              },
+            ]}
             resizeMode="contain"
           />
-          <Text style={[styles.title, { color: colors.text }]}>Emo Elevate Benefits</Text>
+          <Text style={[styles.title, { color: colors.text }]}>
+            {isElevated ? 'Your Emo Elevate Benefits' : 'Emo Elevate Benefits'}
+          </Text>
         </View>
 
         <View style={styles.benefitsContainer}>
           <BenefitItem 
             iconName="verified" 
-            text="Verified Elevated Member Badge" 
+            text="Verified Elevated Member Badge"
           />
           <BenefitItem 
             iconName="calendar-today" 
-            text="1 Free Therapy Session Weekly" 
+            text="1 Free Therapy Session Weekly"
           />
           <BenefitItem 
             iconName="support-agent" 
-            text="Priority Support Access" 
+            text="Priority Support Access"
           />
           <BenefitItem 
             iconName="star" 
-            text="Access to Exclusive Features" 
+            text="Access to Exclusive Features"
           />
         </View>
 
-        {!isElevated && (
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity
-              style={[styles.subscribeButton, { backgroundColor: colors.primary }]}
-              onPress={handleSubscribe}
-              disabled={loading}
-            >
-              <Text style={styles.subscribeButtonText}>
-                Join Emo Elevate - ₹{price}/month
-              </Text>
-            </TouchableOpacity>
-          </View>
-        )}
-
-        {isElevated && (
+        {isElevated ? (
           <View style={styles.elevateStatus}>
-            <Icon name="verified" size={24} color={colors.primary} />
+            <Icon 
+              name="verified" 
+              size={24} 
+              color={colors.primary}
+            />
             <Text style={[styles.elevateText, { color: colors.text }]}>
               You're an Elevated Member!
             </Text>
+          </View>
+        ) : (
+          <View style={styles.buttonContainer}>
+            <Animated.View style={{
+              transform: [{
+                scale: buttonAnimatedValue.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [0.8, 1],
+                })
+              }],
+              opacity: buttonAnimatedValue,
+            }}>
+              <TouchableOpacity
+                style={[styles.subscribeButton, { backgroundColor: colors.primary }]}
+                onPress={handleSubscribe}
+                disabled={loading}
+              >
+                <Text style={styles.subscribeButtonText}>
+                  Join Emo Elevate - ₹{price}/month
+                </Text>
+              </TouchableOpacity>
+            </Animated.View>
           </View>
         )}
       </ScrollView>
@@ -154,7 +298,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginTop: 10,
+    marginTop: 24,
   },
   benefitsContainer: {
     padding: 20,
@@ -209,8 +353,8 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   elevateImage: {
-    width: 64,
-    height: 64,
+    width: 84,
+    height: 84,
   },
 });
 
