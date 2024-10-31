@@ -77,7 +77,7 @@ const ManageElevateScreen: React.FC<Props> = ({ navigation }) => {
           
           subscribersList.push({
             id: userId,
-            name: user.displayName || 'Unknown User',
+            name: user.name || 'Unknown User',
             email: user.email,
             startDate: user.emoElevate.startDate,
             expiryDate: user.emoElevate.expiryDate,

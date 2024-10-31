@@ -1,0 +1,2078 @@
+{
+  "apkInfo": {
+    "downloadURL": "https://firebasestorage.googleapis.com/v0/b/emo-ce9e9.appspot.com/o/apks%2Fapp-release.apk.zip?alt=media&token=4f4f8795-3802-46af-8bd8-5a1365aaf50b",
+    "fileName": "app-release.apk",
+    "fileSize": 77038881,
+    "fileType": "application/vnd.android.package-archive",
+    "lastModified": 1728968013311,
+    "uploadDate": "2024-10-17T06:34:40.132Z",
+    "uploadedBy": "kUIJWo62nvaoHmRjL5YheyQl1553",
+    "version": "1.0.0",
+    "zipFileName": "app-release.apk.zip"
+  },
+  "settings": {
+    "elevatePrice": 300
+  },
+  "sleepMusic": {
+    "-O9BFkDkV6cPVpKDBiLV": {
+      "artist": "Arsha Annah ",
+      "fileUrl": "https://firebasestorage.googleapis.com/v0/b/emo-ce9e9.appspot.com/o/sleepMusic%2F1728929944924.mp3?alt=media&token=dea1ecdd-6ddf-4a8f-a46f-197a214404e0",
+      "id": "-O9BFkDkV6cPVpKDBiLV",
+      "title": "Symphony 1"
+    },
+    "-O9FMot3fePirkH2n3Fy": {
+      "artist": "Amal Antoney",
+      "createdAt": 1728999018887,
+      "fileUrl": "https://firebasestorage.googleapis.com/v0/b/emo-ce9e9.appspot.com/o/sleepMusic%2F1728999015927_sleep%20music%201.mp3?alt=media&token=48bc1fbe-b170-40d0-93a9-fe45c8bb18ea",
+      "id": "-O9FMot3fePirkH2n3Fy",
+      "title": "Ambience 1"
+    }
+  },
+  "supportGroups": {
+    "-O4OkuI8VFCc8S85EqKF": {
+      "createdAt": 1723787879780,
+      "createdBy": "kUIJWo62nvaoHmRjL5YheyQl1553",
+      "description": "A supportive community for those on a journey to recovery from trauma, offering empathy and shared healing",
+      "members": {
+        "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": true,
+        "kUIJWo62nvaoHmRjL5YheyQl1553": true,
+        "wx7Pg3mlDHRqgzGzFFeqyqt3boy2": true
+      },
+      "messages": {
+        "-O9aN5PkTkJhlH_QdFYE": {
+          "readBy": {
+            "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": true,
+            "kUIJWo62nvaoHmRjL5YheyQl1553": true,
+            "wx7Pg3mlDHRqgzGzFFeqyqt3boy2": true
+          },
+          "text": "Hi",
+          "timestamp": 1729368188832,
+          "userId": "kUIJWo62nvaoHmRjL5YheyQl1553",
+          "userName": "Amal Antoney "
+        },
+        "-O9aN76d2CzfpxKBaue5": {
+          "readBy": {
+            "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": true,
+            "kUIJWo62nvaoHmRjL5YheyQl1553": true,
+            "wx7Pg3mlDHRqgzGzFFeqyqt3boy2": true
+          },
+          "text": "Hi",
+          "timestamp": 1729368195795,
+          "userId": "kUIJWo62nvaoHmRjL5YheyQl1553",
+          "userName": "Amal Antoney "
+        },
+        "-O9aNIIeUuav7aGsDsx9": {
+          "readBy": {
+            "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": true,
+            "kUIJWo62nvaoHmRjL5YheyQl1553": true,
+            "wx7Pg3mlDHRqgzGzFFeqyqt3boy2": true
+          },
+          "text": "Gloo",
+          "timestamp": 1729368241481,
+          "userId": "FtqiSFhixZSpoYhU6Ram2I7Iz5x1",
+          "userName": "Arsha Mary "
+        },
+        "-O9aNIldLlzJtGgVkrDv": {
+          "readBy": {
+            "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": true,
+            "kUIJWo62nvaoHmRjL5YheyQl1553": true,
+            "wx7Pg3mlDHRqgzGzFFeqyqt3boy2": true
+          },
+          "text": "Hlo",
+          "timestamp": 1729368243397,
+          "userId": "FtqiSFhixZSpoYhU6Ram2I7Iz5x1",
+          "userName": "Arsha Mary "
+        },
+        "-O9aNRgn1fHRrv8aSB89": {
+          "readBy": {
+            "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": true,
+            "kUIJWo62nvaoHmRjL5YheyQl1553": true,
+            "wx7Pg3mlDHRqgzGzFFeqyqt3boy2": true
+          },
+          "text": "Yeyy",
+          "timestamp": 1729368280076,
+          "userId": "wx7Pg3mlDHRqgzGzFFeqyqt3boy2",
+          "userName": "Amal Antoney 2"
+        },
+        "-O9dPmJHysgjnUDg7GmT": {
+          "readBy": {
+            "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": true,
+            "kUIJWo62nvaoHmRjL5YheyQl1553": true
+          },
+          "text": "Hi",
+          "timestamp": 1729419224577,
+          "userId": "kUIJWo62nvaoHmRjL5YheyQl1553",
+          "userName": "Amal Antoney "
+        }
+      },
+      "name": "The Healing Circle",
+      "typing": {
+        "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": false,
+        "kUIJWo62nvaoHmRjL5YheyQl1553": false,
+        "wx7Pg3mlDHRqgzGzFFeqyqt3boy2": false
+      }
+    },
+    "-O4Q10Btewp8I9ZMuQNz": {
+      "createdAt": 1723809141900,
+      "createdBy": "kUIJWo62nvaoHmRjL5YheyQl1553",
+      "description": "A group dedicated to sharing and practicing mindfulness techniques for mental and emotional well-being",
+      "id": "-O4Q10Btewp8I9ZMuQNz",
+      "members": {
+        "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": true,
+        "kUIJWo62nvaoHmRjL5YheyQl1553": true,
+        "wx7Pg3mlDHRqgzGzFFeqyqt3boy2": true
+      },
+      "messages": {
+        "-O9aN8k1H2a4Fl4EQd2X": {
+          "readBy": {
+            "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": true,
+            "kUIJWo62nvaoHmRjL5YheyQl1553": true,
+            "wx7Pg3mlDHRqgzGzFFeqyqt3boy2": true
+          },
+          "text": "Hi",
+          "timestamp": 1729368202452,
+          "userId": "kUIJWo62nvaoHmRjL5YheyQl1553",
+          "userName": "Amal Antoney "
+        },
+        "-O9aNFlhUbcA9gsd7huC": {
+          "readBy": {
+            "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": true,
+            "kUIJWo62nvaoHmRjL5YheyQl1553": true,
+            "wx7Pg3mlDHRqgzGzFFeqyqt3boy2": true
+          },
+          "text": "Heyyy",
+          "timestamp": 1729368231117,
+          "userId": "FtqiSFhixZSpoYhU6Ram2I7Iz5x1",
+          "userName": "Arsha Mary "
+        },
+        "-O9aNQhwNWPXnXks_aFv": {
+          "readBy": {
+            "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": true,
+            "kUIJWo62nvaoHmRjL5YheyQl1553": true,
+            "wx7Pg3mlDHRqgzGzFFeqyqt3boy2": true
+          },
+          "text": "Hello",
+          "timestamp": 1729368276078,
+          "userId": "wx7Pg3mlDHRqgzGzFFeqyqt3boy2",
+          "userName": "Amal Antoney 2"
+        },
+        "-OAOM614h2FXh2TRmpM6": {
+          "readBy": {
+            "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": true,
+            "kUIJWo62nvaoHmRjL5YheyQl1553": true
+          },
+          "text": "Wassup",
+          "timestamp": 1730223567091,
+          "userId": "FtqiSFhixZSpoYhU6Ram2I7Iz5x1",
+          "userName": "Arsha Mary "
+        },
+        "-OAOuLeyeNmiyZlP69Gq": {
+          "readBy": {
+            "kUIJWo62nvaoHmRjL5YheyQl1553": true
+          },
+          "text": "Hooo",
+          "timestamp": 1730232806232,
+          "userId": "kUIJWo62nvaoHmRjL5YheyQl1553",
+          "userName": "Amal Antoney "
+        }
+      },
+      "name": "Mindful Living Collectives",
+      "typing": {
+        "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": false,
+        "kUIJWo62nvaoHmRjL5YheyQl1553": false,
+        "wx7Pg3mlDHRqgzGzFFeqyqt3boy2": false
+      }
+    },
+    "-O4RK9zhzYjJ2DdBgMo1": {
+      "createdAt": 1723830939735,
+      "createdBy": "kUIJWo62nvaoHmRjL5YheyQl1553",
+      "description": "Fostering positivity and optimism through shared affirmations and uplifting conversations",
+      "id": "-O4RK9zhzYjJ2DdBgMo1",
+      "members": {
+        "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": true,
+        "cgacZlNUBESMusInWxtrzjmeBk52": true,
+        "kUIJWo62nvaoHmRjL5YheyQl1553": true,
+        "wx7Pg3mlDHRqgzGzFFeqyqt3boy2": true,
+        "y94bYStEcqgsObyUGCm0qxnW7mJ3": true
+      },
+      "messages": {
+        "-O9aN3jPqwtqhU9n1v8F": {
+          "readBy": {
+            "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": true,
+            "cgacZlNUBESMusInWxtrzjmeBk52": true,
+            "kUIJWo62nvaoHmRjL5YheyQl1553": true,
+            "wx7Pg3mlDHRqgzGzFFeqyqt3boy2": true,
+            "y94bYStEcqgsObyUGCm0qxnW7mJ3": true
+          },
+          "text": "Hi",
+          "timestamp": 1729368181971,
+          "userId": "kUIJWo62nvaoHmRjL5YheyQl1553",
+          "userName": "Amal Antoney "
+        },
+        "-O9aNEK38vtyIluqTgDv": {
+          "readBy": {
+            "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": true,
+            "cgacZlNUBESMusInWxtrzjmeBk52": true,
+            "kUIJWo62nvaoHmRjL5YheyQl1553": true,
+            "wx7Pg3mlDHRqgzGzFFeqyqt3boy2": true,
+            "y94bYStEcqgsObyUGCm0qxnW7mJ3": true
+          },
+          "text": "Hlooo",
+          "timestamp": 1729368225197,
+          "userId": "FtqiSFhixZSpoYhU6Ram2I7Iz5x1",
+          "userName": "Arsha Mary "
+        },
+        "-O9aNOOCv3iq5VkOV8Ak": {
+          "readBy": {
+            "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": true,
+            "cgacZlNUBESMusInWxtrzjmeBk52": true,
+            "kUIJWo62nvaoHmRjL5YheyQl1553": true,
+            "wx7Pg3mlDHRqgzGzFFeqyqt3boy2": true,
+            "y94bYStEcqgsObyUGCm0qxnW7mJ3": true
+          },
+          "text": "But y",
+          "timestamp": 1729368266556,
+          "userId": "wx7Pg3mlDHRqgzGzFFeqyqt3boy2",
+          "userName": "Amal Antoney 2"
+        },
+        "-O9dEXqfy4nXmGXxiL6z": {
+          "readBy": {
+            "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": true,
+            "cgacZlNUBESMusInWxtrzjmeBk52": true,
+            "kUIJWo62nvaoHmRjL5YheyQl1553": true,
+            "y94bYStEcqgsObyUGCm0qxnW7mJ3": true
+          },
+          "text": "Hhjj",
+          "timestamp": 1729416277572,
+          "userId": "FtqiSFhixZSpoYhU6Ram2I7Iz5x1",
+          "userName": "Arsha Mary "
+        },
+        "-O9p8ZaromaKI1y5_Co7": {
+          "readBy": {
+            "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": true,
+            "cgacZlNUBESMusInWxtrzjmeBk52": true,
+            "kUIJWo62nvaoHmRjL5YheyQl1553": true,
+            "y94bYStEcqgsObyUGCm0qxnW7mJ3": true
+          },
+          "text": "Yeyy",
+          "timestamp": 1729616038450,
+          "userId": "kUIJWo62nvaoHmRjL5YheyQl1553",
+          "userName": "Amal Antoney "
+        },
+        "-OAM2bdDydI0Go_WxcH8": {
+          "readBy": {
+            "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": true,
+            "cgacZlNUBESMusInWxtrzjmeBk52": true,
+            "kUIJWo62nvaoHmRjL5YheyQl1553": true,
+            "y94bYStEcqgsObyUGCm0qxnW7mJ3": true
+          },
+          "text": "Hi",
+          "timestamp": 1730184903353,
+          "userId": "cgacZlNUBESMusInWxtrzjmeBk52",
+          "userName": "Alen"
+        },
+        "-OAM3NuZqg82gFLMlnfN": {
+          "readBy": {
+            "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": true,
+            "cgacZlNUBESMusInWxtrzjmeBk52": true,
+            "kUIJWo62nvaoHmRjL5YheyQl1553": true,
+            "y94bYStEcqgsObyUGCm0qxnW7mJ3": true
+          },
+          "text": "Hi",
+          "timestamp": 1730185105210,
+          "userId": "kUIJWo62nvaoHmRjL5YheyQl1553",
+          "userName": "Amal Antoney "
+        },
+        "-OAM3Q4eGLHlIqUi9G_H": {
+          "readBy": {
+            "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": true,
+            "cgacZlNUBESMusInWxtrzjmeBk52": true,
+            "kUIJWo62nvaoHmRjL5YheyQl1553": true,
+            "y94bYStEcqgsObyUGCm0qxnW7mJ3": true
+          },
+          "text": "Hello",
+          "timestamp": 1730185114110,
+          "userId": "kUIJWo62nvaoHmRjL5YheyQl1553",
+          "userName": "Amal Antoney "
+        },
+        "-OAOM4ZA5rhlZpBEM08v": {
+          "readBy": {
+            "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": true,
+            "kUIJWo62nvaoHmRjL5YheyQl1553": true,
+            "y94bYStEcqgsObyUGCm0qxnW7mJ3": true
+          },
+          "text": "Hiiii",
+          "timestamp": 1730223561051,
+          "userId": "FtqiSFhixZSpoYhU6Ram2I7Iz5x1",
+          "userName": "Arsha Mary "
+        },
+        "-OAOWtCWnCyZoGQ9LeQm": {
+          "deletedAt": 1730232788345,
+          "readBy": {
+            "kUIJWo62nvaoHmRjL5YheyQl1553": true,
+            "y94bYStEcqgsObyUGCm0qxnW7mJ3": true
+          },
+          "text": "Message deleted",
+          "timestamp": 1730226394079,
+          "userId": "kUIJWo62nvaoHmRjL5YheyQl1553",
+          "userName": "Amal Antoney "
+        },
+        "-OAOkgbiUhyqsmCA5fZZ": {
+          "isSystemMessage": true,
+          "readBy": {
+            "kUIJWo62nvaoHmRjL5YheyQl1553": true,
+            "y94bYStEcqgsObyUGCm0qxnW7mJ3": true
+          },
+          "text": "Amal Antoney  has left the group",
+          "timestamp": 1730230274695,
+          "userId": "system",
+          "userName": "System"
+        },
+        "-OAOklAqxY7Amum2pmqW": {
+          "readBy": {
+            "kUIJWo62nvaoHmRjL5YheyQl1553": true,
+            "y94bYStEcqgsObyUGCm0qxnW7mJ3": true
+          },
+          "text": "Patiche",
+          "timestamp": 1730230293370,
+          "userId": "kUIJWo62nvaoHmRjL5YheyQl1553",
+          "userName": "Amal Antoney "
+        },
+        "-OAOl7MYCpUEJFBTdX_1": {
+          "isSystemMessage": true,
+          "readBy": {
+            "kUIJWo62nvaoHmRjL5YheyQl1553": true,
+            "y94bYStEcqgsObyUGCm0qxnW7mJ3": true
+          },
+          "text": "Amal Antoney  has left the group",
+          "timestamp": 1730230388344,
+          "userId": "system",
+          "userName": "System"
+        },
+        "-OAOlL5pvnZ_TjMhUslA": {
+          "isSystemMessage": true,
+          "readBy": {
+            "kUIJWo62nvaoHmRjL5YheyQl1553": true,
+            "y94bYStEcqgsObyUGCm0qxnW7mJ3": true
+          },
+          "text": "Amal Antoney  has joined the group",
+          "timestamp": 1730230444590,
+          "userId": "system",
+          "userName": "System"
+        },
+        "-OAOuEbNSWOIyjHyhMrx": {
+          "readBy": {
+            "kUIJWo62nvaoHmRjL5YheyQl1553": true,
+            "y94bYStEcqgsObyUGCm0qxnW7mJ3": true
+          },
+          "replyTo": "-OAOWtCWnCyZoGQ9LeQm",
+          "text": "Hi",
+          "timestamp": 1730232777303,
+          "userId": "kUIJWo62nvaoHmRjL5YheyQl1553",
+          "userName": "Amal Antoney "
+        },
+        "-OAUX2c_b4uPSVNVp1p4": {
+          "readBy": {
+            "kUIJWo62nvaoHmRjL5YheyQl1553": true,
+            "y94bYStEcqgsObyUGCm0qxnW7mJ3": true
+          },
+          "text": "Hi",
+          "timestamp": 1730327100064,
+          "userId": "kUIJWo62nvaoHmRjL5YheyQl1553",
+          "userName": "Amal Antoney "
+        },
+        "-OAUX3msXMMwGWrgSd8f": {
+          "readBy": {
+            "kUIJWo62nvaoHmRjL5YheyQl1553": true,
+            "y94bYStEcqgsObyUGCm0qxnW7mJ3": true
+          },
+          "text": "Okay",
+          "timestamp": 1730327104849,
+          "userId": "kUIJWo62nvaoHmRjL5YheyQl1553",
+          "userName": "Amal Antoney "
+        },
+        "-OAUX9L-Sa0eQDhQYOM2": {
+          "isSystemMessage": true,
+          "readBy": {
+            "kUIJWo62nvaoHmRjL5YheyQl1553": true,
+            "y94bYStEcqgsObyUGCm0qxnW7mJ3": true
+          },
+          "text": "Amal ajce has joined the group",
+          "timestamp": 1730327127551,
+          "userId": "system",
+          "userName": "System"
+        }
+      },
+      "name": "Positive Vibes",
+      "typing": {
+        "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": false,
+        "cgacZlNUBESMusInWxtrzjmeBk52": false,
+        "kUIJWo62nvaoHmRjL5YheyQl1553": false,
+        "wx7Pg3mlDHRqgzGzFFeqyqt3boy2": false
+      }
+    }
+  },
+  "users": {
+    "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": {
+      "age": "22",
+      "challenges": {
+        "exercise": 0,
+        "gratitude": 1,
+        "journal": 1,
+        "mindfulness": 0,
+        "positivity": 1,
+        "sleep": 1,
+        "social": 1
+      },
+      "completedChallenges": 4,
+      "concerns": [
+        "Relationships"
+      ],
+      "email": "arshamary235@gmail.com",
+      "entries": {
+        "-O3g-JGuCxfEXR_4XSfE": {
+          "content": "Hjsjss",
+          "date": "2024-08-07"
+        },
+        "-O49x_p0Y0QJhvjYgGpZ": {
+          "content": "So irritating",
+          "date": "2024-08-13"
+        },
+        "-O4RLOzDTs9-Op6UIz7w": {
+          "content": "Group chatting idea is good",
+          "date": "2024-08-16"
+        },
+        "-O7UA8G0lWhUaJ044mff": {
+          "content": "hello",
+          "date": "2024-09-23"
+        },
+        "-O7UACfMhGO_W5m56DUh": {
+          "content": "hello what's your opinion about",
+          "date": "2024-09-23"
+        },
+        "-O7UAFSDSbdtE-RdVjL9": {
+          "content": "hello what's your opinion about this IMO app",
+          "date": "2024-09-23"
+        },
+        "-O9a9CxyBgzPtleQZ9XY": {
+          "content": "Hhjnn",
+          "date": "2024-10-19"
+        },
+        "-O9a9IrQFpMgi23I7J5G": {
+          "content": "Hhjnnbnnnhbnnnnnnmn hello how do youhjjjkmm",
+          "date": "2024-10-19"
+        },
+        "-O9aEDc8bLjmj3J4G5Uz": {
+          "content": "Fgbhfdd",
+          "date": "2024-10-19"
+        },
+        "-O9aEJZv_eMvYtuCfYbr": {
+          "content": "Ghbvvrrbbbbntgvvbmmkjjkccdf.   Efgtgg.   Rghhbbbbhb.  Fhjj",
+          "date": "2024-10-19"
+        },
+        "-O9eLIOmpxltlHH9HLLW": {
+          "content": "Hellooooo",
+          "date": "2024-10-20"
+        },
+        "-O9eLJTULnQGDKyzFJMq": {
+          "content": "Hellooooo",
+          "date": "2024-10-20"
+        }
+      },
+      "gender": "Female",
+      "goals": [
+        "Increase Productivity",
+        "Reduce Stress",
+        "Boost Mood",
+        "Manage Anxiety"
+      ],
+      "gratitudeEntries": {
+        "-O3g-IbJSPvU1rcGUdLO": {
+          "date": "2024-08-07T08:42:42.946Z",
+          "entries": [
+            "Ee",
+            "Ss",
+            "Ses",
+            "Ss",
+            "Ssd"
+          ]
+        },
+        "-O40xryJ-D61wGcwx_9G": {
+          "date": "2024-08-11T15:03:44.345Z",
+          "entries": [
+            "Hjj",
+            "Hjjj",
+            "Ghjj",
+            "Fhhj",
+            "Thhj"
+          ]
+        },
+        "-O9a9-KeqkQ8WA-LPQOx": {
+          "date": "2024-10-19T19:01:33.581Z",
+          "entries": [
+            "Yyuu",
+            "Hhj",
+            "Jjj",
+            "Jjj",
+            "Hhj"
+          ]
+        },
+        "-O9a98faeHxGoqS_V9iX": {
+          "date": "2024-10-19T19:02:11.831Z",
+          "entries": [
+            "Fghn",
+            "Ghhj",
+            "Hhjh",
+            "Ffgg",
+            "Ffgg"
+          ]
+        },
+        "-O9aDybxzrqxSrbsTHrr": {
+          "date": "2024-10-19T19:23:17.264Z",
+          "entries": [
+            "Juuj",
+            "Hjjjj",
+            "Jjjjj",
+            "Hhjh",
+            "Bbbn"
+          ]
+        },
+        "-O9aEOM0KH_Nn5npSDSN": {
+          "date": "2024-10-19T19:25:06.775Z",
+          "entries": [
+            "Yhj",
+            "Bhb",
+            "Knn",
+            "Vv",
+            "Gv"
+          ]
+        }
+      },
+      "interests": [
+        "Reading",
+        "Music",
+        "Art"
+      ],
+      "isActive": true,
+      "languagePreference": "English",
+      "moodEntries": {
+        "-O9a6zJfzADAnN-T2yI3": {
+          "date": "2024-10-13",
+          "mood": 10,
+          "notes": "Random entry for Mon Oct 14 2024",
+          "physicalActivity": 8,
+          "sleepQuality": 4,
+          "stressLevel": 2
+        },
+        "-O9a6zLCr8HU6hG-RuS7": {
+          "date": "2024-10-14",
+          "mood": 7,
+          "notes": "Random entry for Tue Oct 15 2024",
+          "physicalActivity": 3,
+          "sleepQuality": 2,
+          "stressLevel": 8
+        },
+        "-O9a6zMCxPRv8XJ3L3hL": {
+          "date": "2024-10-15",
+          "mood": 6,
+          "notes": "Random entry for Wed Oct 16 2024",
+          "physicalActivity": 1,
+          "sleepQuality": 9,
+          "stressLevel": 6
+        },
+        "-O9a6zNF_KEUKOuqQnkV": {
+          "date": "2024-10-16",
+          "mood": 5,
+          "notes": "Random entry for Thu Oct 17 2024",
+          "physicalActivity": 6,
+          "sleepQuality": 1,
+          "stressLevel": 5
+        },
+        "-O9a6zOEbrtXoZtqNsqt": {
+          "date": "2024-10-17",
+          "mood": 3,
+          "notes": "Random entry for Fri Oct 18 2024",
+          "physicalActivity": 10,
+          "sleepQuality": 10,
+          "stressLevel": 2
+        },
+        "-O9a6zPEKZPM3nokRZzp": {
+          "date": "2024-10-18",
+          "mood": 2,
+          "notes": "Random entry for Sat Oct 19 2024",
+          "physicalActivity": 3,
+          "sleepQuality": 8,
+          "stressLevel": 8
+        },
+        "-O9a6zQHjT2fabv2fMgQ": {
+          "date": "2024-10-19",
+          "mood": 8,
+          "notes": "Random entry for Sun Oct 20 2024",
+          "physicalActivity": 10,
+          "sleepQuality": 3,
+          "stressLevel": 1
+        },
+        "-O9a7-6NZzJEc4DMlabZ": {
+          "date": "2024-10-13",
+          "mood": 4,
+          "notes": "Random entry for Mon Oct 14 2024",
+          "physicalActivity": 8,
+          "sleepQuality": 3,
+          "stressLevel": 4
+        },
+        "-O9a7-7wRzsiv2ebB57g": {
+          "date": "2024-10-14",
+          "mood": 4,
+          "notes": "Random entry for Tue Oct 15 2024",
+          "physicalActivity": 9,
+          "sleepQuality": 5,
+          "stressLevel": 10
+        },
+        "-O9a7-9gClufenZltGIs": {
+          "date": "2024-10-15",
+          "mood": 1,
+          "notes": "Random entry for Wed Oct 16 2024",
+          "physicalActivity": 10,
+          "sleepQuality": 8,
+          "stressLevel": 1
+        },
+        "-O9a7-Aiuxi8WLGp0SCD": {
+          "date": "2024-10-16",
+          "mood": 5,
+          "notes": "Random entry for Thu Oct 17 2024",
+          "physicalActivity": 5,
+          "sleepQuality": 10,
+          "stressLevel": 2
+        },
+        "-O9a7-BjeX88soLQLGCG": {
+          "date": "2024-10-17",
+          "mood": 2,
+          "notes": "Random entry for Fri Oct 18 2024",
+          "physicalActivity": 3,
+          "sleepQuality": 6,
+          "stressLevel": 9
+        },
+        "-O9a7-CjiBrxiynXgx8t": {
+          "date": "2024-10-18",
+          "mood": 8,
+          "notes": "Random entry for Sat Oct 19 2024",
+          "physicalActivity": 9,
+          "sleepQuality": 9,
+          "stressLevel": 9
+        },
+        "-O9a7-DkoFNGLk7E-KM4": {
+          "date": "2024-10-19",
+          "mood": 8,
+          "notes": "Random entry for Sun Oct 20 2024",
+          "physicalActivity": 4,
+          "sleepQuality": 10,
+          "stressLevel": 8
+        },
+        "-O9eL5HyI_LkC0_juack": {
+          "date": "2024-10-14",
+          "mood": 1,
+          "notes": "Random entry for Mon Oct 14 2024",
+          "physicalActivity": 5,
+          "sleepQuality": 1,
+          "stressLevel": 8
+        },
+        "-O9eL5KVRZSZalbi0428": {
+          "date": "2024-10-15",
+          "mood": 9,
+          "notes": "Random entry for Tue Oct 15 2024",
+          "physicalActivity": 7,
+          "sleepQuality": 5,
+          "stressLevel": 2
+        },
+        "-O9eL5MXqyqUssPGLCfO": {
+          "date": "2024-10-16",
+          "mood": 5,
+          "notes": "Random entry for Wed Oct 16 2024",
+          "physicalActivity": 10,
+          "sleepQuality": 4,
+          "stressLevel": 10
+        },
+        "-O9eL5OYCykvs1QgkMbc": {
+          "date": "2024-10-17",
+          "mood": 4,
+          "notes": "Random entry for Thu Oct 17 2024",
+          "physicalActivity": 8,
+          "sleepQuality": 1,
+          "stressLevel": 6
+        },
+        "-O9eL5QZaCfOIrSHgFKq": {
+          "date": "2024-10-18",
+          "mood": 2,
+          "notes": "Random entry for Fri Oct 18 2024",
+          "physicalActivity": 4,
+          "sleepQuality": 1,
+          "stressLevel": 8
+        },
+        "-O9eL5SYMC3gblmenZjx": {
+          "date": "2024-10-19",
+          "mood": 3,
+          "notes": "Random entry for Sat Oct 19 2024",
+          "physicalActivity": 6,
+          "sleepQuality": 10,
+          "stressLevel": 1
+        },
+        "-O9eL5UVJ2oP73KHnXB7": {
+          "date": "2024-10-20",
+          "mood": 9,
+          "notes": "Random entry for Sun Oct 20 2024",
+          "physicalActivity": 7,
+          "sleepQuality": 5,
+          "stressLevel": 8
+        },
+        "-O9eLEvYS6jKt9S7IjLD": {
+          "date": "2024-10-20",
+          "mood": 7,
+          "notes": "",
+          "physicalActivity": 9,
+          "sleepQuality": 9,
+          "stressLevel": 8
+        },
+        "-O9eLhhG1geRRCU_U41z": {
+          "date": "2024-10-14",
+          "mood": 4,
+          "notes": "Random entry for Mon Oct 14 2024",
+          "physicalActivity": 3,
+          "sleepQuality": 3,
+          "stressLevel": 10
+        },
+        "-O9eLhkK12fXh91mkvM2": {
+          "date": "2024-10-15",
+          "mood": 5,
+          "notes": "Random entry for Tue Oct 15 2024",
+          "physicalActivity": 8,
+          "sleepQuality": 9,
+          "stressLevel": 8
+        },
+        "-O9eLhmPWhUTXzTNZYst": {
+          "date": "2024-10-16",
+          "mood": 3,
+          "notes": "Random entry for Wed Oct 16 2024",
+          "physicalActivity": 1,
+          "sleepQuality": 8,
+          "stressLevel": 9
+        },
+        "-O9eLhonDrRExDPAIQMQ": {
+          "date": "2024-10-17",
+          "mood": 8,
+          "notes": "Random entry for Thu Oct 17 2024",
+          "physicalActivity": 1,
+          "sleepQuality": 8,
+          "stressLevel": 4
+        },
+        "-O9eLhrHBZEQY_qY3obY": {
+          "date": "2024-10-18",
+          "mood": 5,
+          "notes": "Random entry for Fri Oct 18 2024",
+          "physicalActivity": 8,
+          "sleepQuality": 1,
+          "stressLevel": 6
+        },
+        "-O9eLhtmZ1JwhqiiDx3w": {
+          "date": "2024-10-19",
+          "mood": 10,
+          "notes": "Random entry for Sat Oct 19 2024",
+          "physicalActivity": 8,
+          "sleepQuality": 3,
+          "stressLevel": 8
+        },
+        "-O9eLhwI91S9yHGjYaxP": {
+          "date": "2024-10-20",
+          "mood": 4,
+          "notes": "Random entry for Sun Oct 20 2024",
+          "physicalActivity": 3,
+          "sleepQuality": 8,
+          "stressLevel": 5
+        },
+        "-O9eLhymyMKZuvgzvpQ4": {
+          "date": "2024-10-14",
+          "mood": 1,
+          "notes": "Random entry for Mon Oct 14 2024",
+          "physicalActivity": 6,
+          "sleepQuality": 6,
+          "stressLevel": 5
+        },
+        "-O9eLi6HkjEMiCqh-6Ty": {
+          "date": "2024-10-15",
+          "mood": 4,
+          "notes": "Random entry for Tue Oct 15 2024",
+          "physicalActivity": 4,
+          "sleepQuality": 1,
+          "stressLevel": 7
+        },
+        "-O9eLiANo_6oPtFG7ufX": {
+          "date": "2024-10-16",
+          "mood": 10,
+          "notes": "Random entry for Wed Oct 16 2024",
+          "physicalActivity": 3,
+          "sleepQuality": 4,
+          "stressLevel": 9
+        },
+        "-O9eLiCzHZOWPGI_taln": {
+          "date": "2024-10-17",
+          "mood": 5,
+          "notes": "Random entry for Thu Oct 17 2024",
+          "physicalActivity": 2,
+          "sleepQuality": 10,
+          "stressLevel": 2
+        },
+        "-O9eLiFRdX5nLjgbgaz-": {
+          "date": "2024-10-18",
+          "mood": 1,
+          "notes": "Random entry for Fri Oct 18 2024",
+          "physicalActivity": 9,
+          "sleepQuality": 9,
+          "stressLevel": 4
+        },
+        "-O9eLiI6UbPraL5G7dqV": {
+          "date": "2024-10-19",
+          "mood": 10,
+          "notes": "Random entry for Sat Oct 19 2024",
+          "physicalActivity": 2,
+          "sleepQuality": 2,
+          "stressLevel": 8
+        },
+        "-O9eLiKdbHX31oNaAFAA": {
+          "date": "2024-10-20",
+          "mood": 3,
+          "notes": "Feeling better ",
+          "physicalActivity": 9,
+          "sleepQuality": 8,
+          "stressLevel": 1
+        },
+        "-O9eM-9mxrSNrS2nGe2o": {
+          "date": "2024-10-14",
+          "mood": 5,
+          "notes": "Random entry for Mon Oct 14 2024",
+          "physicalActivity": 7,
+          "sleepQuality": 2,
+          "stressLevel": 6
+        },
+        "-O9eM-DLG04MxdDt-bgD": {
+          "date": "2024-10-15",
+          "mood": 4,
+          "notes": "Random entry for Tue Oct 15 2024",
+          "physicalActivity": 2,
+          "sleepQuality": 3,
+          "stressLevel": 5
+        },
+        "-O9eM-FRU0DBryH0vnvS": {
+          "date": "2024-10-16",
+          "mood": 9,
+          "notes": "Random entry for Wed Oct 16 2024",
+          "physicalActivity": 8,
+          "sleepQuality": 8,
+          "stressLevel": 3
+        },
+        "-O9eM-HXKHJ5pZuEDKr6": {
+          "date": "2024-10-17",
+          "mood": 8,
+          "notes": "Random entry for Thu Oct 17 2024",
+          "physicalActivity": 3,
+          "sleepQuality": 9,
+          "stressLevel": 1
+        },
+        "-O9eM-JkEhZTjMkTqSBY": {
+          "date": "2024-10-18",
+          "mood": 3,
+          "notes": "Random entry for Fri Oct 18 2024",
+          "physicalActivity": 7,
+          "sleepQuality": 6,
+          "stressLevel": 10
+        },
+        "-O9eM-M9iA4tZ-mAd6PE": {
+          "date": "2024-10-19",
+          "mood": 1,
+          "notes": "Random entry for Sat Oct 19 2024",
+          "physicalActivity": 8,
+          "sleepQuality": 2,
+          "stressLevel": 2
+        },
+        "-O9eM-On6BA79yeVS3A9": {
+          "date": "2024-10-20",
+          "mood": 9,
+          "notes": "Random entry for Sun Oct 20 2024",
+          "physicalActivity": 7,
+          "sleepQuality": 1,
+          "stressLevel": 6
+        },
+        "-O9eMD1mMZ8MDl_yU00R": {
+          "date": "2024-10-14",
+          "mood": 3,
+          "notes": "Random entry for Mon Oct 14 2024",
+          "physicalActivity": 3,
+          "sleepQuality": 1,
+          "stressLevel": 5
+        },
+        "-O9eMD46qQ3MCJCcqOaj": {
+          "date": "2024-10-15",
+          "mood": 6,
+          "notes": "Random entry for Tue Oct 15 2024",
+          "physicalActivity": 1,
+          "sleepQuality": 8,
+          "stressLevel": 4
+        },
+        "-O9eMD6RU0epLreKsDvH": {
+          "date": "2024-10-16",
+          "mood": 8,
+          "notes": "Random entry for Wed Oct 16 2024",
+          "physicalActivity": 1,
+          "sleepQuality": 8,
+          "stressLevel": 1
+        },
+        "-O9eMD8dUP8a6jWeWL8L": {
+          "date": "2024-10-17",
+          "mood": 9,
+          "notes": "Random entry for Thu Oct 17 2024",
+          "physicalActivity": 6,
+          "sleepQuality": 1,
+          "stressLevel": 6
+        },
+        "-O9eMDAob4_xeZRWTLd7": {
+          "date": "2024-10-18",
+          "mood": 3,
+          "notes": "Random entry for Fri Oct 18 2024",
+          "physicalActivity": 9,
+          "sleepQuality": 1,
+          "stressLevel": 3
+        },
+        "-O9eMDCuDEnWCP8ET5sz": {
+          "date": "2024-10-19",
+          "mood": 6,
+          "notes": "Random entry for Sat Oct 19 2024",
+          "physicalActivity": 7,
+          "sleepQuality": 3,
+          "stressLevel": 7
+        },
+        "-O9eMDF0vmBfrwbKEF8m": {
+          "date": "2024-10-20",
+          "mood": 10,
+          "notes": "Random entry for Sun Oct 20 2024",
+          "physicalActivity": 9,
+          "sleepQuality": 9,
+          "stressLevel": 3
+        },
+        "-O9eMheUv2C_-9zE0M06": {
+          "date": "2024-10-14",
+          "mood": 5,
+          "notes": "Random entry for Mon Oct 14 2024",
+          "physicalActivity": 4,
+          "sleepQuality": 1,
+          "stressLevel": 8
+        },
+        "-O9eMhghQJrztr76qPox": {
+          "date": "2024-10-15",
+          "mood": 2,
+          "notes": "Random entry for Tue Oct 15 2024",
+          "physicalActivity": 4,
+          "sleepQuality": 2,
+          "stressLevel": 4
+        },
+        "-O9eMhirYfYHL9xWYQNh": {
+          "date": "2024-10-16",
+          "mood": 9,
+          "notes": "Random entry for Wed Oct 16 2024",
+          "physicalActivity": 5,
+          "sleepQuality": 9,
+          "stressLevel": 6
+        },
+        "-O9eMhl69bHZWgQTUrou": {
+          "date": "2024-10-17",
+          "mood": 5,
+          "notes": "Random entry for Thu Oct 17 2024",
+          "physicalActivity": 3,
+          "sleepQuality": 8,
+          "stressLevel": 4
+        },
+        "-O9eMhnOQYW5M45YBw2V": {
+          "date": "2024-10-18",
+          "mood": 8,
+          "notes": "Random entry for Fri Oct 18 2024",
+          "physicalActivity": 5,
+          "sleepQuality": 5,
+          "stressLevel": 10
+        },
+        "-O9eMhpwjkX_ZQfs7phd": {
+          "date": "2024-10-19",
+          "mood": 8,
+          "notes": "Random entry for Sat Oct 19 2024",
+          "physicalActivity": 5,
+          "sleepQuality": 6,
+          "stressLevel": 6
+        },
+        "-O9eMhsNsfR6neTCVRxs": {
+          "date": "2024-10-20",
+          "mood": 2,
+          "notes": "Random entry for Sun Oct 20 2024",
+          "physicalActivity": 6,
+          "sleepQuality": 7,
+          "stressLevel": 5
+        },
+        "-OANH3YBKs-ExpTi3O_2": {
+          "date": "2024-10-23",
+          "mood": 2,
+          "notes": "Random entry for Wed Oct 23 2024",
+          "physicalActivity": 5,
+          "sleepQuality": 4,
+          "stressLevel": 2
+        },
+        "-OANH3_cPoPYyUM2oE1Z": {
+          "date": "2024-10-24",
+          "mood": 10,
+          "notes": "Random entry for Thu Oct 24 2024",
+          "physicalActivity": 5,
+          "sleepQuality": 3,
+          "stressLevel": 5
+        },
+        "-OANH3cHKJb1_q6Ud6wC": {
+          "date": "2024-10-25",
+          "mood": 7,
+          "notes": "Random entry for Fri Oct 25 2024",
+          "physicalActivity": 10,
+          "sleepQuality": 10,
+          "stressLevel": 3
+        },
+        "-OANH3et3f-qKHxZI0c5": {
+          "date": "2024-10-26",
+          "mood": 6,
+          "notes": "Random entry for Sat Oct 26 2024",
+          "physicalActivity": 3,
+          "sleepQuality": 2,
+          "stressLevel": 9
+        },
+        "-OANH3hs0orms7m52Nsj": {
+          "date": "2024-10-27",
+          "mood": 2,
+          "notes": "Random entry for Sun Oct 27 2024",
+          "physicalActivity": 5,
+          "sleepQuality": 8,
+          "stressLevel": 8
+        },
+        "-OANH3kiH7LKdqCrcEth": {
+          "date": "2024-10-28",
+          "mood": 10,
+          "notes": "Random entry for Mon Oct 28 2024",
+          "physicalActivity": 3,
+          "sleepQuality": 6,
+          "stressLevel": 2
+        },
+        "-OANH3ndNgOdnwAbs61x": {
+          "date": "2024-10-29",
+          "mood": 1,
+          "notes": "Random entry for Tue Oct 29 2024",
+          "physicalActivity": 6,
+          "sleepQuality": 9,
+          "stressLevel": 7
+        },
+        "-OANH3qbM5r1cfOZhEq3": {
+          "date": "2024-10-23",
+          "mood": 2,
+          "notes": "Random entry for Wed Oct 23 2024",
+          "physicalActivity": 5,
+          "sleepQuality": 6,
+          "stressLevel": 8
+        },
+        "-OANH3yOlqAUUDa6hY6F": {
+          "date": "2024-10-24",
+          "mood": 7,
+          "notes": "Random entry for Thu Oct 24 2024",
+          "physicalActivity": 6,
+          "sleepQuality": 9,
+          "stressLevel": 9
+        },
+        "-OANH41ki6_qi12bFC8P": {
+          "date": "2024-10-25",
+          "mood": 3,
+          "notes": "Random entry for Fri Oct 25 2024",
+          "physicalActivity": 2,
+          "sleepQuality": 1,
+          "stressLevel": 9
+        },
+        "-OANH446Tdse5aJqu6hW": {
+          "date": "2024-10-26",
+          "mood": 4,
+          "notes": "Random entry for Sat Oct 26 2024",
+          "physicalActivity": 8,
+          "sleepQuality": 2,
+          "stressLevel": 5
+        },
+        "-OANH46jQztYLrFQ0Grz": {
+          "date": "2024-10-27",
+          "mood": 8,
+          "notes": "Random entry for Sun Oct 27 2024",
+          "physicalActivity": 1,
+          "sleepQuality": 6,
+          "stressLevel": 9
+        },
+        "-OANH49qISqE_jitra8f": {
+          "date": "2024-10-28",
+          "mood": 3,
+          "notes": "Random entry for Mon Oct 28 2024",
+          "physicalActivity": 7,
+          "sleepQuality": 4,
+          "stressLevel": 2
+        },
+        "-OANH4ChOWHBJw0RZVCH": {
+          "date": "2024-10-29",
+          "mood": 5,
+          "notes": "Random entry for Tue Oct 29 2024",
+          "physicalActivity": 1,
+          "sleepQuality": 7,
+          "stressLevel": 7
+        },
+        "-OAOMF53kKyM7m-6MeYC": {
+          "date": "2024-10-23",
+          "mood": 10,
+          "notes": "Random entry for Wed Oct 23 2024",
+          "physicalActivity": 2,
+          "sleepQuality": 2,
+          "stressLevel": 9
+        },
+        "-OAOMF7qIhoALusTyOmL": {
+          "date": "2024-10-24",
+          "mood": 1,
+          "notes": "Random entry for Thu Oct 24 2024",
+          "physicalActivity": 9,
+          "sleepQuality": 5,
+          "stressLevel": 9
+        },
+        "-OAOMFAgMj64fGlNZayl": {
+          "date": "2024-10-25",
+          "mood": 2,
+          "notes": "Random entry for Fri Oct 25 2024",
+          "physicalActivity": 7,
+          "sleepQuality": 8,
+          "stressLevel": 3
+        },
+        "-OAOMFDmGECcQ2QDbc7R": {
+          "date": "2024-10-26",
+          "mood": 6,
+          "notes": "Random entry for Sat Oct 26 2024",
+          "physicalActivity": 5,
+          "sleepQuality": 2,
+          "stressLevel": 2
+        },
+        "-OAOMFHQIH_UFuG50X9h": {
+          "date": "2024-10-27",
+          "mood": 7,
+          "notes": "Random entry for Sun Oct 27 2024",
+          "physicalActivity": 5,
+          "sleepQuality": 4,
+          "stressLevel": 8
+        },
+        "-OAOMFLBwCJKudOc85ZP": {
+          "date": "2024-10-28",
+          "mood": 3,
+          "notes": "Random entry for Mon Oct 28 2024",
+          "physicalActivity": 10,
+          "sleepQuality": 10,
+          "stressLevel": 9
+        },
+        "-OAOMFOiV-EhHm1n-2zp": {
+          "date": "2024-10-29",
+          "mood": 3,
+          "notes": "Random entry for Tue Oct 29 2024",
+          "physicalActivity": 8,
+          "sleepQuality": 7,
+          "stressLevel": 7
+        }
+      },
+      "name": "Arsha Mary ",
+      "positivityEntries": {
+        "-O9EsbvOgi1YRdbofN1v": {
+          "date": "2024-10-15T11:13:58.377Z",
+          "thoughts": [
+            "Hjj",
+            "Hhjj",
+            "Tccc"
+          ]
+        },
+        "-O9a9MU6eVwSIyMJEwyZ": {
+          "date": "2024-10-19T19:03:08.375Z",
+          "thoughts": [
+            "Hjjn",
+            "Vhbnn",
+            "Vhbnj"
+          ]
+        }
+      },
+      "predictions": {
+        "2024-10-21": {
+          "predictedMood": 8.6,
+          "recommendation": {
+            "message": "Tomorrow's high mood score suggests a great day ahead, stay positive and focused!",
+            "suggestion": "Get a good night's sleep to ensure a refreshed and energized tomorrow."
+          }
+        },
+        "2024-10-23": {
+          "predictedMood": 5,
+          "recommendation": {
+            "message": "Tomorrow's mood is expected to be low, so prioritize self-care and relaxation techniques.",
+            "suggestion": "Practice gentle stretches and meditation before bed to improve tomorrow's mood."
+          }
+        },
+        "2024-10-30": {
+          "predictedMood": 5,
+          "recommendation": {
+            "message": "Tomorrow's mood is expected to be low, so prioritize self-care and relaxation techniques.",
+            "suggestion": "Practice gentle stretches and meditation before bed to improve tomorrow's mood."
+          }
+        },
+        "2024-11-01": {
+          "predictedMood": 5.4,
+          "recommendation": {
+            "message": "We couldn't generate a personalized recommendation at this time.",
+            "suggestion": "Consider reflecting on your recent activities and how they might be affecting your mood."
+          }
+        }
+      },
+      "preferredTherapyType": "Mindfulness-Based Therapy",
+      "previousTherapyExperience": "Extensive",
+      "role": "admin",
+      "sleepHabits": "Night owl"
+    },
+    "TkzDkG7Nj6XfnjYxJs8PMm4BrvC3": {
+      "age": "23",
+      "challenges": {
+        "exercise": 0,
+        "gratitude": 0,
+        "journal": 0,
+        "mindfulness": 0,
+        "positivity": 0,
+        "sleep": 0,
+        "social": 0
+      },
+      "completedChallenges": 0,
+      "concerns": [
+        "Anxiety",
+        "Stress",
+        "Work-life Balance"
+      ],
+      "email": "sinju641@gmail.com",
+      "gender": "Male",
+      "goals": [
+        "Reduce Stress",
+        "Improve Sleep",
+        "Manage Anxiety",
+        "Boost Mood",
+        "Increase Productivity"
+      ],
+      "interests": [
+        "Music",
+        "Technology",
+        "Travel"
+      ],
+      "isActive": true,
+      "languagePreference": "English",
+      "name": "Job",
+      "preferredTherapyType": "Psychodynamic Therapy",
+      "previousTherapyExperience": "None",
+      "role": "user",
+      "sleepHabits": "Night owl"
+    },
+    "Xm4C7jGQhsVhuVHr4BZWko2TxKt2": {
+      "age": "20",
+      "challenges": {
+        "exercise": 0,
+        "gratitude": 0,
+        "journal": 0,
+        "mindfulness": 0,
+        "positivity": 0,
+        "sleep": 0,
+        "social": 0
+      },
+      "completedChallenges": 0,
+      "concerns": [
+        "Stress",
+        "Self-esteem",
+        "Work-life Balance",
+        "Anxiety"
+      ],
+      "email": "salittajacob99@gmail.com",
+      "gender": "Female",
+      "goals": [
+        "Increase Productivity",
+        "Reduce Stress",
+        "Manage Anxiety",
+        "Boost Mood"
+      ],
+      "interests": [
+        "Music",
+        "Travel",
+        "Cooking"
+      ],
+      "isActive": true,
+      "languagePreference": "English",
+      "name": "Salitta jacob ",
+      "preferredTherapyType": "Mindfulness-Based Therapy",
+      "previousTherapyExperience": "None",
+      "role": "user",
+      "sleepHabits": "Night owl"
+    },
+    "cgacZlNUBESMusInWxtrzjmeBk52": {
+      "age": "22",
+      "challenges": {
+        "exercise": 0,
+        "gratitude": 0,
+        "journal": 0,
+        "mindfulness": 0,
+        "positivity": 0,
+        "sleep": 0,
+        "social": 0
+      },
+      "completedChallenges": 0,
+      "concerns": [
+        "Stress"
+      ],
+      "email": "alenroy230402@gmail.com",
+      "entries": {
+        "-O98kYQpJ-5y0WeVCcJI": {
+          "content": "hello",
+          "date": "2024-10-14"
+        }
+      },
+      "gender": "Male",
+      "goals": [
+        "Reduce Stress"
+      ],
+      "interests": [
+        "Cooking"
+      ],
+      "isActive": true,
+      "languagePreference": "Malayalam",
+      "moodEntries": {
+        "-OAM2ngF0JtYrOaWwXL2": {
+          "date": "2024-10-23",
+          "mood": 9,
+          "notes": "Random entry for Wed Oct 23 2024",
+          "physicalActivity": 8,
+          "sleepQuality": 6,
+          "stressLevel": 6
+        },
+        "-OAM2npqk0wasiSyu3GR": {
+          "date": "2024-10-24",
+          "mood": 5,
+          "notes": "Random entry for Thu Oct 24 2024",
+          "physicalActivity": 3,
+          "sleepQuality": 1,
+          "stressLevel": 3
+        },
+        "-OAM2nzxV1wk0UYiOYcj": {
+          "date": "2024-10-25",
+          "mood": 8,
+          "notes": "Random entry for Fri Oct 25 2024",
+          "physicalActivity": 8,
+          "sleepQuality": 9,
+          "stressLevel": 2
+        },
+        "-OAM2o9OEnZX8ia4rv0I": {
+          "date": "2024-10-26",
+          "mood": 9,
+          "notes": "Random entry for Sat Oct 26 2024",
+          "physicalActivity": 10,
+          "sleepQuality": 2,
+          "stressLevel": 1
+        },
+        "-OAM2oJdSieggRNm7zUn": {
+          "date": "2024-10-27",
+          "mood": 2,
+          "notes": "Random entry for Sun Oct 27 2024",
+          "physicalActivity": 10,
+          "sleepQuality": 8,
+          "stressLevel": 9
+        },
+        "-OAM2oTeJkJup-upjWou": {
+          "date": "2024-10-28",
+          "mood": 6,
+          "notes": "Random entry for Mon Oct 28 2024",
+          "physicalActivity": 7,
+          "sleepQuality": 2,
+          "stressLevel": 3
+        },
+        "-OAM2oZwEvkiDTkqNHmZ": {
+          "date": "2024-10-29",
+          "mood": 10,
+          "notes": "Random entry for Tue Oct 29 2024",
+          "physicalActivity": 7,
+          "sleepQuality": 3,
+          "stressLevel": 10
+        }
+      },
+      "name": "Alen",
+      "predictions": {
+        "2024-10-30": {
+          "predictedMood": 2.4,
+          "recommendation": {
+            "message": "Tomorrow's mood is expected to be low, so prioritize self-care and relaxation techniques.",
+            "suggestion": "Practice gentle stretches and meditation before bed to improve tomorrow's mood."
+          }
+        }
+      },
+      "preferredTherapyType": "Cognitive Behavioral Therapy",
+      "previousTherapyExperience": "Some",
+      "role": "user",
+      "sleepHabits": "Night owl"
+    },
+    "iX0UBwRg6NZwSdmrsTekAkya0ff1": {
+      "age": "21",
+      "challenges": {
+        "exercise": 0,
+        "gratitude": 0,
+        "journal": 0,
+        "mindfulness": 0,
+        "positivity": 0,
+        "sleep": 0,
+        "social": 0
+      },
+      "completedChallenges": 0,
+      "concerns": [
+        "Relationships"
+      ],
+      "email": "anandsanthosh2017@gmail.com",
+      "entries": {
+        "-O4OtliidLzJP6CodWjt": {
+          "content": "Yey",
+          "date": "2024-08-16"
+        }
+      },
+      "gender": "Male",
+      "goals": [
+        "Improve Sleep"
+      ],
+      "interests": [
+        "Sports"
+      ],
+      "isActive": true,
+      "languagePreference": "English",
+      "name": "Anand s",
+      "preferredTherapyType": "Cognitive Behavioral Therapy",
+      "previousTherapyExperience": "Some",
+      "role": "user",
+      "sleepHabits": "Night owl"
+    },
+    "kUIJWo62nvaoHmRjL5YheyQl1553": {
+      "age": "23",
+      "challenges": {
+        "exercise": 1,
+        "gratitude": 2,
+        "journal": 2,
+        "mindfulness": 1,
+        "positivity": 1,
+        "sleep": 2,
+        "social": 2
+      },
+      "completedChallenges": 11,
+      "concerns": [
+        "Depression"
+      ],
+      "email": "amalantoney123@gmail.com",
+      "emoElevate": {
+        "active": true,
+        "expiryDate": "2024-11-30T21:01:38.763Z",
+        "orderId": "order_PFOF4YuyULEKBm",
+        "paymentId": "pay_PFOFoygTG50xcv",
+        "startDate": "2024-10-30T21:01:38.763Z",
+        "subscriptionType": "monthly"
+      },
+      "entries": {
+        "-O9QReKJHcrGi84F-DQE": {
+          "content": "Slept untill 12",
+          "date": "2024-10-17"
+        },
+        "-O9dPQ9YSHte5B27_u9g": {
+          "content": "Haja",
+          "date": "2024-10-20"
+        },
+        "-O9hiyqLYsFOddwigXZ3": {
+          "content": "First series test",
+          "date": "2024-10-21"
+        },
+        "-O9on9pfa-9xPvI7OPp7": {
+          "content": "Hi",
+          "date": "2024-10-22"
+        }
+      },
+      "gender": "Male",
+      "goals": [
+        "Reduce Stress"
+      ],
+      "gratitudeEntries": {
+        "-O9B_d_8-R2lsq0LAKaq": {
+          "date": "2024-10-14T19:52:11.233Z",
+          "entries": [
+            "A",
+            "A",
+            "Aa",
+            "A",
+            "A"
+          ]
+        },
+        "-O9a88LUwVgKU_luNJzh": {
+          "date": "2024-10-19T18:57:47.510Z",
+          "entries": [
+            "Haaa",
+            "Aaa",
+            "Aaa",
+            "Aaa",
+            "Aaa"
+          ]
+        },
+        "-O9dPN1PRRd5RaJPYdPb": {
+          "date": "2024-10-20T10:11:55.648Z",
+          "entries": [
+            "A",
+            "A",
+            "A",
+            "A",
+            "A"
+          ]
+        },
+        "-O9ogXsrH3-r5e0T6ZL-": {
+          "date": "2024-10-22T14:47:07.897Z",
+          "entries": [
+            "Jvk",
+            "Jvkbiv",
+            "Jvkbivbbkj",
+            "Bj",
+            "Bjb"
+          ]
+        }
+      },
+      "interests": [
+        "Reading"
+      ],
+      "isActive": true,
+      "languagePreference": "English",
+      "moodEntries": {
+        "-O9eAkNTkPxLpHYl-Cv2": {
+          "date": "2024-10-14",
+          "mood": 10,
+          "notes": "Random entry for Mon Oct 14 2024",
+          "physicalActivity": 10,
+          "sleepQuality": 6,
+          "stressLevel": 5
+        },
+        "-O9eAkWroWgD-Csi-LUc": {
+          "date": "2024-10-15",
+          "mood": 6,
+          "notes": "Random entry for Tue Oct 15 2024",
+          "physicalActivity": 6,
+          "sleepQuality": 9,
+          "stressLevel": 10
+        },
+        "-O9eAkeAyZcq6m3mdBtZ": {
+          "date": "2024-10-16",
+          "mood": 3,
+          "notes": "Random entry for Wed Oct 16 2024",
+          "physicalActivity": 8,
+          "sleepQuality": 10,
+          "stressLevel": 10
+        },
+        "-O9eAkmN6BKKLHiGqCRn": {
+          "date": "2024-10-17",
+          "mood": 10,
+          "notes": "Random entry for Thu Oct 17 2024",
+          "physicalActivity": 5,
+          "sleepQuality": 8,
+          "stressLevel": 9
+        },
+        "-O9eAkuUG9HUzyOCho0J": {
+          "date": "2024-10-18",
+          "mood": 6,
+          "notes": "Random entry for Fri Oct 18 2024",
+          "physicalActivity": 5,
+          "sleepQuality": 9,
+          "stressLevel": 1
+        },
+        "-O9eAl24IPSvl4KEQFmN": {
+          "date": "2024-10-19",
+          "mood": 3,
+          "notes": "Random entry for Sat Oct 19 2024",
+          "physicalActivity": 1,
+          "sleepQuality": 8,
+          "stressLevel": 7
+        },
+        "-O9eAlBOr8sR5QdrSRo3": {
+          "date": "2024-10-20",
+          "mood": 9,
+          "notes": "Random entry for Sun Oct 20 2024",
+          "physicalActivity": 6,
+          "sleepQuality": 6,
+          "stressLevel": 9
+        },
+        "-O9hhu6CGCP1Arp9el3v": {
+          "date": "2024-10-21",
+          "mood": 9,
+          "notes": "",
+          "physicalActivity": 3,
+          "sleepQuality": 8,
+          "stressLevel": 5
+        },
+        "-O9ogclXFjWr_PwwFUI_": {
+          "date": "2024-10-22",
+          "mood": 6,
+          "notes": "",
+          "physicalActivity": 7,
+          "sleepQuality": 7,
+          "stressLevel": 3
+        },
+        "-O9rhi3y20f5yxx354Lj": {
+          "date": "2024-10-23",
+          "mood": 4,
+          "notes": "",
+          "physicalActivity": 2,
+          "sleepQuality": 9,
+          "stressLevel": 1
+        },
+        "-OA8Xbc_HoQ98BRZNGCp": {
+          "date": "2024-10-26",
+          "mood": 9,
+          "notes": "",
+          "physicalActivity": 5,
+          "sleepQuality": 8,
+          "stressLevel": 6
+        }
+      },
+      "moodRecommendations": {
+        "41": {
+          "message": "Tomorrow's mood is expected to be slightly low, so prioritize self-care and relaxation.",
+          "suggestion": "Take a 10-minute morning meditation and plan a calming evening routine to improve tomorrow's mood."
+        },
+        "50": {
+          "message": "Tomorrow's mood is expected to be low, so prioritize self-care and relaxation techniques.",
+          "suggestion": "Practice gentle stretches and meditation before bed to improve tomorrow's mood."
+        }
+      },
+      "name": "Amal Antoney ",
+      "photoURL": "https://firebasestorage.googleapis.com/v0/b/emo-ce9e9.appspot.com/o/profile_images%2FkUIJWo62nvaoHmRjL5YheyQl1553%2FkUIJWo62nvaoHmRjL5YheyQl1553_profile_image.jpg?alt=media&token=0f41c45e-fa26-45d9-ac43-58b07e099446",
+      "positivityEntries": {
+        "-O9BflR6gMpY-IaK0y4g": {
+          "date": "2024-10-14T20:18:56.289Z",
+          "thoughts": [
+            "Hi",
+            "Amal",
+            "Alan"
+          ]
+        },
+        "-O9DZx1mzucsbghMDML3": {
+          "date": "2024-10-15T05:08:23.173Z",
+          "thoughts": [
+            "Good",
+            "Worse",
+            "Hebe"
+          ]
+        }
+      },
+      "predictions": {
+        "2024-10-21": {
+          "predictedMood": 4.1,
+          "recommendation": {
+            "message": "Tomorrow's mood is expected to be slightly low, so prioritize self-care and relaxation.",
+            "suggestion": "Take a 10-minute morning meditation to set a positive tone for the day."
+          }
+        },
+        "2024-10-22": {
+          "predictedMood": 5.8,
+          "recommendation": {
+            "message": "Tomorrow's mood is looking bright! Take a moment to plan a relaxing evening routine.",
+            "suggestion": "Practice gentle stretches and meditation before bed to set a positive tone for tomorrow."
+          }
+        },
+        "2024-10-23": {
+          "predictedMood": 7.3,
+          "recommendation": {
+            "message": "Tomorrow's mood is looking bright! Take a moment to plan a relaxing evening routine.",
+            "suggestion": "Start by setting a calming alarm and scheduling a gentle morning stretch."
+          }
+        },
+        "2024-10-24": {
+          "predictedMood": 8.1,
+          "recommendation": {
+            "message": "Tomorrow's high mood score suggests a great day ahead, stay positive and focused!",
+            "suggestion": "Get a good night's sleep to ensure a refreshed and energized tomorrow."
+          }
+        },
+        "2024-10-26": {
+          "predictedMood": 5.4,
+          "recommendation": {
+            "message": "Tomorrow's mood is looking a bit low, but you've got this! Stay positive and focused.",
+            "suggestion": "Get a good night's sleep and plan a fun activity for tomorrow to boost your mood."
+          }
+        },
+        "2024-10-27": {
+          "predictedMood": 6.2,
+          "recommendation": {
+            "message": "Tomorrow's mood is looking bright! Take a moment to plan a relaxing evening routine.",
+            "suggestion": "Start by setting a calming alarm and scheduling a gentle morning stretch."
+          }
+        },
+        "2024-10-30": {
+          "predictedMood": 5.3,
+          "recommendation": {
+            "message": "Tomorrow's mood is looking a bit low, but with a plan, you can turn it around!",
+            "suggestion": "Get a good night's sleep and plan a fun activity for tomorrow morning to boost your mood!"
+          }
+        }
+      },
+      "preferredTherapyType": "Mindfulness-Based Therapy",
+      "previousTherapyExperience": "Extensive",
+      "role": "admin",
+      "selfBoostEntries": {
+        "-O9B_adGyReu6lqXLf1J": {
+          "date": "2024-10-14T19:51:59.209Z",
+          "thoughts": [
+            "A",
+            "A",
+            "A"
+          ]
+        },
+        "-O9B_sw955EveXktICYZ": {
+          "date": "2024-10-14T19:53:14.146Z",
+          "thoughts": [
+            "S",
+            "A",
+            "A"
+          ]
+        }
+      },
+      "sleepHabits": "Early bird"
+    },
+    "wx7Pg3mlDHRqgzGzFFeqyqt3boy2": {
+      "age": 22,
+      "challenges": {
+        "exercise": 1,
+        "gratitude": 2,
+        "journal": 2,
+        "mindfulness": 1,
+        "nutrition": 1,
+        "positivity": 1,
+        "sleep": 2,
+        "social": 2
+      },
+      "completedChallenges": 12,
+      "concerns": [
+        "Depression",
+        "Anxiety"
+      ],
+      "email": "amalantoney2@gmail.com",
+      "entries": {
+        "-O4-mdmYPrjTluKKWZVV": {
+          "content": "Peace",
+          "date": "2024-08-11"
+        },
+        "-O4-mgITX10N93NAsGsj": {
+          "content": "Mind",
+          "date": "2024-08-11"
+        },
+        "-O44oWq-6Yl4zyc7TktI": {
+          "content": "hello this is my journal entry for today",
+          "date": "2024-08-12"
+        },
+        "-O6Rep6ovVTQ-Fj13s2a": {
+          "content": "Great day bad exams",
+          "date": "2024-09-10"
+        },
+        "-O9cw4FFFH2Mag2KFpdq": {
+          "content": "Hi today is the first day of my last series exam",
+          "date": "2024-10-20"
+        }
+      },
+      "gender": "Male",
+      "goals": [
+        "Improve Sleep",
+        "Boost Mood",
+        "Increase Productivity"
+      ],
+      "gratitudeEntries": {
+        "-O44oH7kpjt0RmRp2qFg": {
+          "date": "2024-08-12T09:00:18.955Z",
+          "entries": [
+            "Rff",
+            "Gg",
+            "Fd",
+            "Gf",
+            "Ggf"
+          ]
+        },
+        "-O9aGC4rnEcbFpQHiZka": {
+          "date": "2024-10-19T19:33:00.084Z",
+          "entries": [
+            "Happy",
+            "Sad",
+            "Funny",
+            "Cool",
+            "Verybad"
+          ]
+        }
+      },
+      "interests": [
+        "Music",
+        "Travel",
+        "Reading",
+        "Technology"
+      ],
+      "isActive": true,
+      "languagePreference": "Malayalam",
+      "moodEntries": {
+        "-O5rIMmWY39IVomPHH-M": {
+          "date": "2024-08-20",
+          "mood": 3,
+          "notes": "Sample entry for Tue Aug 20 2024",
+          "physicalActivity": 3,
+          "sleepQuality": 8,
+          "stressLevel": 7
+        },
+        "-O5rIMpxy2Q3Z-3crUzE": {
+          "date": "2024-08-21",
+          "mood": 2,
+          "notes": "Sample entry for Wed Aug 21 2024",
+          "physicalActivity": 7,
+          "sleepQuality": 6,
+          "stressLevel": 6
+        },
+        "-O5rIMthS5ME06_Y3_eK": {
+          "date": "2024-08-22",
+          "mood": 6,
+          "notes": "Sample entry for Thu Aug 22 2024",
+          "physicalActivity": 1,
+          "sleepQuality": 3,
+          "stressLevel": 2
+        },
+        "-O5rIMxWHgOlS2sgLzqc": {
+          "date": "2024-08-23",
+          "mood": 10,
+          "notes": "Sample entry for Fri Aug 23 2024",
+          "physicalActivity": 2,
+          "sleepQuality": 6,
+          "stressLevel": 4
+        },
+        "-O5rIN1xl1gur911UJpt": {
+          "date": "2024-08-24",
+          "mood": 3,
+          "notes": "Sample entry for Sat Aug 24 2024",
+          "physicalActivity": 2,
+          "sleepQuality": 1,
+          "stressLevel": 5
+        },
+        "-O5rIN5Eu85yojrRbnyr": {
+          "date": "2024-08-25",
+          "mood": 5,
+          "notes": "Sample entry for Sun Aug 25 2024",
+          "physicalActivity": 7,
+          "sleepQuality": 10,
+          "stressLevel": 4
+        },
+        "-O5rIN8m9Sw3yupw54K1": {
+          "date": "2024-08-26",
+          "mood": 1,
+          "notes": "Sample entry for Mon Aug 26 2024",
+          "physicalActivity": 3,
+          "sleepQuality": 9,
+          "stressLevel": 5
+        },
+        "-O5rINClUOWqtQtBQnGq": {
+          "date": "2024-08-27",
+          "mood": 6,
+          "notes": "Sample entry for Tue Aug 27 2024",
+          "physicalActivity": 5,
+          "sleepQuality": 1,
+          "stressLevel": 4
+        },
+        "-O5rING68hQHhN44v3Ru": {
+          "date": "2024-08-28",
+          "mood": 3,
+          "notes": "Sample entry for Wed Aug 28 2024",
+          "physicalActivity": 3,
+          "sleepQuality": 1,
+          "stressLevel": 1
+        },
+        "-O5rINJJUrdPLcA8QUeW": {
+          "date": "2024-08-29",
+          "mood": 9,
+          "notes": "Sample entry for Thu Aug 29 2024",
+          "physicalActivity": 10,
+          "sleepQuality": 3,
+          "stressLevel": 7
+        },
+        "-O5rINMxSDHZssvTq3OG": {
+          "date": "2024-08-30",
+          "mood": 9,
+          "notes": "Sample entry for Fri Aug 30 2024",
+          "physicalActivity": 1,
+          "sleepQuality": 8,
+          "stressLevel": 7
+        },
+        "-O5rINQKOBVLnV9Mvxzs": {
+          "date": "2024-08-31",
+          "mood": 8,
+          "notes": "Sample entry for Sat Aug 31 2024",
+          "physicalActivity": 7,
+          "sleepQuality": 1,
+          "stressLevel": 10
+        },
+        "-O5rINUVpy7rt_oJ4w9M": {
+          "date": "2024-09-01",
+          "mood": 9,
+          "notes": "Sample entry for Sun Sep 01 2024",
+          "physicalActivity": 1,
+          "sleepQuality": 1,
+          "stressLevel": 4
+        },
+        "-O5rINZc9P9PcfmDnAkT": {
+          "date": "2024-09-02",
+          "mood": 4,
+          "notes": "Sample entry for Mon Sep 02 2024",
+          "physicalActivity": 1,
+          "sleepQuality": 3,
+          "stressLevel": 8
+        },
+        "-O5vSDZHHKhwsFfp-EEy": {
+          "date": "2024-09-04",
+          "mood": 8,
+          "notes": "HznMa",
+          "physicalActivity": 7,
+          "sleepQuality": 8,
+          "stressLevel": 2
+        },
+        "-O9d2qxtC46zrJBeFcy9": {
+          "date": "2024-10-20",
+          "mood": 7,
+          "notes": "",
+          "physicalActivity": 5,
+          "sleepQuality": 5,
+          "stressLevel": 7
+        }
+      },
+      "name": "Amal Antoney 2",
+      "photoURL": "https://firebasestorage.googleapis.com/v0/b/emo-ce9e9.appspot.com/o/profile_images%2Fwx7Pg3mlDHRqgzGzFFeqyqt3boy2%2Fwx7Pg3mlDHRqgzGzFFeqyqt3boy2_profile_image.jpg?alt=media&token=9459f185-55cc-4eca-b2fc-6da5e3a7f160",
+      "preferredTherapyType": "Humanistic Therapy",
+      "previousTherapyExperience": "Some",
+      "role": "user",
+      "sleepHabits": "Early bird"
+    },
+    "y94bYStEcqgsObyUGCm0qxnW7mJ3": {
+      "age": "21",
+      "challenges": {
+        "exercise": 0,
+        "gratitude": 1,
+        "journal": 0,
+        "mindfulness": 0,
+        "positivity": 1,
+        "sleep": 1,
+        "social": 0
+      },
+      "completedChallenges": 3,
+      "concerns": [
+        "Anxiety"
+      ],
+      "email": "amalantoney2025@mca.ajce.in",
+      "entries": {
+        "-O4Ph7s5yE2DfAy9RqWF": {
+          "content": "Today was great",
+          "date": "2024-08-16"
+        },
+        "-O4PhAA5kQK_dfhWYVfq": {
+          "content": "I testing this is my channel",
+          "date": "2024-08-16"
+        }
+      },
+      "gender": "Male",
+      "goals": [
+        "Reduce Stress"
+      ],
+      "gratitudeEntries": {
+        "-O4Ph5QwK9Ltv-96cbnx": {
+          "date": "2024-08-16T10:20:57.550Z",
+          "entries": [
+            "Shelter",
+            "Friends",
+            "Family",
+            "Food",
+            "Happiness"
+          ]
+        }
+      },
+      "interests": [
+        "Sports"
+      ],
+      "isActive": true,
+      "languagePreference": "Telugu",
+      "moodEntries": {
+        "-O9e3irVgXLcHQryPqWY": {
+          "date": "2024-10-14",
+          "mood": 1,
+          "notes": "Random entry for Mon Oct 14 2024",
+          "physicalActivity": 9,
+          "sleepQuality": 2,
+          "stressLevel": 8
+        },
+        "-O9e3j16HBqjsEZQuYdV": {
+          "date": "2024-10-15",
+          "mood": 4,
+          "notes": "Random entry for Tue Oct 15 2024",
+          "physicalActivity": 5,
+          "sleepQuality": 8,
+          "stressLevel": 4
+        },
+        "-O9e3jAidrNwFqw-5Ilb": {
+          "date": "2024-10-16",
+          "mood": 6,
+          "notes": "Random entry for Wed Oct 16 2024",
+          "physicalActivity": 10,
+          "sleepQuality": 6,
+          "stressLevel": 9
+        },
+        "-O9e3jMhkj9seHO8uxev": {
+          "date": "2024-10-17",
+          "mood": 1,
+          "notes": "Random entry for Thu Oct 17 2024",
+          "physicalActivity": 5,
+          "sleepQuality": 7,
+          "stressLevel": 2
+        },
+        "-O9e3jWKmuIGDsrm_Uhx": {
+          "date": "2024-10-18",
+          "mood": 4,
+          "notes": "Random entry for Fri Oct 18 2024",
+          "physicalActivity": 3,
+          "sleepQuality": 7,
+          "stressLevel": 4
+        },
+        "-O9e3jerv-N2sraHYulx": {
+          "date": "2024-10-19",
+          "mood": 9,
+          "notes": "Random entry for Sat Oct 19 2024",
+          "physicalActivity": 7,
+          "sleepQuality": 2,
+          "stressLevel": 6
+        },
+        "-O9e3jp5jp2p4iRKb2GQ": {
+          "date": "2024-10-20",
+          "mood": 10,
+          "notes": "Random entry for Sun Oct 20 2024",
+          "physicalActivity": 8,
+          "sleepQuality": 10,
+          "stressLevel": 1
+        }
+      },
+      "name": "Amal ajce",
+      "predictions": {
+        "2024-10-21": {
+          "predictedMood": 9.6,
+          "recommendation": {
+            "message": "Tomorrow's high mood score suggests a day filled with positivity and enthusiasm.",
+            "suggestion": "Prepare for tomorrow by setting achievable goals and practicing gratitude exercises."
+          }
+        }
+      },
+      "preferredTherapyType": "Mindfulness-Based Therapy",
+      "previousTherapyExperience": "Some",
+      "role": "user",
+      "sleepHabits": "Early bird"
+    }
+  }
+}
