@@ -243,10 +243,10 @@ const MessageItem: React.FC<MessageItemProps> = ({
                 ref={swipeableRef}
                 key={item.id}
                 item={item}
-                renderUnderlayLeft={renderUnderlayLeft}
-                renderUnderlayRight={renderUnderlayRight}
-                snapPointsLeft={[50]}
-                snapPointsRight={[50]}
+                renderUnderlayLeft={isCurrentUser ? renderUnderlayLeft : undefined}
+                renderUnderlayRight={!isCurrentUser ? renderUnderlayRight : undefined}
+                snapPointsLeft={isCurrentUser ? [50] : undefined}
+                snapPointsRight={!isCurrentUser ? [50] : undefined}
                 onChange={onChange}
                 overSwipe={20}
             >
@@ -846,19 +846,17 @@ const styles = StyleSheet.create({
     },
     replyUnderlayLeft: {
         position: 'absolute',
-        left: 0,
+        left: 10,
         height: '100%',
-        width: 60,
         justifyContent: 'center',
-        alignItems: 'center',
+        alignItems: 'flex-start',
     },
     replyUnderlayRight: {
         position: 'absolute',
-        right: 0,
+        right: 10,
         height: '100%',
-        width: 60,
         justifyContent: 'center',
-        alignItems: 'center',
+        alignItems: 'flex-end',
     },
     menuOption: {
         flexDirection: 'row',

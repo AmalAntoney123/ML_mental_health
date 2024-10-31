@@ -318,17 +318,17 @@ const EmoElevateScreen = () => {
             <Text style={styles.popularText}>Popular</Text>
           </View>
         )}
+        {plan.savings && (
+          <Text style={[styles.savingsText, { color: colors.primary }]}>
+            Save {plan.savings}
+          </Text>
+        )}
         <Text style={[styles.durationText, { color: colors.text }]}>
           {plan.duration} Month{plan.duration > 1 ? 's' : ''}
         </Text>
         <Text style={[styles.priceText, { color: colors.text }]}>
           ₹{plan.price}
         </Text>
-        {plan.savings && (
-          <Text style={[styles.savingsText, { color: colors.primary }]}>
-            Save {plan.savings}
-          </Text>
-        )}
       </TouchableOpacity>
     );
   };
@@ -591,7 +591,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: 'center',
     height: '100%',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -615,17 +615,21 @@ const styles = StyleSheet.create({
   },
   durationText: {
     fontSize: 16,
-    fontWeight: 'bold',
     marginBottom: 8,
+    position: 'absolute',
+    top: 16,
   },
   priceText: {
-    fontSize: 24,
+    marginTop: 10,
+    fontSize: 26,
     fontWeight: 'bold',
-    marginBottom: 4,
   },
   savingsText: {
     fontSize: 14,
     fontWeight: 'bold',
+    position: 'absolute',
+    bottom: 8,
+    right: 8,
   },
   scrollContent: {
     flexGrow: 1,
