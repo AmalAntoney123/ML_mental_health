@@ -7,6 +7,7 @@ export interface User {
 }
 
 export interface SupportGroup {
+  coverImage: string | undefined;
   id: string;
   name: string;
   description: string;

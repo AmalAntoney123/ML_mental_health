@@ -168,6 +168,7 @@
         },
         "-OAOuLeyeNmiyZlP69Gq": {
           "readBy": {
+            "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": true,
             "kUIJWo62nvaoHmRjL5YheyQl1553": true
           },
           "text": "Hooo",
@@ -184,6 +185,7 @@
       }
     },
     "-O4RK9zhzYjJ2DdBgMo1": {
+      "coverImage": "https://firebasestorage.googleapis.com/v0/b/emo-ce9e9.appspot.com/o/group_covers%2F-O4RK9zhzYjJ2DdBgMo1_1730366712044.jpg?alt=media&token=dd856079-d4b6-4e00-adeb-a43b5e5f07c7",
       "createdAt": 1723830939735,
       "createdBy": "kUIJWo62nvaoHmRjL5YheyQl1553",
       "description": "Fostering positivity and optimism through shared affirmations and uplifting conversations",
@@ -309,6 +311,7 @@
         "-OAOWtCWnCyZoGQ9LeQm": {
           "deletedAt": 1730232788345,
           "readBy": {
+            "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": true,
             "kUIJWo62nvaoHmRjL5YheyQl1553": true,
             "y94bYStEcqgsObyUGCm0qxnW7mJ3": true
           },
@@ -320,6 +323,7 @@
         "-OAOkgbiUhyqsmCA5fZZ": {
           "isSystemMessage": true,
           "readBy": {
+            "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": true,
             "kUIJWo62nvaoHmRjL5YheyQl1553": true,
             "y94bYStEcqgsObyUGCm0qxnW7mJ3": true
           },
@@ -330,6 +334,7 @@
         },
         "-OAOklAqxY7Amum2pmqW": {
           "readBy": {
+            "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": true,
             "kUIJWo62nvaoHmRjL5YheyQl1553": true,
             "y94bYStEcqgsObyUGCm0qxnW7mJ3": true
           },
@@ -341,6 +346,7 @@
         "-OAOl7MYCpUEJFBTdX_1": {
           "isSystemMessage": true,
           "readBy": {
+            "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": true,
             "kUIJWo62nvaoHmRjL5YheyQl1553": true,
             "y94bYStEcqgsObyUGCm0qxnW7mJ3": true
           },
@@ -352,6 +358,7 @@
         "-OAOlL5pvnZ_TjMhUslA": {
           "isSystemMessage": true,
           "readBy": {
+            "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": true,
             "kUIJWo62nvaoHmRjL5YheyQl1553": true,
             "y94bYStEcqgsObyUGCm0qxnW7mJ3": true
           },
@@ -362,6 +369,7 @@
         },
         "-OAOuEbNSWOIyjHyhMrx": {
           "readBy": {
+            "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": true,
             "kUIJWo62nvaoHmRjL5YheyQl1553": true,
             "y94bYStEcqgsObyUGCm0qxnW7mJ3": true
           },
@@ -373,6 +381,7 @@
         },
         "-OAUX2c_b4uPSVNVp1p4": {
           "readBy": {
+            "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": true,
             "kUIJWo62nvaoHmRjL5YheyQl1553": true,
             "y94bYStEcqgsObyUGCm0qxnW7mJ3": true
           },
@@ -383,6 +392,7 @@
         },
         "-OAUX3msXMMwGWrgSd8f": {
           "readBy": {
+            "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": true,
             "kUIJWo62nvaoHmRjL5YheyQl1553": true,
             "y94bYStEcqgsObyUGCm0qxnW7mJ3": true
           },
@@ -394,6 +404,7 @@
         "-OAUX9L-Sa0eQDhQYOM2": {
           "isSystemMessage": true,
           "readBy": {
+            "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": true,
             "kUIJWo62nvaoHmRjL5YheyQl1553": true,
             "y94bYStEcqgsObyUGCm0qxnW7mJ3": true
           },
@@ -401,6 +412,55 @@
           "timestamp": 1730327127551,
           "userId": "system",
           "userName": "System"
+        },
+        "-OAWunXC_V2TxzJ2nTKI": {
+          "deletedAt": 1730368473596,
+          "readBy": {
+            "kUIJWo62nvaoHmRjL5YheyQl1553": true
+          },
+          "replyTo": "-OAOuEbNSWOIyjHyhMrx",
+          "text": "Message deleted",
+          "timestamp": 1730367142165,
+          "userId": "kUIJWo62nvaoHmRjL5YheyQl1553",
+          "userName": "Amal Antoney "
+        },
+        "-OAWvhjfr3sthYhhaD5z": {
+          "deletedAt": 1730368491260,
+          "readBy": {
+            "kUIJWo62nvaoHmRjL5YheyQl1553": true
+          },
+          "replyTo": "-OAOWtCWnCyZoGQ9LeQm",
+          "text": "Message deleted",
+          "timestamp": 1730367380591,
+          "userId": "kUIJWo62nvaoHmRjL5YheyQl1553",
+          "userName": "Amal Antoney "
+        },
+        "-OAX0UN7tUoLFKcRbT1K": {
+          "readBy": {
+            "kUIJWo62nvaoHmRjL5YheyQl1553": true
+          },
+          "text": "Baxjvjsxsskxjkxaxw\nXwxjvaajvjxaxuwuxdq\nXashisdw\nDq\nDkbxiwxbwd",
+          "timestamp": 1730368894661,
+          "userId": "kUIJWo62nvaoHmRjL5YheyQl1553",
+          "userName": "Amal Antoney "
+        },
+        "-OAX0W6VAAIw3M2564Lu": {
+          "readBy": {
+            "kUIJWo62nvaoHmRjL5YheyQl1553": true
+          },
+          "text": "Vhazvavxhvahdjwjdbnwbdhbddvwjbdsqbxwd",
+          "timestamp": 1730368901785,
+          "userId": "kUIJWo62nvaoHmRjL5YheyQl1553",
+          "userName": "Amal Antoney "
+        },
+        "-OAX0W7-WRqDc3kv0pML": {
+          "readBy": {
+            "kUIJWo62nvaoHmRjL5YheyQl1553": true
+          },
+          "text": "Vhazvavxhvahdjwjdbnwbdhbddvwjbdsqbxwd",
+          "timestamp": 1730368901860,
+          "userId": "kUIJWo62nvaoHmRjL5YheyQl1553",
+          "userName": "Amal Antoney "
         }
       },
       "name": "Positive Vibes",
@@ -429,6 +489,16 @@
         "Relationships"
       ],
       "email": "arshamary235@gmail.com",
+      "emoElevate": {
+        "active": true,
+        "amount": "750",
+        "expiryDate": "2025-01-31T08:04:25.783Z",
+        "lastPaymentDate": "2024-10-31T08:04:25.784Z",
+        "orderId": "order_PFZVKt7Lnvo2zr",
+        "paymentId": "pay_PFZXZfrjcb10xl",
+        "startDate": "2024-10-31T08:04:25.783Z",
+        "subscriptionType": "3_month"
+      },
       "entries": {
         "-O3g-JGuCxfEXR_4XSfE": {
           "content": "Hjsjss",
@@ -481,10 +551,9 @@
       },
       "gender": "Female",
       "goals": [
-        "Increase Productivity",
         "Reduce Stress",
         "Boost Mood",
-        "Manage Anxiety"
+        "Improve Sleep"
       ],
       "gratitudeEntries": {
         "-O3g-IbJSPvU1rcGUdLO": {
@@ -551,7 +620,8 @@
       "interests": [
         "Reading",
         "Music",
-        "Art"
+        "Art",
+        "Sports"
       ],
       "isActive": true,
       "languagePreference": "English",
@@ -1182,6 +1252,7 @@
         }
       },
       "name": "Arsha Mary ",
+      "photoURL": "https://firebasestorage.googleapis.com/v0/b/emo-ce9e9.appspot.com/o/profile_images%2FFtqiSFhixZSpoYhU6Ram2I7Iz5x1%2FFtqiSFhixZSpoYhU6Ram2I7Iz5x1_profile_image.jpg?alt=media&token=aad6d83c-9086-4a71-a8a7-a49142c67897",
       "positivityEntries": {
         "-O9EsbvOgi1YRdbofN1v": {
           "date": "2024-10-15T11:13:58.377Z",
@@ -1472,11 +1543,13 @@
       "email": "amalantoney123@gmail.com",
       "emoElevate": {
         "active": true,
-        "expiryDate": "2024-11-30T21:01:38.763Z",
-        "orderId": "order_PFOF4YuyULEKBm",
-        "paymentId": "pay_PFOFoygTG50xcv",
-        "startDate": "2024-10-30T21:01:38.763Z",
-        "subscriptionType": "monthly"
+        "amount": "300",
+        "expiryDate": "2024-12-01T08:10:05.029Z",
+        "lastPaymentDate": "2024-10-31T08:10:05.035Z",
+        "orderId": "order_PFZdGqsP8QSsDM",
+        "paymentId": "pay_PFZduJPPWahuEv",
+        "startDate": "2024-10-31T08:10:05.029Z",
+        "subscriptionType": "1_month"
       },
       "entries": {
         "-O9QReKJHcrGi84F-DQE": {
