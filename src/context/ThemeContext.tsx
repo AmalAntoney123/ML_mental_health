@@ -33,6 +33,7 @@ interface ThemeContextType {
   themeMode: ThemeMode;
   setThemeMode: (mode: ThemeMode) => void;
   colors: ThemeColors;
+  toggleTheme: () => void;
 }
 
 const lightTheme: ThemeColors = {
@@ -128,6 +129,13 @@ export const ThemeProvider: React.FC<{children: ReactNode}> = ({ children }) => 
       }
     };
 
+    const toggleTheme = () => {
+      const newMode = themeMode === 'system' 
+        ? (isDarkMode ? 'light' : 'dark')
+        : (themeMode === 'dark' ? 'light' : 'dark');
+      handleThemeModeChange(newMode);
+    };
+
     const theme = isDarkMode ? darkTheme : lightTheme;
 
     return (
@@ -135,7 +143,8 @@ export const ThemeProvider: React.FC<{children: ReactNode}> = ({ children }) => 
         isDarkMode, 
         themeMode,
         setThemeMode: handleThemeModeChange,
-        colors: theme 
+        colors: theme,
+        toggleTheme
       }}>
         {children}
       </ThemeContext.Provider>

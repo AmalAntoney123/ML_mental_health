@@ -34,15 +34,15 @@ const IntroScreen: React.FC = () => {
     logo: {
       width: 240,
       height: 240,
-      padding: 20,
+      padding: 0,
       backgroundColor: colors.primaryLight,
       borderRadius: 60,
     },
     image: {
       width: '100%',
       height: '100%',
-      resizeMode: 'contain',
-      tintColor: colors.primary,
+      resizeMode: 'cover',
+      borderRadius: 60,
     },
     titleText: {
       color: colors.onBackground,
@@ -99,19 +99,19 @@ const IntroScreen: React.FC = () => {
       pages={[
         {
           backgroundColor: colors.background,
-          image: <LogoContainer imagePath={require('../assets/hi-emo.png')} />,
+          image: <LogoContainer imagePath={require('../assets/onboarding-3.jpeg')} />,
           title: "Hey there, I'm Emo!",
           subtitle: "Your friendly guide to a happier mind!",
         },
         {
           backgroundColor: colors.background,
-          image: <LogoContainer imagePath={require('../assets/smile-emo.png')} />,
+          image: <LogoContainer imagePath={require('../assets/onboarding-2.jpeg')} />,
           title: "Let's Track Your Mood!",
           subtitle: "Complete fun quizzes, earn streaks, and collect rewards!",
         },
         {
           backgroundColor: colors.background,
-          image: <LogoContainer imagePath={require('../assets/down-emo.png')} />,
+          image: <LogoContainer imagePath={require('../assets/onboarding-1.jpeg')} />,
           title: "Discover Personalized Support!",
           subtitle: "From AI insights to virtual therapy sessions, I've got you covered!",
         },

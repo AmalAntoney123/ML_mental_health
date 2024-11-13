@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView, SafeAreaView, Text, TouchableOpacity, Alert, Dimensions, Button } from 'react-native';
+import { View, StyleSheet, ScrollView, Text, TouchableOpacity, Alert, Dimensions, Button } from 'react-native';
 import { TextInput, Chip, ProgressBar, Provider as PaperProvider, DefaultTheme } from 'react-native-paper';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/types';
 import { useTheme } from '../context/ThemeContext';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { firebase } from '@react-native-firebase/database';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const { width, height } = Dimensions.get('window');
 
@@ -185,8 +186,8 @@ const OnboardingScreen: React.FC<Props> = ({ navigation }) => {
         social: 0,
         journal: 0,
         sleep: 0,
-        positivity: 0,  
-      };
+        positivity: 0,
+    };
     const saveUserData = async () => {
         try {
             const user = firebase.auth().currentUser;
@@ -195,7 +196,7 @@ const OnboardingScreen: React.FC<Props> = ({ navigation }) => {
                     name,
                     age,
                     gender,
-                    email : user.email,
+                    email: user.email,
                     previousTherapyExperience,
                     sleepHabits,
                     interests,
@@ -206,9 +207,9 @@ const OnboardingScreen: React.FC<Props> = ({ navigation }) => {
                     role: 'user',
                     challenges: initialChallenges,
                     completedChallenges: 0,
-                    isActive : true,
+                    isActive: true,
                 });
-                
+
                 navigation.navigate('MainScreen');
             } else {
                 Alert.alert('Error', 'User not found. Please sign in again.');
@@ -411,7 +412,7 @@ const OnboardingScreen: React.FC<Props> = ({ navigation }) => {
 
     return (
         <PaperProvider theme={paperTheme}>
-            <SafeAreaView style={styles.container}>
+            <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }} edges={['top']}>
                 <View style={styles.content}>
                     <View style={styles.topContent}>
                         <Text style={styles.logo}>Emo</Text>

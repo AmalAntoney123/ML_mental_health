@@ -19,16 +19,7 @@ type Props = {
 const LoginScreen: React.FC<Props> = ({ navigation }) => {
   const { colors, toggleTheme } = useTheme();
   const [isLoading, setIsLoading] = useState(false);
-  async function checkUserDataExists(userId: string): Promise<boolean> {
-    try {
-      const snapshot = await database().ref(`users/${userId}`).once('value');
-      return snapshot.exists();
-    } catch (error) {
-      console.error('Error checking user data:', error);
-      // You might want to handle this error differently depending on your app's needs
-      return false;
-    }
-  }
+  
   const handleGoogleSignIn = async () => {
     setIsLoading(true);
     try {
@@ -94,8 +85,8 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
       alignItems: 'center',
     },
     logo: {
-      width: 100,
-      height: 100,
+      width: 182,
+      height: 182,
       resizeMode: 'contain',
     },
     buttonContainer: {
@@ -131,8 +122,8 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
         </View>
         <View style={styles.logoContainer}>
           <Image
-            source={require('../assets/icon.png')}
-            style={[styles.logo, { tintColor: colors.primary }]}
+            source={require('../assets/logo.png')}
+            style={[styles.logo,]}
           />
         </View>
         <View style={styles.buttonContainer}>
