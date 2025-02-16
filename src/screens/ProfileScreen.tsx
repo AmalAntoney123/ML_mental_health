@@ -82,9 +82,7 @@ const ProfileScreen = () => {
 
             fetchUserData();
 
-            // Cleanup function
             return () => {
-                // Any cleanup code if needed
             };
         }, [user])
     );

@@ -1,17 +1,29 @@
 {
-  "apkInfo": {
-    "downloadURL": "https://firebasestorage.googleapis.com/v0/b/emo-ce9e9.appspot.com/o/apks%2Fapp-release.apk.zip?alt=media&token=4f4f8795-3802-46af-8bd8-5a1365aaf50b",
-    "fileName": "app-release.apk",
-    "fileSize": 77038881,
-    "fileType": "application/vnd.android.package-archive",
-    "lastModified": 1728968013311,
-    "uploadDate": "2024-10-17T06:34:40.132Z",
-    "uploadedBy": "kUIJWo62nvaoHmRjL5YheyQl1553",
-    "version": "1.0.0",
-    "zipFileName": "app-release.apk.zip"
+  "appVersions": {
+    "-OAcky5pjiZIXINOSXKv": {
+      "changes": [
+        "First release",
+        "User Login, Register",
+        "Dashboard",
+        "Mood Analytics"
+      ],
+      "downloadUrl": "https://dl.dropboxusercontent.com/scl/fi/8f2ulu8ke7v3k25c2vjze/app-release.apk?rlkey=g1owftsz1f12zsqht2uh2kbjc&st=ey9fxg4l&dl=0",
+      "isCurrent": true,
+      "releaseDate": "2024-11-01T00:00:00.000Z",
+      "version": "1.0.0"
+    },
+    "-OBU7v2VP4YKWVmkaPOh": {
+      "changes": [
+        "Fixed onboarding Screen bug"
+      ],
+      "downloadUrl": "https://dl.dropboxusercontent.com/scl/fi/51nk05xpl4mdd5zuebvoe/Emo-v1.1.0.apk?rlkey=uha85ugnkeiy4rq0vjfrz7gmw&st=wjsdct6c&dl=0",
+      "isCurrent": false,
+      "releaseDate": "2024-11-12T00:00:00.000Z",
+      "version": "1.1.0"
+    }
   },
   "settings": {
-    "elevatePrice": 300
+    "elevatePrice": 500
   },
   "sleepMusic": {
     "-O9BFkDkV6cPVpKDBiLV": {
@@ -30,6 +42,7 @@
   },
   "supportGroups": {
     "-O4OkuI8VFCc8S85EqKF": {
+      "coverImage": "https://firebasestorage.googleapis.com/v0/b/emo-ce9e9.appspot.com/o/group_covers%2F-O4OkuI8VFCc8S85EqKF?alt=media&token=e1d3aeca-00a1-4b2e-81f1-009981c1570a",
       "createdAt": 1723787879780,
       "createdBy": "kUIJWo62nvaoHmRjL5YheyQl1553",
       "description": "A supportive community for those on a journey to recovery from trauma, offering empathy and shared healing",
@@ -97,7 +110,8 @@
         "-O9dPmJHysgjnUDg7GmT": {
           "readBy": {
             "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": true,
-            "kUIJWo62nvaoHmRjL5YheyQl1553": true
+            "kUIJWo62nvaoHmRjL5YheyQl1553": true,
+            "wx7Pg3mlDHRqgzGzFFeqyqt3boy2": true
           },
           "text": "Hi",
           "timestamp": 1729419224577,
@@ -113,14 +127,21 @@
       }
     },
     "-O4Q10Btewp8I9ZMuQNz": {
+      "coverImage": "https://firebasestorage.googleapis.com/v0/b/emo-ce9e9.appspot.com/o/group_covers%2F-O4Q10Btewp8I9ZMuQNz?alt=media&token=b0bdef8b-d805-450f-95a2-f9a19c710299",
       "createdAt": 1723809141900,
       "createdBy": "kUIJWo62nvaoHmRjL5YheyQl1553",
       "description": "A group dedicated to sharing and practicing mindfulness techniques for mental and emotional well-being",
       "id": "-O4Q10Btewp8I9ZMuQNz",
       "members": {
-        "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": true,
-        "kUIJWo62nvaoHmRjL5YheyQl1553": true,
-        "wx7Pg3mlDHRqgzGzFFeqyqt3boy2": true
+        "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": {
+          "name": "Arsha Mary "
+        },
+        "kUIJWo62nvaoHmRjL5YheyQl1553": {
+          "name": "Amal Antoney "
+        },
+        "wx7Pg3mlDHRqgzGzFFeqyqt3boy2": {
+          "name": "Amal Antoney 2"
+        }
       },
       "messages": {
         "-O9aN8k1H2a4Fl4EQd2X": {
@@ -159,7 +180,8 @@
         "-OAOM614h2FXh2TRmpM6": {
           "readBy": {
             "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": true,
-            "kUIJWo62nvaoHmRjL5YheyQl1553": true
+            "kUIJWo62nvaoHmRjL5YheyQl1553": true,
+            "wx7Pg3mlDHRqgzGzFFeqyqt3boy2": true
           },
           "text": "Wassup",
           "timestamp": 1730223567091,
@@ -169,7 +191,8 @@
         "-OAOuLeyeNmiyZlP69Gq": {
           "readBy": {
             "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": true,
-            "kUIJWo62nvaoHmRjL5YheyQl1553": true
+            "kUIJWo62nvaoHmRjL5YheyQl1553": true,
+            "wx7Pg3mlDHRqgzGzFFeqyqt3boy2": true
           },
           "text": "Hooo",
           "timestamp": 1730232806232,
@@ -177,7 +200,7 @@
           "userName": "Amal Antoney "
         }
       },
-      "name": "Mindful Living Collectives",
+      "name": "Mindful Living Collective",
       "typing": {
         "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": false,
         "kUIJWo62nvaoHmRjL5YheyQl1553": false,
@@ -191,6 +214,7 @@
       "description": "Fostering positivity and optimism through shared affirmations and uplifting conversations",
       "id": "-O4RK9zhzYjJ2DdBgMo1",
       "members": {
+        "BdeFQRJHx6axS7bok6GIGx1Cu642": true,
         "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": true,
         "cgacZlNUBESMusInWxtrzjmeBk52": true,
         "kUIJWo62nvaoHmRjL5YheyQl1553": true,
@@ -200,6 +224,7 @@
       "messages": {
         "-O9aN3jPqwtqhU9n1v8F": {
           "readBy": {
+            "BdeFQRJHx6axS7bok6GIGx1Cu642": true,
             "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": true,
             "cgacZlNUBESMusInWxtrzjmeBk52": true,
             "kUIJWo62nvaoHmRjL5YheyQl1553": true,
@@ -213,6 +238,7 @@
         },
         "-O9aNEK38vtyIluqTgDv": {
           "readBy": {
+            "BdeFQRJHx6axS7bok6GIGx1Cu642": true,
             "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": true,
             "cgacZlNUBESMusInWxtrzjmeBk52": true,
             "kUIJWo62nvaoHmRjL5YheyQl1553": true,
@@ -226,6 +252,7 @@
         },
         "-O9aNOOCv3iq5VkOV8Ak": {
           "readBy": {
+            "BdeFQRJHx6axS7bok6GIGx1Cu642": true,
             "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": true,
             "cgacZlNUBESMusInWxtrzjmeBk52": true,
             "kUIJWo62nvaoHmRjL5YheyQl1553": true,
@@ -239,9 +266,11 @@
         },
         "-O9dEXqfy4nXmGXxiL6z": {
           "readBy": {
+            "BdeFQRJHx6axS7bok6GIGx1Cu642": true,
             "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": true,
             "cgacZlNUBESMusInWxtrzjmeBk52": true,
             "kUIJWo62nvaoHmRjL5YheyQl1553": true,
+            "wx7Pg3mlDHRqgzGzFFeqyqt3boy2": true,
             "y94bYStEcqgsObyUGCm0qxnW7mJ3": true
           },
           "text": "Hhjj",
@@ -251,9 +280,11 @@
         },
         "-O9p8ZaromaKI1y5_Co7": {
           "readBy": {
+            "BdeFQRJHx6axS7bok6GIGx1Cu642": true,
             "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": true,
             "cgacZlNUBESMusInWxtrzjmeBk52": true,
             "kUIJWo62nvaoHmRjL5YheyQl1553": true,
+            "wx7Pg3mlDHRqgzGzFFeqyqt3boy2": true,
             "y94bYStEcqgsObyUGCm0qxnW7mJ3": true
           },
           "text": "Yeyy",
@@ -263,9 +294,11 @@
         },
         "-OAM2bdDydI0Go_WxcH8": {
           "readBy": {
+            "BdeFQRJHx6axS7bok6GIGx1Cu642": true,
             "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": true,
             "cgacZlNUBESMusInWxtrzjmeBk52": true,
             "kUIJWo62nvaoHmRjL5YheyQl1553": true,
+            "wx7Pg3mlDHRqgzGzFFeqyqt3boy2": true,
             "y94bYStEcqgsObyUGCm0qxnW7mJ3": true
           },
           "text": "Hi",
@@ -275,9 +308,11 @@
         },
         "-OAM3NuZqg82gFLMlnfN": {
           "readBy": {
+            "BdeFQRJHx6axS7bok6GIGx1Cu642": true,
             "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": true,
             "cgacZlNUBESMusInWxtrzjmeBk52": true,
             "kUIJWo62nvaoHmRjL5YheyQl1553": true,
+            "wx7Pg3mlDHRqgzGzFFeqyqt3boy2": true,
             "y94bYStEcqgsObyUGCm0qxnW7mJ3": true
           },
           "text": "Hi",
@@ -287,9 +322,11 @@
         },
         "-OAM3Q4eGLHlIqUi9G_H": {
           "readBy": {
+            "BdeFQRJHx6axS7bok6GIGx1Cu642": true,
             "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": true,
             "cgacZlNUBESMusInWxtrzjmeBk52": true,
             "kUIJWo62nvaoHmRjL5YheyQl1553": true,
+            "wx7Pg3mlDHRqgzGzFFeqyqt3boy2": true,
             "y94bYStEcqgsObyUGCm0qxnW7mJ3": true
           },
           "text": "Hello",
@@ -299,8 +336,10 @@
         },
         "-OAOM4ZA5rhlZpBEM08v": {
           "readBy": {
+            "BdeFQRJHx6axS7bok6GIGx1Cu642": true,
             "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": true,
             "kUIJWo62nvaoHmRjL5YheyQl1553": true,
+            "wx7Pg3mlDHRqgzGzFFeqyqt3boy2": true,
             "y94bYStEcqgsObyUGCm0qxnW7mJ3": true
           },
           "text": "Hiiii",
@@ -311,8 +350,10 @@
         "-OAOWtCWnCyZoGQ9LeQm": {
           "deletedAt": 1730232788345,
           "readBy": {
+            "BdeFQRJHx6axS7bok6GIGx1Cu642": true,
             "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": true,
             "kUIJWo62nvaoHmRjL5YheyQl1553": true,
+            "wx7Pg3mlDHRqgzGzFFeqyqt3boy2": true,
             "y94bYStEcqgsObyUGCm0qxnW7mJ3": true
           },
           "text": "Message deleted",
@@ -323,8 +364,10 @@
         "-OAOkgbiUhyqsmCA5fZZ": {
           "isSystemMessage": true,
           "readBy": {
+            "BdeFQRJHx6axS7bok6GIGx1Cu642": true,
             "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": true,
             "kUIJWo62nvaoHmRjL5YheyQl1553": true,
+            "wx7Pg3mlDHRqgzGzFFeqyqt3boy2": true,
             "y94bYStEcqgsObyUGCm0qxnW7mJ3": true
           },
           "text": "Amal Antoney  has left the group",
@@ -334,8 +377,10 @@
         },
         "-OAOklAqxY7Amum2pmqW": {
           "readBy": {
+            "BdeFQRJHx6axS7bok6GIGx1Cu642": true,
             "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": true,
             "kUIJWo62nvaoHmRjL5YheyQl1553": true,
+            "wx7Pg3mlDHRqgzGzFFeqyqt3boy2": true,
             "y94bYStEcqgsObyUGCm0qxnW7mJ3": true
           },
           "text": "Patiche",
@@ -346,8 +391,10 @@
         "-OAOl7MYCpUEJFBTdX_1": {
           "isSystemMessage": true,
           "readBy": {
+            "BdeFQRJHx6axS7bok6GIGx1Cu642": true,
             "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": true,
             "kUIJWo62nvaoHmRjL5YheyQl1553": true,
+            "wx7Pg3mlDHRqgzGzFFeqyqt3boy2": true,
             "y94bYStEcqgsObyUGCm0qxnW7mJ3": true
           },
           "text": "Amal Antoney  has left the group",
@@ -358,8 +405,10 @@
         "-OAOlL5pvnZ_TjMhUslA": {
           "isSystemMessage": true,
           "readBy": {
+            "BdeFQRJHx6axS7bok6GIGx1Cu642": true,
             "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": true,
             "kUIJWo62nvaoHmRjL5YheyQl1553": true,
+            "wx7Pg3mlDHRqgzGzFFeqyqt3boy2": true,
             "y94bYStEcqgsObyUGCm0qxnW7mJ3": true
           },
           "text": "Amal Antoney  has joined the group",
@@ -369,8 +418,10 @@
         },
         "-OAOuEbNSWOIyjHyhMrx": {
           "readBy": {
+            "BdeFQRJHx6axS7bok6GIGx1Cu642": true,
             "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": true,
             "kUIJWo62nvaoHmRjL5YheyQl1553": true,
+            "wx7Pg3mlDHRqgzGzFFeqyqt3boy2": true,
             "y94bYStEcqgsObyUGCm0qxnW7mJ3": true
           },
           "replyTo": "-OAOWtCWnCyZoGQ9LeQm",
@@ -381,8 +432,10 @@
         },
         "-OAUX2c_b4uPSVNVp1p4": {
           "readBy": {
+            "BdeFQRJHx6axS7bok6GIGx1Cu642": true,
             "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": true,
             "kUIJWo62nvaoHmRjL5YheyQl1553": true,
+            "wx7Pg3mlDHRqgzGzFFeqyqt3boy2": true,
             "y94bYStEcqgsObyUGCm0qxnW7mJ3": true
           },
           "text": "Hi",
@@ -392,8 +445,10 @@
         },
         "-OAUX3msXMMwGWrgSd8f": {
           "readBy": {
+            "BdeFQRJHx6axS7bok6GIGx1Cu642": true,
             "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": true,
             "kUIJWo62nvaoHmRjL5YheyQl1553": true,
+            "wx7Pg3mlDHRqgzGzFFeqyqt3boy2": true,
             "y94bYStEcqgsObyUGCm0qxnW7mJ3": true
           },
           "text": "Okay",
@@ -404,8 +459,10 @@
         "-OAUX9L-Sa0eQDhQYOM2": {
           "isSystemMessage": true,
           "readBy": {
+            "BdeFQRJHx6axS7bok6GIGx1Cu642": true,
             "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": true,
             "kUIJWo62nvaoHmRjL5YheyQl1553": true,
+            "wx7Pg3mlDHRqgzGzFFeqyqt3boy2": true,
             "y94bYStEcqgsObyUGCm0qxnW7mJ3": true
           },
           "text": "Amal ajce has joined the group",
@@ -416,7 +473,11 @@
         "-OAWunXC_V2TxzJ2nTKI": {
           "deletedAt": 1730368473596,
           "readBy": {
-            "kUIJWo62nvaoHmRjL5YheyQl1553": true
+            "BdeFQRJHx6axS7bok6GIGx1Cu642": true,
+            "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": true,
+            "kUIJWo62nvaoHmRjL5YheyQl1553": true,
+            "wx7Pg3mlDHRqgzGzFFeqyqt3boy2": true,
+            "y94bYStEcqgsObyUGCm0qxnW7mJ3": true
           },
           "replyTo": "-OAOuEbNSWOIyjHyhMrx",
           "text": "Message deleted",
@@ -427,7 +488,11 @@
         "-OAWvhjfr3sthYhhaD5z": {
           "deletedAt": 1730368491260,
           "readBy": {
-            "kUIJWo62nvaoHmRjL5YheyQl1553": true
+            "BdeFQRJHx6axS7bok6GIGx1Cu642": true,
+            "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": true,
+            "kUIJWo62nvaoHmRjL5YheyQl1553": true,
+            "wx7Pg3mlDHRqgzGzFFeqyqt3boy2": true,
+            "y94bYStEcqgsObyUGCm0qxnW7mJ3": true
           },
           "replyTo": "-OAOWtCWnCyZoGQ9LeQm",
           "text": "Message deleted",
@@ -437,7 +502,11 @@
         },
         "-OAX0UN7tUoLFKcRbT1K": {
           "readBy": {
-            "kUIJWo62nvaoHmRjL5YheyQl1553": true
+            "BdeFQRJHx6axS7bok6GIGx1Cu642": true,
+            "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": true,
+            "kUIJWo62nvaoHmRjL5YheyQl1553": true,
+            "wx7Pg3mlDHRqgzGzFFeqyqt3boy2": true,
+            "y94bYStEcqgsObyUGCm0qxnW7mJ3": true
           },
           "text": "Baxjvjsxsskxjkxaxw\nXwxjvaajvjxaxuwuxdq\nXashisdw\nDq\nDkbxiwxbwd",
           "timestamp": 1730368894661,
@@ -446,7 +515,11 @@
         },
         "-OAX0W6VAAIw3M2564Lu": {
           "readBy": {
-            "kUIJWo62nvaoHmRjL5YheyQl1553": true
+            "BdeFQRJHx6axS7bok6GIGx1Cu642": true,
+            "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": true,
+            "kUIJWo62nvaoHmRjL5YheyQl1553": true,
+            "wx7Pg3mlDHRqgzGzFFeqyqt3boy2": true,
+            "y94bYStEcqgsObyUGCm0qxnW7mJ3": true
           },
           "text": "Vhazvavxhvahdjwjdbnwbdhbddvwjbdsqbxwd",
           "timestamp": 1730368901785,
@@ -455,12 +528,303 @@
         },
         "-OAX0W7-WRqDc3kv0pML": {
           "readBy": {
-            "kUIJWo62nvaoHmRjL5YheyQl1553": true
+            "BdeFQRJHx6axS7bok6GIGx1Cu642": true,
+            "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": true,
+            "kUIJWo62nvaoHmRjL5YheyQl1553": true,
+            "wx7Pg3mlDHRqgzGzFFeqyqt3boy2": true,
+            "y94bYStEcqgsObyUGCm0qxnW7mJ3": true
           },
           "text": "Vhazvavxhvahdjwjdbnwbdhbddvwjbdsqbxwd",
           "timestamp": 1730368901860,
           "userId": "kUIJWo62nvaoHmRjL5YheyQl1553",
           "userName": "Amal Antoney "
+        },
+        "-OAX3Ax4HgKFE4xFwtfn": {
+          "readBy": {
+            "BdeFQRJHx6axS7bok6GIGx1Cu642": true,
+            "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": true,
+            "kUIJWo62nvaoHmRjL5YheyQl1553": true,
+            "wx7Pg3mlDHRqgzGzFFeqyqt3boy2": true,
+            "y94bYStEcqgsObyUGCm0qxnW7mJ3": true
+          },
+          "text": "Okay",
+          "timestamp": 1730369601496,
+          "userId": "y94bYStEcqgsObyUGCm0qxnW7mJ3",
+          "userName": "Amal ajce"
+        },
+        "-OAX6JqRXkUuho20gHAk": {
+          "readBy": {
+            "BdeFQRJHx6axS7bok6GIGx1Cu642": true,
+            "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": true,
+            "kUIJWo62nvaoHmRjL5YheyQl1553": true,
+            "wx7Pg3mlDHRqgzGzFFeqyqt3boy2": true
+          },
+          "text": "Yupp",
+          "timestamp": 1730370424356,
+          "userId": "FtqiSFhixZSpoYhU6Ram2I7Iz5x1",
+          "userName": "Arsha Mary "
+        },
+        "-OAX6Kf838rQyORtdSeV": {
+          "readBy": {
+            "BdeFQRJHx6axS7bok6GIGx1Cu642": true,
+            "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": true,
+            "kUIJWo62nvaoHmRjL5YheyQl1553": true,
+            "wx7Pg3mlDHRqgzGzFFeqyqt3boy2": true
+          },
+          "text": "Vannn",
+          "timestamp": 1730370427716,
+          "userId": "FtqiSFhixZSpoYhU6Ram2I7Iz5x1",
+          "userName": "Arsha Mary "
+        },
+        "-OAX6OjSp5YhxoOtkSO4": {
+          "readBy": {
+            "BdeFQRJHx6axS7bok6GIGx1Cu642": true,
+            "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": true,
+            "kUIJWo62nvaoHmRjL5YheyQl1553": true,
+            "wx7Pg3mlDHRqgzGzFFeqyqt3boy2": true
+          },
+          "replyTo": "-OAX3Ax4HgKFE4xFwtfn",
+          "text": "Daahh",
+          "timestamp": 1730370444471,
+          "userId": "FtqiSFhixZSpoYhU6Ram2I7Iz5x1",
+          "userName": "Arsha Mary "
+        },
+        "-OAX6SzTJcW6qhTNhf4h": {
+          "readBy": {
+            "BdeFQRJHx6axS7bok6GIGx1Cu642": true,
+            "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": true,
+            "kUIJWo62nvaoHmRjL5YheyQl1553": true,
+            "wx7Pg3mlDHRqgzGzFFeqyqt3boy2": true
+          },
+          "text": "Vannn",
+          "timestamp": 1730370461840,
+          "userId": "kUIJWo62nvaoHmRjL5YheyQl1553",
+          "userName": "Amal Antoney "
+        },
+        "-OAX6ULR3P2j1EZcmQQw": {
+          "readBy": {
+            "BdeFQRJHx6axS7bok6GIGx1Cu642": true,
+            "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": true,
+            "kUIJWo62nvaoHmRjL5YheyQl1553": true,
+            "wx7Pg3mlDHRqgzGzFFeqyqt3boy2": true
+          },
+          "text": "Work aavndo",
+          "timestamp": 1730370467380,
+          "userId": "kUIJWo62nvaoHmRjL5YheyQl1553",
+          "userName": "Amal Antoney "
+        },
+        "-OAX6VfSLFYlz42_xnpg": {
+          "readBy": {
+            "BdeFQRJHx6axS7bok6GIGx1Cu642": true,
+            "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": true,
+            "kUIJWo62nvaoHmRjL5YheyQl1553": true,
+            "wx7Pg3mlDHRqgzGzFFeqyqt3boy2": true
+          },
+          "text": "Indallooo",
+          "timestamp": 1730370472811,
+          "userId": "FtqiSFhixZSpoYhU6Ram2I7Iz5x1",
+          "userName": "Arsha Mary "
+        },
+        "-OAX6Wv1vqZi6hFf_GgX": {
+          "readBy": {
+            "BdeFQRJHx6axS7bok6GIGx1Cu642": true,
+            "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": true,
+            "kUIJWo62nvaoHmRjL5YheyQl1553": true,
+            "wx7Pg3mlDHRqgzGzFFeqyqt3boy2": true
+          },
+          "text": "Njan typeyv",
+          "timestamp": 1730370478371,
+          "userId": "kUIJWo62nvaoHmRjL5YheyQl1553",
+          "userName": "Amal Antoney "
+        },
+        "-OAX6Wy4qxiIV2xRNtEq": {
+          "readBy": {
+            "BdeFQRJHx6axS7bok6GIGx1Cu642": true,
+            "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": true,
+            "kUIJWo62nvaoHmRjL5YheyQl1553": true,
+            "wx7Pg3mlDHRqgzGzFFeqyqt3boy2": true
+          },
+          "text": "Njan typeyva",
+          "timestamp": 1730370478375,
+          "userId": "kUIJWo62nvaoHmRjL5YheyQl1553",
+          "userName": "Amal Antoney "
+        },
+        "-OAX6YTEEoiKsD9VW3IS": {
+          "readBy": {
+            "BdeFQRJHx6axS7bok6GIGx1Cu642": true,
+            "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": true,
+            "kUIJWo62nvaoHmRjL5YheyQl1553": true,
+            "wx7Pg3mlDHRqgzGzFFeqyqt3boy2": true
+          },
+          "text": "Sheyy",
+          "timestamp": 1730370484251,
+          "userId": "FtqiSFhixZSpoYhU6Ram2I7Iz5x1",
+          "userName": "Arsha Mary "
+        },
+        "-OAX6ZBKG04XevldQIq2": {
+          "readBy": {
+            "BdeFQRJHx6axS7bok6GIGx1Cu642": true,
+            "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": true,
+            "kUIJWo62nvaoHmRjL5YheyQl1553": true,
+            "wx7Pg3mlDHRqgzGzFFeqyqt3boy2": true
+          },
+          "text": "Sheyy illaa",
+          "timestamp": 1730370487210,
+          "userId": "FtqiSFhixZSpoYhU6Ram2I7Iz5x1",
+          "userName": "Arsha Mary "
+        },
+        "-OAX6_5GKiSQewt5loG5": {
+          "readBy": {
+            "BdeFQRJHx6axS7bok6GIGx1Cu642": true,
+            "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": true,
+            "kUIJWo62nvaoHmRjL5YheyQl1553": true,
+            "wx7Pg3mlDHRqgzGzFFeqyqt3boy2": true
+          },
+          "text": "Oru min",
+          "timestamp": 1730370490891,
+          "userId": "FtqiSFhixZSpoYhU6Ram2I7Iz5x1",
+          "userName": "Arsha Mary "
+        },
+        "-OAX6_zMuWnFRgYW0zL5": {
+          "readBy": {
+            "BdeFQRJHx6axS7bok6GIGx1Cu642": true,
+            "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": true,
+            "kUIJWo62nvaoHmRjL5YheyQl1553": true,
+            "wx7Pg3mlDHRqgzGzFFeqyqt3boy2": true
+          },
+          "text": "Nee nthelm typeythe",
+          "timestamp": 1730370494955,
+          "userId": "kUIJWo62nvaoHmRjL5YheyQl1553",
+          "userName": "Amal Antoney "
+        },
+        "-OAX6bzKbBschaGHwa69": {
+          "readBy": {
+            "BdeFQRJHx6axS7bok6GIGx1Cu642": true,
+            "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": true,
+            "kUIJWo62nvaoHmRjL5YheyQl1553": true,
+            "wx7Pg3mlDHRqgzGzFFeqyqt3boy2": true
+          },
+          "text": "Fhhjjjkjhjnnkkjjj",
+          "timestamp": 1730370502730,
+          "userId": "FtqiSFhixZSpoYhU6Ram2I7Iz5x1",
+          "userName": "Arsha Mary "
+        },
+        "-OAX6ckb7BOjUhhFmxhP": {
+          "readBy": {
+            "BdeFQRJHx6axS7bok6GIGx1Cu642": true,
+            "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": true,
+            "kUIJWo62nvaoHmRjL5YheyQl1553": true,
+            "wx7Pg3mlDHRqgzGzFFeqyqt3boy2": true
+          },
+          "text": "Cheyth",
+          "timestamp": 1730370505850,
+          "userId": "FtqiSFhixZSpoYhU6Ram2I7Iz5x1",
+          "userName": "Arsha Mary "
+        },
+        "-OAX6dKF9A97C5kRYlOr": {
+          "readBy": {
+            "BdeFQRJHx6axS7bok6GIGx1Cu642": true,
+            "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": true,
+            "kUIJWo62nvaoHmRjL5YheyQl1553": true,
+            "wx7Pg3mlDHRqgzGzFFeqyqt3boy2": true
+          },
+          "text": "Ndooo",
+          "timestamp": 1730370508251,
+          "userId": "FtqiSFhixZSpoYhU6Ram2I7Iz5x1",
+          "userName": "Arsha Mary "
+        },
+        "-OAX6dx0CLPjGCYBgsK9": {
+          "readBy": {
+            "BdeFQRJHx6axS7bok6GIGx1Cu642": true,
+            "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": true,
+            "kUIJWo62nvaoHmRjL5YheyQl1553": true,
+            "wx7Pg3mlDHRqgzGzFFeqyqt3boy2": true
+          },
+          "text": "Ndooo",
+          "timestamp": 1730370510731,
+          "userId": "FtqiSFhixZSpoYhU6Ram2I7Iz5x1",
+          "userName": "Arsha Mary "
+        },
+        "-OAX6eqaSZidrSngwNPN": {
+          "readBy": {
+            "BdeFQRJHx6axS7bok6GIGx1Cu642": true,
+            "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": true,
+            "kUIJWo62nvaoHmRjL5YheyQl1553": true,
+            "wx7Pg3mlDHRqgzGzFFeqyqt3boy2": true
+          },
+          "text": "Illalloo",
+          "timestamp": 1730370514491,
+          "userId": "FtqiSFhixZSpoYhU6Ram2I7Iz5x1",
+          "userName": "Arsha Mary "
+        },
+        "-OAX6gXURN5Sv4WO3ZNS": {
+          "readBy": {
+            "BdeFQRJHx6axS7bok6GIGx1Cu642": true,
+            "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": true,
+            "kUIJWo62nvaoHmRjL5YheyQl1553": true,
+            "wx7Pg3mlDHRqgzGzFFeqyqt3boy2": true
+          },
+          "text": "Aavanillale",
+          "timestamp": 1730370521505,
+          "userId": "kUIJWo62nvaoHmRjL5YheyQl1553",
+          "userName": "Amal Antoney "
+        },
+        "-OAX716jO6WZVPaPkhBz": {
+          "readBy": {
+            "BdeFQRJHx6axS7bok6GIGx1Cu642": true,
+            "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": true,
+            "kUIJWo62nvaoHmRjL5YheyQl1553": true,
+            "wx7Pg3mlDHRqgzGzFFeqyqt3boy2": true
+          },
+          "text": "Illa",
+          "timestamp": 1730370609796,
+          "userId": "FtqiSFhixZSpoYhU6Ram2I7Iz5x1",
+          "userName": "Arsha Mary "
+        },
+        "-OAX9efnXj7kIy0VSSW7": {
+          "readBy": {
+            "BdeFQRJHx6axS7bok6GIGx1Cu642": true,
+            "kUIJWo62nvaoHmRjL5YheyQl1553": true,
+            "wx7Pg3mlDHRqgzGzFFeqyqt3boy2": true
+          },
+          "text": "Oky",
+          "timestamp": 1730371300587,
+          "userId": "kUIJWo62nvaoHmRjL5YheyQl1553",
+          "userName": "Amal Antoney "
+        },
+        "-OAX9ez1iZxUOhpQRDL9": {
+          "readBy": {
+            "BdeFQRJHx6axS7bok6GIGx1Cu642": true,
+            "kUIJWo62nvaoHmRjL5YheyQl1553": true,
+            "wx7Pg3mlDHRqgzGzFFeqyqt3boy2": true
+          },
+          "text": "Oky",
+          "timestamp": 1730371301725,
+          "userId": "kUIJWo62nvaoHmRjL5YheyQl1553",
+          "userName": "Amal Antoney "
+        },
+        "-OB-ct9TcKMxjHxtKqFl": {
+          "readBy": {
+            "BdeFQRJHx6axS7bok6GIGx1Cu642": true,
+            "kUIJWo62nvaoHmRjL5YheyQl1553": true,
+            "wx7Pg3mlDHRqgzGzFFeqyqt3boy2": true
+          },
+          "replyTo": "-OAX9efnXj7kIy0VSSW7",
+          "text": "Ha",
+          "timestamp": 1730882540300,
+          "userId": "wx7Pg3mlDHRqgzGzFFeqyqt3boy2",
+          "userName": "Amal Antoney 2"
+        },
+        "-OBYrk5y2ddd1yEi-RN9": {
+          "isSystemMessage": true,
+          "readBy": {
+            "BdeFQRJHx6axS7bok6GIGx1Cu642": true,
+            "kUIJWo62nvaoHmRjL5YheyQl1553": true
+          },
+          "text": "Ujj has joined the group",
+          "timestamp": 1731473637928,
+          "userId": "system",
+          "userName": "System"
         }
       },
       "name": "Positive Vibes",
@@ -468,11 +832,161 @@
         "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": false,
         "cgacZlNUBESMusInWxtrzjmeBk52": false,
         "kUIJWo62nvaoHmRjL5YheyQl1553": false,
-        "wx7Pg3mlDHRqgzGzFFeqyqt3boy2": false
+        "wx7Pg3mlDHRqgzGzFFeqyqt3boy2": false,
+        "y94bYStEcqgsObyUGCm0qxnW7mJ3": false
+      }
+    },
+    "-OBU-yb466kHfPsLgGjq": {
+      "createdAt": 1731392170588,
+      "createdBy": "kUIJWo62nvaoHmRjL5YheyQl1553",
+      "description": "Supportive community for individuals seeking to navigate life's challenges together. Whether you're dealing with stress, anxiety, grief, or personal growth, our group provides a judgment-free space to share experiences, gain insights, and build resilience.",
+      "id": "-OBU-yb466kHfPsLgGjq",
+      "name": "Haven Circle",
+      "typing": {
+        "SLmDUzbEhrNwpoyscBtOEr98L582": false
       }
     }
   },
+  "therapists": {
+    "-OJ9ViSmxgtHgvRW-2wG": {
+      "availability": "Weekends Only",
+      "bio": "I am Prasad Varghese, M.Sc. Psychiatry, with over five years of experience in mental health care. My approach is client-centered, combining evidence-based techniques to support individuals in managing stress, anxiety, and emotional challenges. I am passionate about creating a safe and non-judgmental space for clients to explore their thoughts and feelings.",
+      "createdAt": 1739638106434,
+      "education": "Msc Psychiatry",
+      "email": "prasadv@gmail.com",
+      "experience": "5",
+      "hourlyRate": "1500",
+      "languages": "malayalam, english",
+      "licenseNumber": "21314141",
+      "name": "Prasad Varkey",
+      "phone": "9567641392",
+      "specialization": "general therapy",
+      "uid": "Vi7gZT8wYgVTznMtRrNYfrCZTLg2"
+    }
+  },
   "users": {
+    "3xmKZiTe8OXPJgFoNRwnZfDjQm92": {
+      "createdAt": 1739637592618,
+      "email": "vprasad@gmail.com",
+      "isActive": true,
+      "role": "therapist"
+    },
+    "BdeFQRJHx6axS7bok6GIGx1Cu642": {
+      "age": "11",
+      "challenges": {
+        "exercise": 0,
+        "gratitude": 0,
+        "journal": 0,
+        "mindfulness": 0,
+        "positivity": 0,
+        "sleep": 0,
+        "social": 0
+      },
+      "completedChallenges": 0,
+      "concerns": [
+        "Relationships"
+      ],
+      "email": "mrkuttusan@gmail.com",
+      "emoElevate": {
+        "active": true,
+        "amount": "500",
+        "expiryDate": "2024-12-13T04:53:43.359Z",
+        "lastPaymentDate": "2024-11-13T04:53:43.362Z",
+        "orderId": "order_PKfEwNuT9dwENy",
+        "paymentId": "pay_PKfFE872NXtP8S",
+        "startDate": "2024-11-13T04:53:43.359Z",
+        "subscriptionType": "1_month"
+      },
+      "gender": "Male",
+      "goals": [
+        "Reduce Stress"
+      ],
+      "interests": [
+        "Sports"
+      ],
+      "isActive": true,
+      "languagePreference": "Malayalam",
+      "moodEntries": {
+        "-OBYrsVGpNEx_27rJqU4": {
+          "date": "2024-11-13",
+          "mood": 9,
+          "notes": "",
+          "physicalActivity": 3,
+          "sleepQuality": 9,
+          "stressLevel": 7
+        },
+        "-OBYrt8z7-vylE2ZnPr2": {
+          "date": "2024-11-07",
+          "mood": 9,
+          "notes": "Random entry for Thu Nov 07 2024",
+          "physicalActivity": 10,
+          "sleepQuality": 1,
+          "stressLevel": 1
+        },
+        "-OBYrtCg7rZd2nQ_L2bj": {
+          "date": "2024-11-08",
+          "mood": 4,
+          "notes": "Random entry for Fri Nov 08 2024",
+          "physicalActivity": 10,
+          "sleepQuality": 6,
+          "stressLevel": 9
+        },
+        "-OBYrtGo47IHolg7ke1v": {
+          "date": "2024-11-09",
+          "mood": 3,
+          "notes": "Random entry for Sat Nov 09 2024",
+          "physicalActivity": 6,
+          "sleepQuality": 9,
+          "stressLevel": 5
+        },
+        "-OBYrtKClDQxGkOVKHSa": {
+          "date": "2024-11-10",
+          "mood": 4,
+          "notes": "Random entry for Sun Nov 10 2024",
+          "physicalActivity": 8,
+          "sleepQuality": 8,
+          "stressLevel": 4
+        },
+        "-OBYrtNmQWqZpQMmAmJY": {
+          "date": "2024-11-11",
+          "mood": 2,
+          "notes": "Random entry for Mon Nov 11 2024",
+          "physicalActivity": 9,
+          "sleepQuality": 4,
+          "stressLevel": 3
+        },
+        "-OBYrtRDd198nlJ9u6sj": {
+          "date": "2024-11-12",
+          "mood": 7,
+          "notes": "Random entry for Tue Nov 12 2024",
+          "physicalActivity": 1,
+          "sleepQuality": 3,
+          "stressLevel": 9
+        },
+        "-OBYrtUg5K_Z0x2XIOkp": {
+          "date": "2024-11-13",
+          "mood": 4,
+          "notes": "Random entry for Wed Nov 13 2024",
+          "physicalActivity": 2,
+          "sleepQuality": 10,
+          "stressLevel": 1
+        }
+      },
+      "name": "Ujj",
+      "predictions": {
+        "2024-11-14": {
+          "predictedMood": 5.9,
+          "recommendation": {
+            "message": "Tomorrow's mood is looking bright! Take a moment to plan a relaxing evening routine.",
+            "suggestion": "Practice gentle stretches and meditation before bed to set a positive tone for tomorrow."
+          }
+        }
+      },
+      "preferredTherapyType": "Humanistic Therapy",
+      "previousTherapyExperience": "None",
+      "role": "user",
+      "sleepHabits": "Early bird"
+    },
     "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": {
       "age": "22",
       "challenges": {
@@ -1345,6 +1859,12 @@
       "role": "user",
       "sleepHabits": "Night owl"
     },
+    "Vi7gZT8wYgVTznMtRrNYfrCZTLg2": {
+      "createdAt": 1739638106335,
+      "email": "prasadv@gmail.com",
+      "isActive": true,
+      "role": "therapist"
+    },
     "Xm4C7jGQhsVhuVHr4BZWko2TxKt2": {
       "age": "20",
       "challenges": {
@@ -1376,7 +1896,7 @@
         "Travel",
         "Cooking"
       ],
-      "isActive": true,
+      "isActive": false,
       "languagePreference": "English",
       "name": "Salitta jacob ",
       "preferredTherapyType": "Mindfulness-Based Therapy",
@@ -1488,6 +2008,44 @@
       "role": "user",
       "sleepHabits": "Night owl"
     },
+    "fv58jeQqYwSYr5XeaouDzJVbrel1": {
+      "age": "20",
+      "challenges": {
+        "exercise": 0,
+        "gratitude": 0,
+        "journal": 0,
+        "mindfulness": 0,
+        "positivity": 0,
+        "sleep": 0,
+        "social": 0
+      },
+      "completedChallenges": 0,
+      "concerns": [
+        "Anxiety",
+        "Stress",
+        "Work-life Balance"
+      ],
+      "email": "anilaantoney2@gmail.com",
+      "gender": "Female",
+      "goals": [
+        "Improve Sleep",
+        "Manage Anxiety",
+        "Reduce Stress",
+        "Increase Productivity",
+        "Boost Mood"
+      ],
+      "interests": [
+        "Reading",
+        "Cooking"
+      ],
+      "isActive": true,
+      "languagePreference": "English",
+      "name": "Anila",
+      "preferredTherapyType": "Mindfulness-Based Therapy",
+      "previousTherapyExperience": "None",
+      "role": "user",
+      "sleepHabits": "Night owl"
+    },
     "iX0UBwRg6NZwSdmrsTekAkya0ff1": {
       "age": "21",
       "challenges": {
@@ -1567,6 +2125,14 @@
         "-O9on9pfa-9xPvI7OPp7": {
           "content": "Hi",
           "date": "2024-10-22"
+        },
+        "-OAg-e6PU5siP00P2C6r": {
+          "content": "Haha",
+          "date": "2024-11-02"
+        },
+        "-OBYqKUUtbQqlweXwnr_": {
+          "content": "Rfg",
+          "date": "2024-11-13"
         }
       },
       "gender": "Male",
@@ -1612,6 +2178,16 @@
             "Jvkbivbbkj",
             "Bj",
             "Bjb"
+          ]
+        },
+        "-OBYpp9eCjKoxgXLygY8": {
+          "date": "2024-11-13T04:45:34.262Z",
+          "entries": [
+            "Ftt",
+            "Drf",
+            "Trtgf",
+            "Gfc",
+            "Ctt"
           ]
         }
       },
@@ -1708,6 +2284,22 @@
           "physicalActivity": 5,
           "sleepQuality": 8,
           "stressLevel": 6
+        },
+        "-OAX9rp5xniwU4IA8sId": {
+          "date": "2024-10-31",
+          "mood": 10,
+          "notes": "",
+          "physicalActivity": 7,
+          "sleepQuality": 7,
+          "stressLevel": 2
+        },
+        "-OBt-D8jaTsI0gmY4AJD": {
+          "date": "2024-11-17",
+          "mood": 8,
+          "notes": "",
+          "physicalActivity": 8,
+          "sleepQuality": 5,
+          "stressLevel": 4
         }
       },
       "moodRecommendations": {
@@ -1789,6 +2381,34 @@
             "message": "Tomorrow's mood is looking a bit low, but with a plan, you can turn it around!",
             "suggestion": "Get a good night's sleep and plan a fun activity for tomorrow morning to boost your mood!"
           }
+        },
+        "2024-11-01": {
+          "predictedMood": 8.1,
+          "recommendation": {
+            "message": "Tomorrow's high mood score suggests a great day ahead, stay positive and focused!",
+            "suggestion": "Get a good night's sleep to ensure a refreshed and energized tomorrow."
+          }
+        },
+        "2024-11-18": {
+          "predictedMood": 6.1,
+          "recommendation": {
+            "message": "Tomorrow's mood is looking bright! Take a moment to plan a relaxing evening routine.",
+            "suggestion": "Practice gentle stretches or meditation before bed to unwind and set a positive tone."
+          }
+        },
+        "2024-12-31": {
+          "predictedMood": 4.8,
+          "recommendation": {
+            "message": "Tomorrow's mood is looking bright! Take a moment to plan a relaxing evening routine.",
+            "suggestion": "Practice gentle stretches or meditation before bed to unwind and set a positive tone."
+          }
+        },
+        "2025-02-11": {
+          "predictedMood": 4.8,
+          "recommendation": {
+            "message": "Tomorrow's mood is looking bright! Take a moment to plan a relaxing evening routine.",
+            "suggestion": "Practice gentle stretches or meditation before bed to unwind and set a positive tone."
+          }
         }
       },
       "preferredTherapyType": "Mindfulness-Based Therapy",
@@ -1813,6 +2433,42 @@
         }
       },
       "sleepHabits": "Early bird"
+    },
+    "m3RsRIRSvLcm1MTqjJkbPjSG2OS2": {
+      "age": "18",
+      "challenges": {
+        "exercise": 0,
+        "gratitude": 0,
+        "journal": 0,
+        "mindfulness": 0,
+        "positivity": 0,
+        "sleep": 0,
+        "social": 0
+      },
+      "completedChallenges": 0,
+      "concerns": [
+        "Depression",
+        "Anxiety",
+        "Stress",
+        "Relationships"
+      ],
+      "email": "teresapappachen@gmail.com",
+      "gender": "Female",
+      "goals": [
+        "Reduce Stress",
+        "Manage Anxiety",
+        "Increase Productivity"
+      ],
+      "interests": [
+        "Music"
+      ],
+      "isActive": true,
+      "languagePreference": "English",
+      "name": "Teresa",
+      "preferredTherapyType": "Mindfulness-Based Therapy",
+      "previousTherapyExperience": "None",
+      "role": "user",
+      "sleepHabits": "Irregular sleep pattern"
     },
     "wx7Pg3mlDHRqgzGzFFeqyqt3boy2": {
       "age": 22,
@@ -2018,10 +2674,34 @@
           "physicalActivity": 5,
           "sleepQuality": 5,
           "stressLevel": 7
+        },
+        "-OAXYLGAUo3-hBX2Z89I": {
+          "date": "2024-10-31",
+          "mood": 9,
+          "notes": "",
+          "physicalActivity": 4,
+          "sleepQuality": 5,
+          "stressLevel": 3
         }
       },
       "name": "Amal Antoney 2",
       "photoURL": "https://firebasestorage.googleapis.com/v0/b/emo-ce9e9.appspot.com/o/profile_images%2Fwx7Pg3mlDHRqgzGzFFeqyqt3boy2%2Fwx7Pg3mlDHRqgzGzFFeqyqt3boy2_profile_image.jpg?alt=media&token=9459f185-55cc-4eca-b2fc-6da5e3a7f160",
+      "predictions": {
+        "2024-11-01": {
+          "predictedMood": 6,
+          "recommendation": {
+            "message": "Tomorrow's mood is looking a bit low, but you've got this! Take it one step at a time.",
+            "suggestion": "Get a good night's sleep and plan a small, enjoyable activity for tomorrow morning."
+          }
+        },
+        "2024-11-07": {
+          "predictedMood": 5.3,
+          "recommendation": {
+            "message": "Tomorrow's mood is looking a bit low, but you've got this! Take it one step at a time.",
+            "suggestion": "Get a good night's sleep and plan a small, enjoyable activity for tomorrow morning."
+          }
+        }
+      },
       "preferredTherapyType": "Humanistic Therapy",
       "previousTherapyExperience": "Some",
       "role": "user",
@@ -2133,6 +2813,7 @@
         }
       },
       "name": "Amal ajce",
+      "photoURL": "https://firebasestorage.googleapis.com/v0/b/emo-ce9e9.appspot.com/o/profile_images%2Fy94bYStEcqgsObyUGCm0qxnW7mJ3%2Fy94bYStEcqgsObyUGCm0qxnW7mJ3_profile_image.jpg?alt=media&token=0e6d59c8-05e6-4196-9a61-a73ef54cab70",
       "predictions": {
         "2024-10-21": {
           "predictedMood": 9.6,
