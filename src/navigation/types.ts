@@ -90,4 +90,9 @@ export type RootStackParamList = {
   JournalHistory: undefined;
   EmoElevate: undefined;
   ManageElevate: undefined;
+  AIChatScreen: undefined;
+  StreakInfo: {
+    streak: number;
+    lastLoginTimestamp: number;
+  };
 };

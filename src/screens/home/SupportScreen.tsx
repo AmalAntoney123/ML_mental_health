@@ -7,6 +7,8 @@ import auth from '@react-native-firebase/auth';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../../navigation/types';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { HfInference } from '@huggingface/inference';
+import { HUGGINGFACE_API_KEY } from '../../config';
 
 interface SupportGroup {
   id: string;
@@ -157,6 +159,23 @@ const SupportScreen: React.FC = () => {
           <Icon name="add" size={24} color={colors.primary} />
         </TouchableOpacity>
       </View>
+      {/* AI Chat Card */}
+      <TouchableOpacity 
+        style={[styles.aiChatCard, { backgroundColor: colors.surface }]}
+        onPress={() => navigation.navigate('AIChatScreen')}
+      >
+        <View style={styles.aiChatContent}>
+          <Icon name="psychology" size={32} color={colors.primary} />
+          <View style={styles.aiChatInfo}>
+            <Text style={[styles.aiChatTitle, { color: colors.text }]}>
+              Emo Assistant
+            </Text>
+            <Text style={[styles.aiChatDescription, { color: colors.text }]}>
+              Your 24/7 mental health companion. Share your thoughts and get supportive responses.
+            </Text>
+          </View>
+        </View>
+      </TouchableOpacity>
       {joinedGroups.length === 0 ? (
         <View style={styles.noGroupsContainer}>
           <Text style={[styles.noGroupsText, { color: colors.text }]}>You haven't joined any groups yet.</Text>
@@ -271,6 +290,36 @@ const styles = StyleSheet.create({
   unreadCount: {
     fontSize: 12,
     fontWeight: 'bold',
+  },
+  aiChatCard: {
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+    elevation: 3,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+  },
+  aiChatContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  aiChatInfo: {
+    marginLeft: 16,
+    flex: 1,
+  },
+  aiChatTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 4,
+  },
+  aiChatDescription: {
+    fontSize: 14,
+    lineHeight: 20,
   },
 });
 

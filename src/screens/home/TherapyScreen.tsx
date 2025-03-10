@@ -4,7 +4,6 @@ import { useTheme } from '../../context/ThemeContext';
 import { Card, Avatar, Searchbar, Button, ActivityIndicator, Chip } from 'react-native-paper';
 import database, { FirebaseDatabaseTypes } from '@react-native-firebase/database';
 import { useAuth } from '../../utils/auth';
-import Clipboard from '@react-native-community/clipboard';
 
 interface Therapist {
   id: string;
@@ -163,12 +162,15 @@ const TherapyScreen: React.FC = () => {
   };
 
   const renderBookingButton = (therapist: Therapist) => {
-    const status = getBookingStatus(therapist.id);
-    const booking = Object.values(therapistBookings).find(
+    const existingBookings = Object.values(therapistBookings).filter(
       b => b.therapistId === therapist.id && b.userId === user?.uid
     );
     
-    if (status === 'pending') {
+    const activeBooking = existingBookings.find(
+      b => b.status === 'pending' || b.status === 'confirmed'
+    );
+    
+    if (activeBooking?.status === 'pending') {
       return (
         <TouchableOpacity 
           style={[styles.bookButton, { backgroundColor: colors.surface }]}
@@ -181,12 +183,12 @@ const TherapyScreen: React.FC = () => {
       );
     }
     
-    if (status === 'confirmed' && booking) {
+    if (activeBooking?.status === 'confirmed') {
       return (
         <TouchableOpacity 
           style={[styles.bookButton, { backgroundColor: colors.primary }]}
           onPress={() => {
-            setSelectedBooking(booking);
+            setSelectedBooking(activeBooking);
             setModalVisible(true);
           }}
         >
@@ -215,7 +217,7 @@ const TherapyScreen: React.FC = () => {
       return;
     }
 
-    // Check if there's already a pending booking with this therapist
+    // Check if there's already a pending or confirmed booking with this therapist
     const therapistBookingsRef = database().ref(`therapists/${therapist.id}/bookings`);
     const existingBookingSnapshot = await therapistBookingsRef
       .orderByChild('userId')
@@ -223,8 +225,15 @@ const TherapyScreen: React.FC = () => {
       .once('value');
 
     if (existingBookingSnapshot.exists()) {
-      Alert.alert('Booking Exists', 'You already have a booking with this therapist');
-      return;
+      const bookings = existingBookingSnapshot.val();
+      const hasActiveBooking = Object.values(bookings).some((booking: any) => 
+        booking.status === 'pending' || booking.status === 'confirmed'
+      );
+
+      if (hasActiveBooking) {
+        Alert.alert('Booking Exists', 'You already have an active booking with this therapist');
+        return;
+      }
     }
 
     try {

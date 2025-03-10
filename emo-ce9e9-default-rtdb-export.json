@@ -862,12 +862,133 @@
       "phone": "9567641392",
       "specialization": "general therapy",
       "uid": "Vi7gZT8wYgVTznMtRrNYfrCZTLg2"
+    },
+    "-OJ9epn9Bx8X8FPNnH2A": {
+      "availability": "Weekdays 9AM-5PM",
+      "bio": "kjahsdajkdbnamdas, makdjaskm a, amlsd jwpihjncs da ",
+      "createdAt": 1739640757980,
+      "education": "aaaa",
+      "email": "amalantoney4@gmail.com",
+      "experience": "6",
+      "hourlyRate": "1700",
+      "languages": "english, hindi",
+      "licenseNumber": "1231421213",
+      "name": "Mary Joseph",
+      "phone": "9567641392",
+      "specialization": "Therapy",
+      "uid": "bu4OnGyK6CUfDNxpeiDcO5L2vMJ2"
+    },
+    "-OJ9i3eBixtRPmSX2BJf": {
+      "availability": "Weekdays 9AM-5PM",
+      "bio": "asdad asd adahk jsdhaskda ada da d",
+      "createdAt": 1739641605197,
+      "education": "sfsasda",
+      "email": "palavi@gmail.com",
+      "experience": "3",
+      "hourlyRate": "2500",
+      "languages": "english, tamil",
+      "licenseNumber": "3425252525",
+      "name": "Palavi Surendran",
+      "phone": "8745673485",
+      "specialization": "adaas",
+      "uid": "HugdVub4NNeLjgCrEAR8dTeQnyI2"
+    },
+    "-OJ9iTIbNJYImRsyOiH3": {
+      "availability": "Weekdays 9AM-5PM",
+      "bio": "adssa da sdad asd ad ada dadad",
+      "bookings": {
+        "-OJEmMMwFdDt3EbPx7ev": {
+          "id": "-OJEmMMwFdDt3EbPx7ev",
+          "requestedAt": 1739726615063,
+          "status": "pending",
+          "therapistId": "-OJ9iTIbNJYImRsyOiH3",
+          "therapistName": "Alan George",
+          "userId": "kUIJWo62nvaoHmRjL5YheyQl1553",
+          "userName": "Amal Antoney"
+        }
+      },
+      "createdAt": 1739641710245,
+      "education": "adad",
+      "email": "alang@gmail.com",
+      "experience": "3",
+      "hourlyRate": "1600",
+      "languages": "english, french",
+      "licenseNumber": "asdadssas",
+      "name": "Alan George",
+      "phone": "73464835743",
+      "specialization": "sda",
+      "uid": "BWOOpLWkqeVAK35zcsidtxvYgEX2"
+    },
+    "-OJ9s6xojCkuUP2oVUgC": {
+      "availability": "Weekdays 9AM-5PM",
+      "bio": "adadadada ada",
+      "createdAt": 1739644240300,
+      "education": "dadad",
+      "email": "amallsimone@mail.com",
+      "experience": "3",
+      "hourlyRate": "2733",
+      "languages": "english",
+      "licenseNumber": "324242",
+      "name": "Simone Cowel",
+      "phone": "984545635",
+      "specialization": "dsad",
+      "uid": "SwDX0ZgpXRQwcwh61ero2iQ7QQH2"
+    },
+    "-OJCenWhMo6VBL-PZ8Rm": {
+      "availability": "Weekdays Evening",
+      "bio": "sdaa dad aadsad",
+      "bookings": {
+        "-OJD2kqooih1Yb0V9Wq1": {
+          "hasNotes": true,
+          "id": "-OJD2kqooih1Yb0V9Wq1",
+          "meetLink": "meet.google.com/qmk-gfgt-dqx",
+          "requestedAt": 1739697621533,
+          "scheduledDate": "February 10, 2025",
+          "scheduledTime": "02:57 PM",
+          "status": "completed",
+          "therapistId": "-OJCenWhMo6VBL-PZ8Rm",
+          "therapistName": "Adam Joan",
+          "updatedAt": 1739698028636,
+          "userId": "kUIJWo62nvaoHmRjL5YheyQl1553",
+          "userName": "Amal Antoney"
+        },
+        "-OJEq2cQOUuPgX0d4vjH": {
+          "id": "-OJEq2cQOUuPgX0d4vjH",
+          "meetLink": "meet.google.com/qdk-icqz-zhs",
+          "requestedAt": 1739727582773,
+          "scheduledDate": "February 20, 2025",
+          "scheduledTime": "02:00 PM",
+          "status": "confirmed",
+          "therapistId": "-OJCenWhMo6VBL-PZ8Rm",
+          "therapistName": "Adam Joan",
+          "updatedAt": 1739727802828,
+          "userId": "kUIJWo62nvaoHmRjL5YheyQl1553",
+          "userName": "Amal Antoney"
+        }
+      },
+      "createdAt": 1739691081021,
+      "education": "adad",
+      "email": "adamjoan@gmail.com",
+      "experience": "9",
+      "hourlyRate": "700",
+      "languages": "english, malayalam",
+      "licenseNumber": "897429872893",
+      "name": "Adam Joan",
+      "phone": "9876745678",
+      "specialization": "asds",
+      "uid": "CGdUt1UXgjeYajWle1CUE84IAfu1"
     }
   },
   "users": {
     "3xmKZiTe8OXPJgFoNRwnZfDjQm92": {
       "createdAt": 1739637592618,
       "email": "vprasad@gmail.com",
+      "isActive": true,
+      "role": "therapist"
+    },
+    "BWOOpLWkqeVAK35zcsidtxvYgEX2": {
+      "createdAt": 1739641710162,
+      "email": "alang@gmail.com",
       "isActive": true,
       "role": "therapist"
     },
@@ -986,6 +1107,12 @@
       "previousTherapyExperience": "None",
       "role": "user",
       "sleepHabits": "Early bird"
+    },
+    "CGdUt1UXgjeYajWle1CUE84IAfu1": {
+      "createdAt": 1739691080850,
+      "email": "adamjoan@gmail.com",
+      "isActive": true,
+      "role": "therapist"
     },
     "FtqiSFhixZSpoYhU6Ram2I7Iz5x1": {
       "age": "22",
@@ -1820,6 +1947,18 @@
       "role": "admin",
       "sleepHabits": "Night owl"
     },
+    "HugdVub4NNeLjgCrEAR8dTeQnyI2": {
+      "createdAt": 1739641605090,
+      "email": "palavi@gmail.com",
+      "isActive": true,
+      "role": "therapist"
+    },
+    "SwDX0ZgpXRQwcwh61ero2iQ7QQH2": {
+      "createdAt": 1739644240022,
+      "email": "amallsimone@mail.com",
+      "isActive": true,
+      "role": "therapist"
+    },
     "TkzDkG7Nj6XfnjYxJs8PMm4BrvC3": {
       "age": "23",
       "challenges": {
@@ -1903,6 +2042,12 @@
       "previousTherapyExperience": "None",
       "role": "user",
       "sleepHabits": "Night owl"
+    },
+    "bu4OnGyK6CUfDNxpeiDcO5L2vMJ2": {
+      "createdAt": 1739640757898,
+      "email": "amalantoney4@gmail.com",
+      "isActive": true,
+      "role": "therapist"
     },
     "cgacZlNUBESMusInWxtrzjmeBk52": {
       "age": "22",
@@ -2300,6 +2445,62 @@
           "physicalActivity": 8,
           "sleepQuality": 5,
           "stressLevel": 4
+        },
+        "-OJCpkoA-F_ybjMdtIwl": {
+          "date": "2025-02-10",
+          "mood": 8,
+          "notes": "Random entry for Mon Feb 10 2025",
+          "physicalActivity": 5,
+          "sleepQuality": 10,
+          "stressLevel": 1
+        },
+        "-OJCpkyj0rZ8wcQ-eqkw": {
+          "date": "2025-02-11",
+          "mood": 7,
+          "notes": "Random entry for Tue Feb 11 2025",
+          "physicalActivity": 6,
+          "sleepQuality": 2,
+          "stressLevel": 1
+        },
+        "-OJCpl8-QEFArPP1hozb": {
+          "date": "2025-02-12",
+          "mood": 10,
+          "notes": "Random entry for Wed Feb 12 2025",
+          "physicalActivity": 3,
+          "sleepQuality": 6,
+          "stressLevel": 1
+        },
+        "-OJCplIWzgPsFDBkepDe": {
+          "date": "2025-02-13",
+          "mood": 4,
+          "notes": "Random entry for Thu Feb 13 2025",
+          "physicalActivity": 10,
+          "sleepQuality": 1,
+          "stressLevel": 2
+        },
+        "-OJCplTSQiOiQGZ1jJdh": {
+          "date": "2025-02-14",
+          "mood": 7,
+          "notes": "Random entry for Fri Feb 14 2025",
+          "physicalActivity": 5,
+          "sleepQuality": 6,
+          "stressLevel": 3
+        },
+        "-OJCpldA3CDhlZLc4Z-j": {
+          "date": "2025-02-15",
+          "mood": 9,
+          "notes": "Random entry for Sat Feb 15 2025",
+          "physicalActivity": 7,
+          "sleepQuality": 1,
+          "stressLevel": 3
+        },
+        "-OJCplnnBCEZf2N9otPi": {
+          "date": "2025-02-16",
+          "mood": 2,
+          "notes": "Random entry for Sun Feb 16 2025",
+          "physicalActivity": 8,
+          "sleepQuality": 1,
+          "stressLevel": 3
         }
       },
       "moodRecommendations": {
@@ -2409,6 +2610,13 @@
             "message": "Tomorrow's mood is looking bright! Take a moment to plan a relaxing evening routine.",
             "suggestion": "Practice gentle stretches or meditation before bed to unwind and set a positive tone."
           }
+        },
+        "2025-02-17": {
+          "predictedMood": 5.4,
+          "recommendation": {
+            "message": "Tomorrow's mood is looking a bit low, but you've got this! Stay positive and focused.",
+            "suggestion": "Get a good night's sleep and plan a fun activity for tomorrow to boost your mood."
+          }
         }
       },
       "preferredTherapyType": "Mindfulness-Based Therapy",
@@ -2432,7 +2640,17 @@
           ]
         }
       },
-      "sleepHabits": "Early bird"
+      "sleepHabits": "Early bird",
+      "therapyNotes": {
+        "-OJD2kqooih1Yb0V9Wq1": {
+          "notes": "very good kid",
+          "sessionDate": "February 10, 2025",
+          "sessionTime": "02:57 PM",
+          "therapistId": "CGdUt1UXgjeYajWle1CUE84IAfu1",
+          "therapistName": "Adam Joan",
+          "updatedAt": 1739725858306
+        }
+      }
     },
     "m3RsRIRSvLcm1MTqjJkbPjSG2OS2": {
       "age": "18",
@@ -2469,6 +2687,18 @@
       "previousTherapyExperience": "None",
       "role": "user",
       "sleepHabits": "Irregular sleep pattern"
+    },
+    "mw9v6epfxbR4XIvLQZKxGXPiK8F2": {
+      "createdAt": 1739641986856,
+      "email": "someone@gmail.com",
+      "isActive": true,
+      "role": "therapist"
+    },
+    "uu4moTW8qXekZQvSQZp9rQETa5g2": {
+      "createdAt": 1739641290558,
+      "email": "palavi@mail.com",
+      "isActive": true,
+      "role": "therapist"
     },
     "wx7Pg3mlDHRqgzGzFFeqyqt3boy2": {
       "age": 22,
