@@ -44,6 +44,7 @@ import ManageElevateScreen from '../screens/admin/ManageElevateScreen';
 import AIChatScreen from '../screens/home/AIChatScreen';
 import StreakInfoScreen from '../screens/StreakInfoScreen';
 import WeeklyHighscoresScreen from '../screens/WeeklyHighscoresScreen';
+import FriendsScreen from '../screens/FriendsScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -186,6 +187,7 @@ const Navigation: React.FC = () => {
         <Stack.Screen name="AIChatScreen" component={AIChatScreen} />
         <Stack.Screen name="StreakInfo" component={StreakInfoScreen} />
         <Stack.Screen name="WeeklyHighscores" component={WeeklyHighscoresScreen} />
+        <Stack.Screen name="Friends" component={FriendsScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

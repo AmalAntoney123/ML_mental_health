@@ -37,6 +37,7 @@ interface UserData {
         weekly: number;
         lastReset?: string;
     };
+    friends?: Record<string, boolean>;
 }
 
 interface UserScore {
@@ -55,6 +56,7 @@ const ProfileScreen = () => {
     const [loading, setLoading] = useState<boolean>(true);
     const [weeklyScores, setWeeklyScores] = useState<UserScore[]>([]);
     const [loadingScores, setLoadingScores] = useState(true);
+    const [hasFriends, setHasFriends] = useState(false);
     type ProfileScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'MainScreen'>;
 
     const navigation = useNavigation<ProfileScreenNavigationProp>();
@@ -85,6 +87,7 @@ const ProfileScreen = () => {
                                 preferredTherapyType: data.preferredTherapyType,
                                 emoElevate: data.emoElevate,
                                 points: data.points || { total: 0, weekly: 0 },
+                                friends: data.friends,
                             });
                         }
                         setLoading(false);
@@ -156,6 +159,12 @@ const ProfileScreen = () => {
         fetchWeeklyScores();
     }, []);
 
+    useEffect(() => {
+        if (userData?.friends) {
+            setHasFriends(Object.keys(userData.friends).length > 0);
+        }
+    }, [userData?.friends]);
+
     const handleEditProfile = () => {
         if (userData) {
             navigation.navigate('EditProfile', {
@@ -200,6 +209,7 @@ const ProfileScreen = () => {
                         preferredTherapyType: data.preferredTherapyType,
                         emoElevate: data.emoElevate,
                         points: data.points || { total: 0, weekly: 0 },
+                        friends: data.friends,
                     });
                 }
                 setLoading(false);
@@ -342,8 +352,11 @@ const ProfileScreen = () => {
                             <TouchableOpacity style={[styles.button, { backgroundColor: colors.primary }]} onPress={handleEditProfile}>
                                 <Text style={styles.buttonText}>Edit Profile</Text>
                             </TouchableOpacity>
-                            <TouchableOpacity style={[styles.button, { backgroundColor: colors.primary }]}>
-                                <Text style={styles.buttonText}>Add Friends</Text>
+                            <TouchableOpacity 
+                                style={[styles.button, { backgroundColor: colors.primary }]}
+                                onPress={() => navigation.navigate('Friends')}
+                            >
+                                <Text style={styles.buttonText}>{hasFriends ? 'View Friends' : 'Add Friends'}</Text>
                             </TouchableOpacity>
                             <TouchableOpacity style={[styles.button, { backgroundColor: colors.surface }]}>
                                 <Icon name="mail" size={20} color={colors.text} />

@@ -96,4 +96,5 @@ export type RootStackParamList = {
     lastLoginTimestamp: number;
   };
   WeeklyHighscores: undefined;
+  Friends: undefined;
 };
