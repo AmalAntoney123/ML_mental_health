@@ -242,13 +242,38 @@ const FriendsScreen = () => {
         }
     };
 
-    const openFriendModal = (friend: Friend) => {
-        setSelectedFriend(friend);
-        setShowFriendModal(true);
-        Animated.spring(slideAnim, {
-            toValue: 1,
-            useNativeDriver: true,
-        }).start();
+    const openFriendModal = async (friend: Friend) => {
+        try {
+            // Fetch friend's challenge data
+            const friendRef = firebase.database().ref(`users/${friend.id}`);
+            const snapshot = await friendRef.once('value');
+            const friendData = snapshot.val();
+            
+            // Update the friend object with the fetched data
+            const updatedFriend = {
+                ...friend,
+                challenges: friendData.challenges || {},
+                completedChallenges: friendData.completedChallenges || 0,
+                streak: friendData.streak || 0,
+                points: friendData.points || { total: 0, weekly: 0 }
+            };
+            
+            setSelectedFriend(updatedFriend);
+            setShowFriendModal(true);
+            Animated.spring(slideAnim, {
+                toValue: 1,
+                useNativeDriver: true,
+            }).start();
+        } catch (error) {
+            console.error('Error fetching friend data:', error);
+            // Still show the modal with basic info if there's an error
+            setSelectedFriend(friend);
+            setShowFriendModal(true);
+            Animated.spring(slideAnim, {
+                toValue: 1,
+                useNativeDriver: true,
+            }).start();
+        }
     };
 
     const closeFriendModal = () => {
@@ -305,12 +330,6 @@ const FriendsScreen = () => {
                 )}
                 <Text style={[styles.friendName, { color: colors.text }]}>{item.name}</Text>
             </View>
-            <TouchableOpacity
-                style={[styles.removeButton, { backgroundColor: colors.error }]}
-                onPress={() => removeFriend(item.id)}
-            >
-                <Icon name="remove" size={20} color="white" />
-            </TouchableOpacity>
         </TouchableOpacity>
     );
 
@@ -447,17 +466,32 @@ const FriendsScreen = () => {
 
                         <View style={[styles.modalChallenges, { backgroundColor: colors.surface }]}>
                             <Text style={[styles.modalSectionTitle, { color: colors.text }]}>Challenges</Text>
-                            {selectedFriend.challenges && Object.entries(selectedFriend.challenges).map(([challenge, level], index) => {
-                                const iconName = getChallengeIcon(challenge);
-                                return (
-                                    <View key={index} style={styles.challengeItem}>
-                                        <MaterialCommunityIcons name={iconName} size={24} color={colors.primary} />
-                                        <Text style={[styles.challengeName, { color: colors.text }]}>{challenge}</Text>
-                                        <Text style={[styles.challengeLevel, { color: colors.primary }]}>Level {level}</Text>
-                                    </View>
-                                );
-                            })}
+                            {selectedFriend.challenges && Object.entries(selectedFriend.challenges).length > 0 ? (
+                                Object.entries(selectedFriend.challenges).map(([challenge, level], index) => {
+                                    const iconName = getChallengeIcon(challenge);
+                                    return (
+                                        <View key={index} style={styles.challengeItem}>
+                                            <MaterialCommunityIcons name={iconName} size={24} color={colors.primary} />
+                                            <Text style={[styles.challengeName, { color: colors.text }]}>{challenge}</Text>
+                                            <Text style={[styles.challengeLevel, { color: colors.primary }]}>Level {level}</Text>
+                                        </View>
+                                    );
+                                })
+                            ) : (
+                                <Text style={[styles.emptyText, { color: colors.gray }]}>No challenges completed yet</Text>
+                            )}
                         </View>
+
+                        <TouchableOpacity
+                            style={[styles.removeFriendButton, { backgroundColor: colors.error }]}
+                            onPress={() => {
+                                removeFriend(selectedFriend.id);
+                                closeFriendModal();
+                            }}
+                        >
+                            <Icon name="person-remove" size={20} color="white" />
+                            <Text style={styles.removeFriendText}>Remove Friend</Text>
+                        </TouchableOpacity>
                     </Animated.View>
                 </TouchableOpacity>
             </Modal>
@@ -624,8 +658,8 @@ const styles = StyleSheet.create({
     },
     emptyText: {
         textAlign: 'center',
-        marginTop: 32,
-        fontSize: 16,
+        marginTop: 8,
+        fontSize: 14,
     },
     modalOverlay: {
         flex: 1,
@@ -796,6 +830,20 @@ const styles = StyleSheet.create({
     buttonText: {
         color: 'white',
         fontSize: 14,
+    },
+    removeFriendButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 12,
+        borderRadius: 8,
+        marginTop: 16,
+    },
+    removeFriendText: {
+        color: 'white',
+        marginLeft: 8,
+        fontSize: 16,
+        fontWeight: '500',
     },
 });
 

@@ -2422,27 +2422,27 @@
       },
       "challenges": {
         "exercise": 0,
-        "gratitude": 0,
-        "journal": 0,
-        "mindfulness": 0,
+        "gratitude": 1,
+        "journal": 1,
+        "mindfulness": 1,
         "positivity": 0,
         "sleep": 0,
         "social": 1
       },
-      "completedChallenges": 1,
+      "completedChallenges": 4,
       "concerns": [
         "Depression"
       ],
       "email": "amalantoney123@gmail.com",
       "emoElevate": {
         "active": true,
-        "amount": "300",
-        "expiryDate": "2024-12-01T08:10:05.029Z",
-        "lastPaymentDate": "2024-10-31T08:10:05.035Z",
-        "orderId": "order_PFZdGqsP8QSsDM",
-        "paymentId": "pay_PFZduJPPWahuEv",
-        "startDate": "2024-10-31T08:10:05.029Z",
-        "subscriptionType": "1_month"
+        "amount": "1250",
+        "expiryDate": "2025-07-06T11:56:22.120Z",
+        "lastPaymentDate": "2025-04-06T11:56:22.120Z",
+        "orderId": "order_QFlMe2TidlicJ2",
+        "paymentId": "pay_QFlN4I6RpDh4MJ",
+        "startDate": "2025-04-06T11:56:22.120Z",
+        "subscriptionType": "3_month"
       },
       "entries": {
         "-O9QReKJHcrGi84F-DQE": {
@@ -2469,6 +2469,9 @@
           "content": "Rfg",
           "date": "2024-11-13"
         }
+      },
+      "friends": {
+        "wx7Pg3mlDHRqgzGzFFeqyqt3boy2": true
       },
       "gender": "Male",
       "goals": [
@@ -2718,7 +2721,8 @@
       "photoURL": "https://firebasestorage.googleapis.com/v0/b/emo-ce9e9.appspot.com/o/profile_images%2FkUIJWo62nvaoHmRjL5YheyQl1553%2FkUIJWo62nvaoHmRjL5YheyQl1553_profile_image.jpg?alt=media&token=0f41c45e-fa26-45d9-ac43-58b07e099446",
       "points": {
         "lastReset": "2025-04-06T10:58:02.043Z",
-        "weekly": 100
+        "total": 600,
+        "weekly": 700
       },
       "positivityEntries": {
         "-O9BflR6gMpY-IaK0y4g": {
@@ -3023,6 +3027,9 @@
           "date": "2024-10-20"
         }
       },
+      "friends": {
+        "kUIJWo62nvaoHmRjL5YheyQl1553": true
+      },
       "gender": "Male",
       "goals": [
         "Improve Sleep",
@@ -3059,6 +3066,7 @@
       ],
       "isActive": true,
       "languagePreference": "Malayalam",
+      "lastLoginTimestamp": 1743941430902,
       "moodEntries": {
         "-O5rIMmWY39IVomPHH-M": {
           "date": "2024-08-20",
@@ -3199,6 +3207,11 @@
       },
       "name": "Amal Antoney 2",
       "photoURL": "https://firebasestorage.googleapis.com/v0/b/emo-ce9e9.appspot.com/o/profile_images%2Fwx7Pg3mlDHRqgzGzFFeqyqt3boy2%2Fwx7Pg3mlDHRqgzGzFFeqyqt3boy2_profile_image.jpg?alt=media&token=9459f185-55cc-4eca-b2fc-6da5e3a7f160",
+      "points": {
+        "lastReset": "2025-04-06T12:10:34.781Z",
+        "total": 0,
+        "weekly": 0
+      },
       "predictions": {
         "2024-11-01": {
           "predictedMood": 6,
@@ -3218,7 +3231,8 @@
       "preferredTherapyType": "Humanistic Therapy",
       "previousTherapyExperience": "Some",
       "role": "user",
-      "sleepHabits": "Early bird"
+      "sleepHabits": "Early bird",
+      "streak": 1
     },
     "y94bYStEcqgsObyUGCm0qxnW7mJ3": {
       "age": "21",
