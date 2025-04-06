@@ -298,12 +298,40 @@ const JournalChallengeScreen: React.FC = () => {
         );
       case 'finished':
         return (
-          <>
+          <View style={[styles.container, { backgroundColor: colors.background }]}>
+            <View style={[styles.completionIcon, { backgroundColor: colors.primary + '20' }]}>
+              <Icon name="checkmark-circle" size={80} color={colors.primary} />
+            </View>
+            <Text style={[styles.title, { color: colors.text }]}>Great Job!</Text>
+            <Text style={[styles.subtitle, { color: colors.text }]}>
+              You've completed the journal challenge
+            </Text>
+
+            {pointsEarned && (
+              <View style={[styles.pointsContainer, { backgroundColor: colors.surface }]}>
+                <Text style={[styles.pointsTitle, { color: colors.text }]}>Points Earned</Text>
+                <View style={styles.pointsBreakdown}>
+                  <View style={styles.pointsRow}>
+                    <Text style={[styles.pointsLabel, { color: colors.text }]}>Base Points</Text>
+                    <Text style={[styles.pointsValue, { color: colors.primary }]}>+{pointsEarned.base}</Text>
+                  </View>
+                  <View style={styles.pointsRow}>
+                    <Text style={[styles.pointsLabel, { color: colors.text }]}>Level Bonus</Text>
+                    <Text style={[styles.pointsValue, { color: colors.primary }]}>+{pointsEarned.levelBonus}</Text>
+                  </View>
+                  <View style={[styles.totalRow, { borderTopColor: colors.border }]}>
+                    <Text style={[styles.totalLabel, { color: colors.text }]}>Total</Text>
+                    <Text style={[styles.totalValue, { color: colors.primary }]}>{pointsEarned.total}</Text>
+                  </View>
+                </View>
+              </View>
+            )}
+
             <Text style={[styles.text, { color: colors.text }]}>{quotes[Math.floor(Math.random() * quotes.length)]}</Text>
             <TouchableOpacity style={[styles.button, { backgroundColor: colors.primary }]} onPress={() => setStage('instructions')}>
               <Text style={styles.buttonText}>Do it Again</Text>
             </TouchableOpacity>
-          </>
+          </View>
         );
     }
   };
@@ -396,6 +424,68 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  completionIcon: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  subtitle: {
+    fontSize: 18,
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  pointsContainer: {
+    width: '90%',
+    borderRadius: 16,
+    padding: 16,
+    marginVertical: 24,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  pointsTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  pointsBreakdown: {
+    width: '100%',
+  },
+  pointsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  pointsLabel: {
+    fontSize: 16,
+  },
+  pointsValue: {
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  totalRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingTop: 12,
+    marginTop: 8,
+    borderTopWidth: 1,
+  },
+  totalLabel: {
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  totalValue: {
+    fontSize: 24,
+    fontWeight: 'bold',
   },
 });
 
