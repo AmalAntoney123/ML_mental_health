@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useTheme } from '../context/ThemeContext';
@@ -39,6 +39,13 @@ interface UserData {
     };
 }
 
+interface UserScore {
+    id: string;
+    name: string;
+    points: number;
+    rank?: number;
+}
+
 const ProfileScreen = () => {
     const { colors } = useTheme();
     const { user } = useAuth() as { user: any };
@@ -46,6 +53,8 @@ const ProfileScreen = () => {
     const [userPhotoURL, setUserPhotoURL] = useState<string | null>(user?.photoURL || null);
     const [userData, setUserData] = useState<UserData | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
+    const [weeklyScores, setWeeklyScores] = useState<UserScore[]>([]);
+    const [loadingScores, setLoadingScores] = useState(true);
     type ProfileScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'MainScreen'>;
 
     const navigation = useNavigation<ProfileScreenNavigationProp>();
@@ -92,6 +101,60 @@ const ProfileScreen = () => {
             };
         }, [user])
     );
+
+    useEffect(() => {
+        const fetchWeeklyScores = async () => {
+            try {
+                const usersRef = firebase.database().ref('users');
+                const snapshot = await usersRef.once('value');
+                const usersData = snapshot.val();
+
+                // Process each user's data
+                const userScores: UserScore[] = await Promise.all(
+                    Object.entries(usersData).map(async ([id, data]: [string, any]) => {
+                        const points = data.points || { total: 0, weekly: 0, lastReset: new Date().toISOString() };
+                        
+                        // Check if points need to be reset
+                        const lastReset = new Date(points.lastReset);
+                        const now = new Date();
+                        const shouldReset = now.getTime() - lastReset.getTime() > 7 * 24 * 60 * 60 * 1000;
+                        
+                        if (shouldReset) {
+                            return {
+                                id,
+                                name: data.name || 'Anonymous',
+                                points: 0
+                            };
+                        }
+
+                        return {
+                            id,
+                            name: data.name || 'Anonymous',
+                            points: points.weekly || 0
+                        };
+                    })
+                );
+
+                // Filter, sort, and rank users
+                const rankedScores = userScores
+                    .filter(user => user.points > 0)
+                    .sort((a, b) => b.points - a.points)
+                    .map((user, index) => ({
+                        ...user,
+                        rank: index + 1
+                    }))
+                    .slice(0, 3); // Only show top 3
+
+                setWeeklyScores(rankedScores);
+            } catch (error) {
+                console.error('Error fetching weekly scores:', error);
+            } finally {
+                setLoadingScores(false);
+            }
+        };
+
+        fetchWeeklyScores();
+    }, []);
 
     const handleEditProfile = () => {
         if (userData) {
@@ -292,37 +355,29 @@ const ProfileScreen = () => {
                 <View style={[styles.card, styles.highscoreContainer, { backgroundColor: colors.secondaryBackground }]}>
                     <View style={styles.highscoreHeader}>
                         <Text style={[styles.highscoreText, { color: colors.text }]}>Weekly Highscores</Text>
-                        <Text style={[styles.viewAllText, { color: colors.primary }]}>View all</Text>
+                        <TouchableOpacity onPress={() => navigation.navigate('WeeklyHighscores')}>
+                            <Text style={[styles.viewAllText, { color: colors.primary }]}>View all</Text>
+                        </TouchableOpacity>
                     </View>
-                    <View style={styles.highscoreList}>
-                        <View style={styles.highscoreItem}>
-                            <View style={styles.highscoreRank}>
-                                <Text style={[styles.rankText, { color: colors.text }]}>1</Text>
-                            </View>
-                            <View style={styles.highscoreInfo}>
-                                <Text style={[styles.highscoreName, { color: colors.text }]}>John Doe</Text>
-                                <Text style={[styles.highscorePoints, { color: colors.primary }]}>1,250 pts</Text>
-                            </View>
+                    {loadingScores ? (
+                        <ActivityIndicator size="small" color={colors.primary} />
+                    ) : weeklyScores.length > 0 ? (
+                        <View style={styles.highscoreList}>
+                            {weeklyScores.map((score) => (
+                                <View key={score.id} style={styles.highscoreItem}>
+                                    <View style={styles.highscoreRank}>
+                                        <Text style={[styles.rankText, { color: colors.text }]}>#{score.rank}</Text>
+                                    </View>
+                                    <View style={styles.highscoreInfo}>
+                                        <Text style={[styles.highscoreName, { color: colors.text }]}>{score.name}</Text>
+                                        <Text style={[styles.highscorePoints, { color: colors.primary }]}>{score.points} pts</Text>
+                                    </View>
+                                </View>
+                            ))}
                         </View>
-                        <View style={styles.highscoreItem}>
-                            <View style={styles.highscoreRank}>
-                                <Text style={[styles.rankText, { color: colors.text }]}>2</Text>
-                            </View>
-                            <View style={styles.highscoreInfo}>
-                                <Text style={[styles.highscoreName, { color: colors.text }]}>Jane Smith</Text>
-                                <Text style={[styles.highscorePoints, { color: colors.primary }]}>1,100 pts</Text>
-                            </View>
-                        </View>
-                        <View style={styles.highscoreItem}>
-                            <View style={styles.highscoreRank}>
-                                <Text style={[styles.rankText, { color: colors.text }]}>3</Text>
-                            </View>
-                            <View style={styles.highscoreInfo}>
-                                <Text style={[styles.highscoreName, { color: colors.text }]}>Mike Johnson</Text>
-                                <Text style={[styles.highscorePoints, { color: colors.primary }]}>950 pts</Text>
-                            </View>
-                        </View>
-                    </View>
+                    ) : (
+                        <Text style={[styles.emptyStateText, { color: colors.gray }]}>No scores yet this week</Text>
+                    )}
                 </View>
 
                 <View style={[styles.card, styles.challengesContainer, { backgroundColor: colors.secondaryBackground }]}>
@@ -547,6 +602,11 @@ const styles = StyleSheet.create({
     },
     verifiedBadge: {
         marginRight: 6,
+    },
+    emptyStateText: {
+        fontSize: 14,
+        textAlign: 'center',
+        padding: 16,
     },
 });
 
