@@ -5,12 +5,18 @@ import LottieView from 'lottie-react-native';
 import { useAuth } from '../../utils/auth';
 import database from '@react-native-firebase/database';
 import { ProgressBar } from 'react-native-paper';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 const GratitudeScreen: React.FC = () => {
   const [stage, setStage] = useState<'instructions' | 'gratitude' | 'finished'>('instructions');
   const [gratitudeEntries, setGratitudeEntries] = useState<string[]>([]);
   const [currentEntry, setCurrentEntry] = useState('');
   const [showReflectionModal, setShowReflectionModal] = useState(false);
+  const [pointsEarned, setPointsEarned] = useState<{
+    base: number;
+    levelBonus: number;
+    total: number;
+  } | null>(null);
   const { colors } = useTheme();
   const { user } = useAuth();
   const animationRef = useRef<LottieView>(null);
@@ -35,8 +41,6 @@ const GratitudeScreen: React.FC = () => {
       setGratitudeEntries(newEntries);
       setCurrentEntry('');
 
-
-
       if (newEntries.length === totalEntries) {
         setShowReflectionModal(true);
       }
@@ -52,37 +56,105 @@ const GratitudeScreen: React.FC = () => {
     </ScrollView>
   );
 
+  const initializePoints = async (userRef: any) => {
+    try {
+      const pointsSnapshot = await userRef.child('points').once('value');
+      if (!pointsSnapshot.exists()) {
+        await userRef.child('points').set({
+          total: 0,
+          weekly: 0,
+          lastReset: new Date().toISOString()
+        });
+      }
+    } catch (error) {
+      console.error('Error initializing points:', error);
+    }
+  };
+
   const handleFinish = async () => {
     setShowReflectionModal(false);
     setStage('finished');
     animationRef.current?.play();
 
-    if (user) {
-      const userId = user.uid;
-      const userRef = database().ref(`users/${userId}`);
+    if (!user) {
+      console.error('No user found');
+      return;
+    }
 
-      try {
-        const userSnapshot = await userRef.once('value');
-        const userData = userSnapshot.val();
+    const userId = user.uid;
+    const userRef = database().ref(`users/${userId}`);
 
-        const currentLevel = Math.floor(userData.completedChallenges / 7) + 1;
+    try {
+      // Initialize points structure if it doesn't exist
+      await initializePoints(userRef);
 
-        if (userData.challenges.gratitude < currentLevel) {
-          const newGratitudeCount = userData.challenges.gratitude + 1;
-          await userRef.child('challenges/gratitude').set(newGratitudeCount);
+      const userSnapshot = await userRef.once('value');
+      const userData = userSnapshot.val();
 
-          const newCompletedChallengesCount = userData.completedChallenges + 1;
-          await userRef.child('completedChallenges').set(newCompletedChallengesCount);
+      if (!userData) {
+        console.error('No user data found');
+        return;
+      }
+
+      // Initialize challenges if they don't exist
+      if (!userData.challenges) {
+        await userRef.child('challenges').set({
+          gratitude: 0,
+          mindfulness: 0,
+          breathing: 0,
+          exercise: 0,
+          sleep: 0,
+          social: 0,
+          journal: 0
+        });
+      }
+
+      // Initialize completedChallenges if it doesn't exist
+      if (typeof userData.completedChallenges !== 'number') {
+        await userRef.child('completedChallenges').set(0);
+      }
+
+      const currentLevel = Math.floor((userData.completedChallenges || 0) / 7) + 1;
+      const currentGratitudeCount = userData.challenges?.gratitude || 0;
+
+      if (currentGratitudeCount < currentLevel) {
+        const points = userData.points || { total: 0, weekly: 0, lastReset: new Date().toISOString() };
+        
+        // Check if points need to be reset
+        const lastReset = new Date(points.lastReset);
+        const now = new Date();
+        const shouldReset = now.getTime() - lastReset.getTime() > 7 * 24 * 60 * 60 * 1000;
+        
+        if (shouldReset) {
+          points.weekly = 0;
+          points.lastReset = now.toISOString();
         }
 
-        const gratitudeRef = userRef.child('gratitudeEntries').push();
-        await gratitudeRef.set({
-          date: new Date().toISOString(),
-          entries: gratitudeEntries
+        // Calculate new points
+        const basePoints = 100;
+        const levelBonus = currentLevel * 50;
+        const pointsToAdd = basePoints + levelBonus;
+
+        // Update points
+        await userRef.child('points').set({
+          total: (points.total || 0) + pointsToAdd,
+          weekly: (points.weekly || 0) + pointsToAdd,
+          lastReset: points.lastReset
         });
-      } catch (error) {
-        console.error('Error updating gratitude and completed challenges count:', error);
+
+        // Update challenge counts
+        await userRef.child('challenges/gratitude').set(currentGratitudeCount + 1);
+        await userRef.child('completedChallenges').set((userData.completedChallenges || 0) + 1);
+
+        // Set points earned for display
+        setPointsEarned({
+          base: basePoints,
+          levelBonus: levelBonus,
+          total: pointsToAdd
+        });
       }
+    } catch (error) {
+      console.error('Error updating gratitude entry and completed challenges count:', error);
     }
   };
 
@@ -131,20 +203,42 @@ const GratitudeScreen: React.FC = () => {
         );
       case 'finished':
         return (
-          <>
-            <LottieView
-              ref={animationRef}
-              source={require('../../assets/lottie/gratitude-animation.json')}
-              autoPlay={true}
-              loop={true}
-              style={styles.animation}
-            />
-            <Text style={[styles.title, { color: colors.text }]}>Congratulations!</Text>
-            <Text style={[styles.text, { color: colors.text }]}>You've completed the gratitude exercise. Keep nurturing this positive mindset!</Text>
-            <TouchableOpacity style={[styles.button, { backgroundColor: colors.primary }]} onPress={() => setStage('instructions')}>
+          <View style={[styles.container, { backgroundColor: colors.background }]}>
+            <View style={[styles.completionIcon, { backgroundColor: colors.primary + '20' }]}>
+              <Icon name="check-circle" size={80} color={colors.primary} />
+            </View>
+            <Text style={[styles.title, { color: colors.text }]}>Great Job!</Text>
+            <Text style={[styles.subtitle, { color: colors.text }]}>
+              You've completed your gratitude exercise
+            </Text>
+
+            {pointsEarned && (
+              <View style={[styles.pointsContainer, { backgroundColor: colors.surface }]}>
+                <Text style={[styles.pointsTitle, { color: colors.text }]}>Points Earned</Text>
+                <View style={styles.pointsBreakdown}>
+                  <View style={styles.pointsRow}>
+                    <Text style={[styles.pointsLabel, { color: colors.text }]}>Base Points</Text>
+                    <Text style={[styles.pointsValue, { color: colors.primary }]}>+{pointsEarned.base}</Text>
+                  </View>
+                  <View style={styles.pointsRow}>
+                    <Text style={[styles.pointsLabel, { color: colors.text }]}>Level Bonus</Text>
+                    <Text style={[styles.pointsValue, { color: colors.primary }]}>+{pointsEarned.levelBonus}</Text>
+                  </View>
+                  <View style={[styles.totalRow, { borderTopColor: colors.border }]}>
+                    <Text style={[styles.totalLabel, { color: colors.text }]}>Total</Text>
+                    <Text style={[styles.totalValue, { color: colors.primary }]}>{pointsEarned.total}</Text>
+                  </View>
+                </View>
+              </View>
+            )}
+
+            <TouchableOpacity
+              style={[styles.button, { backgroundColor: colors.primary }]}
+              onPress={() => setStage('instructions')}
+            >
               <Text style={styles.buttonText}>Do it Again</Text>
             </TouchableOpacity>
-          </>
+          </View>
         );
     }
   };
@@ -280,6 +374,52 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 5,
     textAlign: 'left',
+  },
+  completionIcon: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  pointsContainer: {
+    padding: 20,
+    borderRadius: 10,
+    marginBottom: 20,
+  },
+  pointsTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  pointsBreakdown: {
+    width: '100%',
+  },
+  pointsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 5,
+  },
+  pointsLabel: {
+    fontSize: 16,
+  },
+  pointsValue: {
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  totalRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 5,
+  },
+  totalLabel: {
+    fontSize: 16,
+  },
+  totalValue: {
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
 

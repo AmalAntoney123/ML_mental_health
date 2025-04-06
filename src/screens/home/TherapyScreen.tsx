@@ -4,6 +4,8 @@ import { useTheme } from '../../context/ThemeContext';
 import { Card, Avatar, Searchbar, Button, ActivityIndicator, Chip } from 'react-native-paper';
 import database, { FirebaseDatabaseTypes } from '@react-native-firebase/database';
 import { useAuth } from '../../utils/auth';
+import RazorpayCheckout from 'react-native-razorpay';
+import { RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET } from '../../config';
 
 interface Therapist {
   id: string;
@@ -14,34 +16,50 @@ interface Therapist {
   availability: string;
 }
 
+interface CompletedSession {
+  id: string;
+  therapistId: string;
+  therapistName: string;
+  sessionDate: string;
+  sessionTime: string;
+  notes?: string;
+  meetLink?: string;
+}
+
 interface BookingRequest {
   id: string;
   therapistId: string;
   userId: string;
   userName: string;
   therapistName: string;
-  status: 'pending' | 'confirmed' | 'rejected';
+  status: 'pending' | 'confirmed' | 'rejected' | 'completed';
   requestedAt: number;
   scheduledDate?: string;
   scheduledTime?: string;
   meetLink?: string;
   updatedAt?: number;
+  notes?: string;
+  paymentStatus?: 'pending' | 'paid';
+  paymentAmount: number;
+  paymentDescription?: string;
 }
 
-type SortOption = 'name' | 'experience';
+type SortOption = 'name' | 'date' | 'experience';
 
 type BookingsListener = {
   [key: string]: FirebaseDatabaseTypes.Query;
 };
 
+type ListItem = Therapist | BookingRequest;
+
 const TherapyScreen: React.FC = () => {
   const { colors } = useTheme();
   const { user } = useAuth();
   const [therapists, setTherapists] = useState<Therapist[]>([]);
-  const [previousTherapists, setPreviousTherapists] = useState<Therapist[]>([]);
+  const [completedSessions, setCompletedSessions] = useState<BookingRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const [sortBy, setSortBy] = useState<SortOption>('name');
+  const [sortBy, setSortBy] = useState<SortOption>('date');
   const [activeTab, setActiveTab] = useState<'available' | 'previous'>('available');
   const [bookingRequests, setBookingRequests] = useState<{ [key: string]: BookingRequest }>({});
   const [therapistBookings, setTherapistBookings] = useState<{ [key: string]: BookingRequest }>({});
@@ -217,9 +235,32 @@ const TherapyScreen: React.FC = () => {
       return;
     }
 
+    // Check for any pending payments
+    const therapistBookingsRef = database().ref('therapists');
+    const therapistBookingsSnapshot = await therapistBookingsRef.once('value');
+    const therapistBookings = therapistBookingsSnapshot.val();
+
+    let hasPendingPayment = false;
+    if (therapistBookings) {
+      Object.entries(therapistBookings).forEach(([therapistId, therapistData]: [string, any]) => {
+        if (therapistData.bookings) {
+          Object.values(therapistData.bookings).forEach((booking: any) => {
+            if (booking.userId === user.uid && booking.status === 'completed' && booking.paymentStatus === 'pending') {
+              hasPendingPayment = true;
+            }
+          });
+        }
+      });
+    }
+
+    if (hasPendingPayment) {
+      Alert.alert('Payment Required', 'You have pending payments for completed sessions. Please complete your payments before booking new sessions.');
+      return;
+    }
+
     // Check if there's already a pending or confirmed booking with this therapist
-    const therapistBookingsRef = database().ref(`therapists/${therapist.id}/bookings`);
     const existingBookingSnapshot = await therapistBookingsRef
+      .child(`${therapist.id}/bookings`)
       .orderByChild('userId')
       .equalTo(user.uid)
       .once('value');
@@ -250,6 +291,9 @@ const TherapyScreen: React.FC = () => {
         therapistName: therapist.name,
         status: 'pending',
         requestedAt: Date.now(),
+        paymentStatus: 'pending',
+        paymentAmount: 0,
+        paymentDescription: ''
       };
 
       // Add only to therapist's bookings
@@ -267,6 +311,94 @@ const TherapyScreen: React.FC = () => {
     }
   };
 
+  const handlePayment = async (booking: BookingRequest) => {
+    try {
+      const auth = btoa(`${RAZORPAY_KEY_ID}:${RAZORPAY_KEY_SECRET}`);
+
+      // First create an order
+      const orderResponse = await fetch('https://api.razorpay.com/v1/orders', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Basic ${auth}`,
+        },
+        body: JSON.stringify({
+          amount: Math.round(booking.paymentAmount * 100), // Convert to paise using the actual payment amount
+          currency: 'INR',
+          receipt: `therapy_${booking.id}`,
+        }),
+      });
+
+      if (!orderResponse.ok) {
+        const errorData = await orderResponse.json();
+        console.error('Order creation failed:', errorData);
+        throw new Error('Failed to create order');
+      }
+
+      const orderData = await orderResponse.json();
+      console.log('Order created:', orderData);
+
+      // Then initiate payment
+      const options = {
+        description: booking.paymentDescription || `Therapy Session with ${booking.therapistName}`,
+        currency: 'INR',
+        key: RAZORPAY_KEY_ID,
+        amount: Math.round(booking.paymentAmount * 100), // Convert to paise using the actual payment amount
+        name: 'Emo Therapy',
+        order_id: orderData.id,
+        prefill: {
+          email: user?.email || 'undefined',
+          contact: user?.phoneNumber || '',
+          name: user?.displayName || '',
+        },
+        theme: { color: '#5E72E4' },
+      };
+
+      console.log('Initiating payment with options:', options);
+      const paymentData = await RazorpayCheckout.open(options);
+      console.log('Payment Success:', paymentData);
+
+      // Update payment status in database
+      await database()
+        .ref(`therapists/${booking.therapistId}/bookings/${booking.id}`)
+        .update({ 
+          paymentStatus: 'paid',
+          paymentId: paymentData.razorpay_payment_id,
+          orderId: orderData.id,
+          lastPaymentDate: new Date().toISOString()
+        });
+
+      Alert.alert('Success', 'Payment processed successfully!');
+
+    } catch (error: any) {
+      console.error('Payment failed:', error);
+
+      if (error.code === 'PAYMENT_CANCELLED') {
+        Alert.alert('Payment Cancelled', 'Would you like to try again?', [
+          {
+            text: 'Try Again',
+            onPress: () => handlePayment(booking)
+          },
+          {
+            text: 'Cancel',
+            style: 'cancel'
+          }
+        ]);
+      } else {
+        Alert.alert(
+          'Payment Failed',
+          'There was an error processing your payment. Please try again.',
+          [
+            {
+              text: 'OK',
+              style: 'cancel'
+            }
+          ]
+        );
+      }
+    }
+  };
+
   const getInitials = (name: string) => {
     return name
       .split(' ')
@@ -275,27 +407,41 @@ const TherapyScreen: React.FC = () => {
       .toUpperCase();
   };
 
-  const filterTherapists = (list: Therapist[]) => {
-    return list
-      .filter(therapist => 
-        therapist.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        therapist.specialization.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-      .sort((a, b) => {
-        if (sortBy === 'name') {
-          return a.name.localeCompare(b.name);
-        } else {
-          // Convert experience string to number for sorting
-          const aExp = parseInt(a.experience);
-          const bExp = parseInt(b.experience);
-          return bExp - aExp;
-        }
-      });
+  const filterTherapists = (list: Therapist[] | BookingRequest[]) => {
+    if (activeTab === 'available') {
+      return (list as Therapist[])
+        .filter(therapist => 
+          therapist.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          therapist.specialization.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+        .sort((a, b) => {
+          if (sortBy === 'name') {
+            return a.name.localeCompare(b.name);
+          } else if (sortBy === 'experience') {
+            const aExp = parseInt(a.experience);
+            const bExp = parseInt(b.experience);
+            return bExp - aExp;
+          }
+          return 0;
+        });
+    } else {
+      return (list as BookingRequest[])
+        .filter(session => 
+          session.therapistName.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+        .sort((a, b) => {
+          if (sortBy === 'name') {
+            return a.therapistName.localeCompare(b.therapistName);
+          } else if (sortBy === 'date') {
+            return (b.updatedAt || 0) - (a.updatedAt || 0);
+          }
+          return 0;
+        });
+    }
   };
 
   useEffect(() => {
     const therapistsRef = database().ref('therapists');
-    const previousTherapistsRef = database().ref(`users/${user?.uid}/previousTherapists`);
     
     therapistsRef.on('value', snapshot => {
       const data = snapshot.val();
@@ -309,79 +455,33 @@ const TherapyScreen: React.FC = () => {
           availability: therapist.availability,
         }));
         setTherapists(therapistList);
+
+        // Fetch completed sessions for each therapist
+        if (user) {
+          const completedSessionsList: BookingRequest[] = [];
+          Object.entries(data).forEach(([therapistId, therapistData]: [string, any]) => {
+            if (therapistData.bookings) {
+              Object.entries(therapistData.bookings).forEach(([bookingId, booking]: [string, any]) => {
+                if (booking.userId === user.uid && booking.status === 'completed') {
+                  completedSessionsList.push({
+                    ...booking,
+                    id: bookingId,
+                    therapistId: therapistId
+                  });
+                }
+              });
+            }
+          });
+          setCompletedSessions(completedSessionsList);
+        }
       }
       setLoading(false);
     });
 
-    // Fetch booking requests based on user role
-    if (user) {
-      // Check if current user is a therapist
-      const userRef = database().ref(`therapists/${user.uid}`);
-      userRef.once('value', snapshot => {
-        const isTherapist = snapshot.exists();
-        
-        if (isTherapist) {
-          // Fetch therapist's bookings
-          const therapistBookingsRef = database().ref(`therapistBookings/${user.uid}`);
-          therapistBookingsRef.on('value', snapshot => {
-            const data = snapshot.val();
-            if (data) {
-              setBookingRequests(data);
-            }
-          });
-        } else {
-          // Fetch user's bookings
-          const userBookingsRef = database().ref(`bookings/${user.uid}`);
-          userBookingsRef.on('value', snapshot => {
-            const data = snapshot.val();
-            if (data) {
-              setBookingRequests(data);
-            }
-          });
-        }
-      });
-
-      return () => {
-        therapistsRef.off();
-        previousTherapistsRef.off();
-        database().ref(`bookings/${user.uid}`).off();
-        database().ref(`therapistBookings/${user.uid}`).off();
-      };
-    }
-  }, [user]);
-
-  useEffect(() => {
-    if (!user) return;
-
-    const bookingsListener: BookingsListener = {};
-
-    // Listen to each therapist's bookings
-    therapists.forEach(therapist => {
-      const bookingRef = database()
-        .ref(`therapists/${therapist.id}/bookings`)
-        .orderByChild('userId')
-        .equalTo(user.uid);
-
-      bookingRef.on('value', snapshot => {
-        const bookings = snapshot.val();
-        if (bookings) {
-          setTherapistBookings(prev => ({
-            ...prev,
-            ...bookings
-          }));
-        }
-      });
-
-      bookingsListener[therapist.id] = bookingRef;
-    });
-
-    // Cleanup listeners
     return () => {
-      Object.entries(bookingsListener).forEach(([_, ref]) => {
-        ref.off();
-      });
+      therapistsRef.off();
     };
-  }, [therapists, user]);
+  }, [user]);
 
   const renderTherapist = ({ item }: { item: Therapist }) => (
     <Card style={[styles.card, { backgroundColor: colors.surface }]} elevation={2}>
@@ -409,6 +509,53 @@ const TherapyScreen: React.FC = () => {
     </Card>
   );
 
+  const renderCompletedSession = ({ item }: { item: BookingRequest }) => (
+    <Card style={[styles.card, { backgroundColor: colors.surface }]} elevation={2}>
+      <View style={styles.therapistContainer}>
+        <Avatar.Text
+          size={80}
+          label={getInitials(item.therapistName)}
+          style={styles.therapistImage}
+          color={colors.onPrimary}
+        />
+        <View style={styles.therapistInfo}>
+          <Text style={[styles.therapistName, { color: colors.text }]}>{item.therapistName}</Text>
+          <Text style={[styles.therapistDetails, { color: colors.text }]}>
+            Date: {item.scheduledDate}
+          </Text>
+          <Text style={[styles.therapistDetails, { color: colors.text }]}>
+            Time: {item.scheduledTime}
+          </Text>
+          {item.notes && (
+            <Text style={[styles.therapistDetails, { color: colors.text }]}>
+              Notes: {item.notes}
+            </Text>
+          )}
+          {item.paymentStatus === 'pending' && (
+            <TouchableOpacity 
+              style={[styles.bookButton, { backgroundColor: colors.primary }]}
+              onPress={() => handlePayment(item)}
+            >
+              <Text style={[styles.bookButtonText, { color: colors.onPrimary }]}>
+                Pay for Session
+              </Text>
+            </TouchableOpacity>
+          )}
+        </View>
+      </View>
+    </Card>
+  );
+
+  const renderItem = ({ item }: { item: ListItem }) => {
+    if ('specialization' in item) {
+      // This is a Therapist
+      return renderTherapist({ item: item as Therapist });
+    } else {
+      // This is a BookingRequest
+      return renderCompletedSession({ item: item as BookingRequest });
+    }
+  };
+
   if (loading) {
     return (
       <View style={[styles.container, styles.centerContent, { backgroundColor: colors.background }]}>
@@ -417,7 +564,9 @@ const TherapyScreen: React.FC = () => {
     );
   }
 
-  const filteredTherapists = filterTherapists(activeTab === 'available' ? therapists : previousTherapists);
+  const filteredItems = activeTab === 'available' 
+    ? filterTherapists(therapists)
+    : filterTherapists(completedSessions);
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -447,20 +596,20 @@ const TherapyScreen: React.FC = () => {
             styles.tabText,
             { color: activeTab === 'previous' ? colors.onPrimary : colors.text }
           ]}>
-            Previous Therapists
+            Previous Sessions
           </Text>
         </TouchableOpacity>
       </View>
 
       <View style={styles.searchContainer}>
         <Searchbar
-          placeholder="Search by name or specialization..."
+          placeholder={activeTab === 'available' ? "Search by name or specialization..." : "Search by therapist name..."}
           onChangeText={setSearchQuery}
           value={searchQuery}
           style={[styles.searchBar, { backgroundColor: colors.surface }]}
           iconColor={colors.primary}
           inputStyle={{ color: colors.text }}
-          placeholderTextColor={colors.text + '80'} // 80 adds 50% opacity
+          placeholderTextColor={colors.text + '80'}
           elevation={2}
         />
       </View>
@@ -477,96 +626,32 @@ const TherapyScreen: React.FC = () => {
           Name
         </Chip>
         <Chip
-          selected={sortBy === 'experience'}
-          onPress={() => setSortBy('experience')}
-          style={[styles.chip, { backgroundColor: sortBy === 'experience' ? colors.primary : colors.surface }]}
-          textStyle={{ color: sortBy === 'experience' ? colors.onPrimary : colors.text }}
+          selected={activeTab === 'available' ? sortBy === 'experience' : sortBy === 'date'}
+          onPress={() => setSortBy(activeTab === 'available' ? 'experience' : 'date')}
+          style={[styles.chip, { backgroundColor: (activeTab === 'available' ? sortBy === 'experience' : sortBy === 'date') ? colors.primary : colors.surface }]}
+          textStyle={{ color: (activeTab === 'available' ? sortBy === 'experience' : sortBy === 'date') ? colors.onPrimary : colors.text }}
           elevation={2}
         >
-          Experience
+          {activeTab === 'available' ? 'Experience' : 'Date'}
         </Chip>
       </View>
 
-      {filteredTherapists.length === 0 ? (
+      {filteredItems.length === 0 ? (
         <View style={styles.centerContent}>
           <Text style={[styles.noTherapistsText, { color: colors.text }]}>
-            No therapists found
+            {activeTab === 'available' ? 'No therapists found' : 'No previous sessions found'}
           </Text>
         </View>
       ) : (
-        <FlatList
-          data={filteredTherapists}
-          renderItem={renderTherapist}
+        <FlatList<ListItem>
+          data={filteredItems}
+          renderItem={renderItem}
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.listContainer}
         />
       )}
 
-      {selectedBooking && (
-        <Modal
-          animationType="fade"
-          transparent={true}
-          visible={modalVisible}
-          onRequestClose={() => setModalVisible(false)}
-        >
-          <View style={styles.modalOverlay}>
-            <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
-              <Text style={[styles.modalTitle, { color: colors.text }]}>Session Details</Text>
-              
-              <View style={styles.detailsContainer}>
-                <View style={styles.detailRow}>
-                  <Text style={[styles.detailLabel, { color: colors.text }]}>Status:</Text>
-                  <Text style={[styles.detailValue, { color: colors.primary }]}>
-                    {selectedBooking.status.charAt(0).toUpperCase() + selectedBooking.status.slice(1)}
-                  </Text>
-                </View>
-
-                <View style={styles.detailRow}>
-                  <Text style={[styles.detailLabel, { color: colors.text }]}>Requested on:</Text>
-                  <Text style={[styles.detailValue, { color: colors.text }]}>
-                    {new Date(selectedBooking.requestedAt).toLocaleDateString()}
-                  </Text>
-                </View>
-
-                {selectedBooking.scheduledDate && selectedBooking.scheduledTime && (
-                  <>
-                    <View style={styles.detailRow}>
-                      <Text style={[styles.detailLabel, { color: colors.text }]}>Date:</Text>
-                      <Text style={[styles.detailValue, { color: colors.text }]}>
-                        {selectedBooking.scheduledDate}
-                      </Text>
-                    </View>
-                    <View style={styles.detailRow}>
-                      <Text style={[styles.detailLabel, { color: colors.text }]}>Time:</Text>
-                      <Text style={[styles.detailValue, { color: colors.text }]}>
-                        {selectedBooking.scheduledTime}
-                      </Text>
-                    </View>
-                  </>
-                )}
-              </View>
-
-              <View style={styles.buttonContainer}>
-                {selectedBooking.meetLink && (
-                  <TouchableOpacity
-                    style={[styles.modalButton, styles.joinButton, { backgroundColor: colors.primary }]}
-                    onPress={() => handleJoinMeeting(selectedBooking)}
-                  >
-                    <Text style={[styles.buttonText, { color: colors.onPrimary }]}>Join Meeting</Text>
-                  </TouchableOpacity>
-                )}
-                
-                <TouchableOpacity
-                  style={[styles.modalButton, styles.closeButton, { backgroundColor: colors.surface, borderColor: colors.primary }]}
-                  onPress={() => setModalVisible(false)}
-                >
-                  <Text style={[styles.buttonText, { color: colors.primary }]}>Close</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
-        </Modal>
-      )}
+      {selectedBooking && showBookingDetails(selectedBooking)}
     </View>
   );
 };

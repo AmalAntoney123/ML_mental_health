@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, Dimensions } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, Dimensions, Animated } from 'react-native';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { useTheme } from '../../context/ThemeContext';
 import database from '@react-native-firebase/database';
@@ -7,6 +7,7 @@ import auth from '@react-native-firebase/auth';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useAuth } from '../../utils/auth';
 import { RootStackParamList } from '../../navigation/types';
+import LottieView from 'lottie-react-native';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -17,12 +18,20 @@ interface SupportGroup {
 }
 
 const SocialScreen: React.FC = () => {
-  const [stage, setStage] = useState<'instructions' | 'challenge' | 'finished'>('instructions');
-  const [joinedGroups, setJoinedGroups] = useState<SupportGroup[]>([]);
-  const [taskCompleted, setTaskCompleted] = useState(false);
+  const [stage, setStage] = useState<'instructions' | 'social' | 'finished'>('instructions');
+  const [showReflectionModal, setShowReflectionModal] = useState(false);
+  const [groups, setGroups] = useState<SupportGroup[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [pointsEarned, setPointsEarned] = useState<{
+    base: number;
+    levelBonus: number;
+    total: number;
+  } | null>(null);
   const { colors } = useTheme();
   const { user } = useAuth();
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const animationRef = useRef<LottieView>(null);
+  const fadeAnim = useRef(new Animated.Value(0)).current;
 
   const instructions = "Connect with others by sending a message in any support group. This simple act can help build community and support.";
   const quotes = [
@@ -32,13 +41,12 @@ const SocialScreen: React.FC = () => {
   ];
 
   useEffect(() => {
-    if (stage === 'challenge') {
-      fetchJoinedGroups();
-      checkTaskCompletion();
+    if (stage === 'social') {
+      fetchGroups();
     }
   }, [stage]);
 
-  const fetchJoinedGroups = async () => {
+  const fetchGroups = async () => {
     const currentUser = auth().currentUser;
     if (!currentUser) return;
 
@@ -54,24 +62,13 @@ const SocialScreen: React.FC = () => {
           name: group.name,
           description: group.description,
         }));
-      setJoinedGroups(userGroups);
+      setGroups(userGroups);
     }
-  };
-
-  const checkTaskCompletion = async () => {
-    if (!user) return;
-
-    const userRef = database().ref(`users/${user.uid}`);
-    const snapshot = await userRef.child('challenges/social').once('value');
-    const socialChallengeCount = snapshot.val() || 0;
-
-    const currentLevel = Math.floor((await userRef.child('completedChallenges').once('value')).val() / 7) + 1;
-
-    setTaskCompleted(socialChallengeCount >= currentLevel);
+    setLoading(false);
   };
 
   const handleStart = () => {
-    setStage('challenge');
+    setStage('social');
   };
 
   const handleGroupPress = (group: SupportGroup) => {
@@ -79,20 +76,105 @@ const SocialScreen: React.FC = () => {
   };
 
   const handleFinish = async () => {
-    if (user) {
-      const userRef = database().ref(`users/${user.uid}`);
-      const socialChallengeSnapshot = await userRef.child('challenges/social').once('value');
-      const currentSocialChallengeCount = socialChallengeSnapshot.val() || 0;
-      
-      const completedChallengesSnapshot = await userRef.child('completedChallenges').once('value');
-      const currentLevel = Math.floor(completedChallengesSnapshot.val() / 7) + 1;
-
-      if (currentSocialChallengeCount < currentLevel) {
-        await userRef.child('challenges/social').set(currentSocialChallengeCount + 1);
-        await userRef.child('completedChallenges').set(completedChallengesSnapshot.val() + 1);
-      }
-    }
+    setShowReflectionModal(false);
     setStage('finished');
+    animationRef.current?.play();
+
+    if (!user) {
+      console.error('No user found');
+      return;
+    }
+
+    const userId = user.uid;
+    const userRef = database().ref(`users/${userId}`);
+
+    try {
+      // Initialize points structure if it doesn't exist
+      await initializePoints(userRef);
+
+      const userSnapshot = await userRef.once('value');
+      const userData = userSnapshot.val();
+
+      if (!userData) {
+        console.error('No user data found');
+        return;
+      }
+
+      // Initialize challenges if they don't exist
+      if (!userData.challenges) {
+        await userRef.child('challenges').set({
+          gratitude: 0,
+          mindfulness: 0,
+          breathing: 0,
+          exercise: 0,
+          sleep: 0,
+          social: 0,
+          journal: 0
+        });
+      }
+
+      // Initialize completedChallenges if it doesn't exist
+      if (typeof userData.completedChallenges !== 'number') {
+        await userRef.child('completedChallenges').set(0);
+      }
+
+      const currentLevel = Math.floor((userData.completedChallenges || 0) / 7) + 1;
+      const currentSocialCount = userData.challenges?.social || 0;
+
+      if (currentSocialCount < currentLevel) {
+        const points = userData.points || { total: 0, weekly: 0, lastReset: new Date().toISOString() };
+        
+        // Check if points need to be reset
+        const lastReset = new Date(points.lastReset);
+        const now = new Date();
+        const shouldReset = now.getTime() - lastReset.getTime() > 7 * 24 * 60 * 60 * 1000;
+        
+        if (shouldReset) {
+          points.weekly = 0;
+          points.lastReset = now.toISOString();
+        }
+
+        // Calculate new points
+        const basePoints = 100;
+        const levelBonus = currentLevel * 50;
+        const pointsToAdd = basePoints + levelBonus;
+
+        // Update points
+        await userRef.child('points').set({
+          total: (points.total || 0) + pointsToAdd,
+          weekly: (points.weekly || 0) + pointsToAdd,
+          lastReset: points.lastReset
+        });
+
+        // Update challenge counts
+        await userRef.child('challenges/social').set(currentSocialCount + 1);
+        await userRef.child('completedChallenges').set((userData.completedChallenges || 0) + 1);
+
+        // Set points earned for display
+        setPointsEarned({
+          base: basePoints,
+          levelBonus: levelBonus,
+          total: pointsToAdd
+        });
+      }
+    } catch (error) {
+      console.error('Error updating social and completed challenges count:', error);
+    }
+  };
+
+  const initializePoints = async (userRef: any) => {
+    try {
+      const pointsSnapshot = await userRef.child('points').once('value');
+      if (!pointsSnapshot.exists()) {
+        await userRef.child('points').set({
+          total: 0,
+          weekly: 0,
+          lastReset: new Date().toISOString()
+        });
+      }
+    } catch (error) {
+      console.error('Error initializing points:', error);
+    }
   };
 
   const renderGroupItem = ({ item }: { item: SupportGroup }) => (
@@ -121,46 +203,34 @@ const SocialScreen: React.FC = () => {
             </TouchableOpacity>
           </>
         );
-      case 'challenge':
+      case 'social':
         return (
           <>
             <Text style={[styles.title, { color: colors.text }]}>Social Challenge</Text>
             <Text style={[styles.text, { color: colors.text }]}>
               Send a message in any support group to complete this challenge.
             </Text>
-            {taskCompleted ? (
-              <View style={styles.completedContainer}>
-                <Icon name="check-circle" size={48} color={colors.primary} />
-                <Text style={[styles.completedText, { color: colors.text }]}>
-                  Challenge completed! Great job interacting with your support group.
-                </Text>
-                <TouchableOpacity style={[styles.button, { backgroundColor: colors.primary }]} onPress={handleFinish}>
-                  <Text style={styles.buttonText}>Finish</Text>
-                </TouchableOpacity>
-              </View>
-            ) : (
+            {groups.length > 0 ? (
               <View style={styles.groupListContainer}>
                 <Text style={[styles.subtitle, { color: colors.text }]}>Your Support Groups:</Text>
-                {joinedGroups.length > 0 ? (
-                  <FlatList
-                    data={joinedGroups}
-                    renderItem={renderGroupItem}
-                    keyExtractor={(item) => item.id}
-                    contentContainerStyle={styles.groupList}
-                  />
-                ) : (
-                  <View style={styles.noGroupsContainer}>
-                    <Text style={[styles.noGroupsText, { color: colors.text }]}>
-                      You haven't joined any support groups yet.
-                    </Text>
-                    <TouchableOpacity
-                      style={[styles.button, { backgroundColor: colors.primary }]}
-                      onPress={() => navigation.navigate('FindGroupsScreen')}
-                    >
-                      <Text style={styles.buttonText}>Find Groups</Text>
-                    </TouchableOpacity>
-                  </View>
-                )}
+                <FlatList
+                  data={groups}
+                  renderItem={renderGroupItem}
+                  keyExtractor={(item) => item.id}
+                  contentContainerStyle={styles.groupList}
+                />
+              </View>
+            ) : (
+              <View style={styles.noGroupsContainer}>
+                <Text style={[styles.noGroupsText, { color: colors.text }]}>
+                  You haven't joined any support groups yet.
+                </Text>
+                <TouchableOpacity
+                  style={[styles.button, { backgroundColor: colors.primary }]}
+                  onPress={() => navigation.navigate('FindGroupsScreen')}
+                >
+                  <Text style={styles.buttonText}>Find Groups</Text>
+                </TouchableOpacity>
               </View>
             )}
           </>
@@ -256,15 +326,6 @@ const styles = StyleSheet.create({
   noGroupsText: {
     fontSize: 16,
     textAlign: 'center',
-    marginBottom: 20,
-  },
-  completedContainer: {
-    alignItems: 'center',
-  },
-  completedText: {
-    fontSize: 18,
-    textAlign: 'center',
-    marginTop: 20,
     marginBottom: 20,
   },
 });

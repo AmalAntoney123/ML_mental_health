@@ -95,4 +95,5 @@ export type RootStackParamList = {
     streak: number;
     lastLoginTimestamp: number;
   };
+  WeeklyHighscores: undefined;
 };

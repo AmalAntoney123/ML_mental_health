@@ -43,6 +43,7 @@ import EmoElevateScreen from '../screens/PremiumBenefitsScreen';
 import ManageElevateScreen from '../screens/admin/ManageElevateScreen';
 import AIChatScreen from '../screens/home/AIChatScreen';
 import StreakInfoScreen from '../screens/StreakInfoScreen';
+import WeeklyHighscoresScreen from '../screens/WeeklyHighscoresScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -184,6 +185,7 @@ const Navigation: React.FC = () => {
         <Stack.Screen name="ManageElevate" component={ManageElevateScreen} />
         <Stack.Screen name="AIChatScreen" component={AIChatScreen} />
         <Stack.Screen name="StreakInfo" component={StreakInfoScreen} />
+        <Stack.Screen name="WeeklyHighscores" component={WeeklyHighscoresScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

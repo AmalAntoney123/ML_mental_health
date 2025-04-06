@@ -1,21 +1,30 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, Dimensions } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, Dimensions, Animated } from 'react-native';
 import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../utils/auth';
 import database from '@react-native-firebase/database';
 import Toast from 'react-native-toast-message';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Voice, { SpeechResultsEvent } from '@react-native-voice/voice';
+import LottieView from 'lottie-react-native';
 
 const { width, height } = Dimensions.get('window');
 
 const JournalChallengeScreen: React.FC = () => {
-  const [stage, setStage] = useState<'instructions' | 'writing' | 'finished'>('instructions');
+  const [stage, setStage] = useState<'instructions' | 'journal' | 'finished'>('instructions');
+  const [showReflectionModal, setShowReflectionModal] = useState(false);
   const [journalEntry, setJournalEntry] = useState('');
   const { colors } = useTheme();
   const { user } = useAuth();
   const [isRecording, setIsRecording] = useState(false);
   const [partialResults, setPartialResults] = useState<string[]>([]);
+  const animationRef = useRef<LottieView>(null);
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const [pointsEarned, setPointsEarned] = useState<{
+    base: number;
+    levelBonus: number;
+    total: number;
+  } | null>(null);
 
   const instructions = "Take a moment to reflect on your day. We'll guide you through a journaling exercise to help you process your thoughts and emotions.";
   const quotes = [
@@ -126,46 +135,108 @@ const JournalChallengeScreen: React.FC = () => {
   };
 
   const handleStart = () => {
-    setStage('writing');
+    setStage('journal');
   };
 
-  const handleSubmitJournal = async () => {
-    if (!journalEntry.trim() || !user) return;
+  const handleFinish = async () => {
+    setShowReflectionModal(false);
+    setStage('finished');
+    animationRef.current?.play();
+
+    if (!user) {
+      console.error('No user found');
+      return;
+    }
+
+    const userId = user.uid;
+    const userRef = database().ref(`users/${userId}`);
 
     try {
-      const userRef = database().ref(`users/${user.uid}`);
-      const journalChallengeSnapshot = await userRef.child('challenges/journal').once('value');
-      const currentJournalChallengeCount = journalChallengeSnapshot.val() || 0;
-      
-      const completedChallengesSnapshot = await userRef.child('completedChallenges').once('value');
-      const currentLevel = Math.floor(completedChallengesSnapshot.val() / 7) + 1;
+      // Initialize points structure if it doesn't exist
+      await initializePoints(userRef);
 
-      if (currentJournalChallengeCount < currentLevel) {
-        await userRef.child('challenges/journal').set(currentJournalChallengeCount + 1);
-        await userRef.child('completedChallenges').set(completedChallengesSnapshot.val() + 1);
+      const userSnapshot = await userRef.once('value');
+      const userData = userSnapshot.val();
 
-        Toast.show({
-          type: 'success',
-          text1: 'Journal Challenge Completed!',
-          text2: 'Great job on writing your journal entry!',
-          visibilityTime: 3000,
-          autoHide: true,
-          topOffset: 30,
-          bottomOffset: 40,
+      if (!userData) {
+        console.error('No user data found');
+        return;
+      }
+
+      // Initialize challenges if they don't exist
+      if (!userData.challenges) {
+        await userRef.child('challenges').set({
+          gratitude: 0,
+          mindfulness: 0,
+          breathing: 0,
+          exercise: 0,
+          sleep: 0,
+          social: 0,
+          journal: 0
         });
       }
 
-      // Save the journal entry to the user's journal
-      const entriesRef = database().ref(`users/${user.uid}/entries`);
-      const newEntryRef = entriesRef.push();
-      await newEntryRef.set({
-        date: new Date().toISOString().split('T')[0],
-        content: journalEntry.trim(),
-      });
+      // Initialize completedChallenges if it doesn't exist
+      if (typeof userData.completedChallenges !== 'number') {
+        await userRef.child('completedChallenges').set(0);
+      }
 
-      setStage('finished');
+      const currentLevel = Math.floor((userData.completedChallenges || 0) / 7) + 1;
+      const currentJournalCount = userData.challenges?.journal || 0;
+
+      if (currentJournalCount < currentLevel) {
+        const points = userData.points || { total: 0, weekly: 0, lastReset: new Date().toISOString() };
+        
+        // Check if points need to be reset
+        const lastReset = new Date(points.lastReset);
+        const now = new Date();
+        const shouldReset = now.getTime() - lastReset.getTime() > 7 * 24 * 60 * 60 * 1000;
+        
+        if (shouldReset) {
+          points.weekly = 0;
+          points.lastReset = now.toISOString();
+        }
+
+        // Calculate new points
+        const basePoints = 100;
+        const levelBonus = currentLevel * 50;
+        const pointsToAdd = basePoints + levelBonus;
+
+        // Update points
+        await userRef.child('points').set({
+          total: (points.total || 0) + pointsToAdd,
+          weekly: (points.weekly || 0) + pointsToAdd,
+          lastReset: points.lastReset
+        });
+
+        // Update challenge counts
+        await userRef.child('challenges/journal').set(currentJournalCount + 1);
+        await userRef.child('completedChallenges').set((userData.completedChallenges || 0) + 1);
+
+        // Set points earned for display
+        setPointsEarned({
+          base: basePoints,
+          levelBonus: levelBonus,
+          total: pointsToAdd
+        });
+      }
     } catch (error) {
-      console.error('Failed to submit journal entry:', error);
+      console.error('Error updating journal and completed challenges count:', error);
+    }
+  };
+
+  const initializePoints = async (userRef: any) => {
+    try {
+      const pointsSnapshot = await userRef.child('points').once('value');
+      if (!pointsSnapshot.exists()) {
+        await userRef.child('points').set({
+          total: 0,
+          weekly: 0,
+          lastReset: new Date().toISOString()
+        });
+      }
+    } catch (error) {
+      console.error('Error initializing points:', error);
     }
   };
 
@@ -207,13 +278,13 @@ const JournalChallengeScreen: React.FC = () => {
             </TouchableOpacity>
           </>
         );
-      case 'writing':
+      case 'journal':
         return (
           <>
             <Text style={[styles.title, { color: colors.text }]}>Write Your Journal</Text>
             {renderJournalInput()}
             <View style={styles.buttonContainer}>
-              <TouchableOpacity style={[styles.button, { backgroundColor: colors.primary }]} onPress={handleSubmitJournal}>
+              <TouchableOpacity style={[styles.button, { backgroundColor: colors.primary }]} onPress={handleFinish}>
                 <Text style={styles.buttonText}>Submit Journal</Text>
               </TouchableOpacity>
               <TouchableOpacity

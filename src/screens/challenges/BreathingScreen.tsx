@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Dimensions, Animated } from 'react-native';
 import { useTheme } from '../../context/ThemeContext';
 import LottieView from 'lottie-react-native';
 import SoundPlayer from 'react-native-sound-player';
@@ -16,13 +16,20 @@ const TOTAL_CYCLE_DURATION = INHALE_DURATION + HOLD_DURATION + EXHALE_DURATION;
 const EXERCISE_DURATION = 180;
 
 const BreathingScreen: React.FC = () => {
-    const [stage, setStage] = useState<'instructions' | 'exercise' | 'finished'>('instructions');
-    const [timer, setTimer] = useState(EXERCISE_DURATION);
-    const [showFinishButton, setShowFinishButton] = useState(false);
-    const [breathPhase, setBreathPhase] = useState<'inhale' | 'hold' | 'exhale'>('inhale');
+    const [stage, setStage] = useState<'instructions' | 'breathing' | 'finished'>('instructions');
+    const [showReflectionModal, setShowReflectionModal] = useState(false);
+    const [breathingPhase, setBreathingPhase] = useState<'inhale' | 'hold' | 'exhale'>('inhale');
+    const [breathCount, setBreathCount] = useState(0);
     const [captionVisible, setCaptionVisible] = useState(true);
     const { colors } = useTheme();
     const { user } = useAuth();
+    const animationRef = useRef<LottieView>(null);
+    const fadeAnim = useRef(new Animated.Value(0)).current;
+    const [pointsEarned, setPointsEarned] = useState<{
+        base: number;
+        levelBonus: number;
+        total: number;
+    } | null>(null);
 
     const instructions = "Take a comfortable position. We'll guide you through a series of deep breaths to help you relax and focus.";
     const quotes = [
@@ -35,26 +42,25 @@ const BreathingScreen: React.FC = () => {
 
     useEffect(() => {
         let interval: NodeJS.Timeout;
-        if (stage === 'exercise' && timer > 0) {
+        if (stage === 'breathing' && breathCount < EXERCISE_DURATION) {
             interval = setInterval(() => {
-                setTimer((prevTimer) => {
-                    if (prevTimer <= 1) {
-                        setShowFinishButton(true);
+                setBreathCount((prevBreathCount) => {
+                    if (prevBreathCount >= EXERCISE_DURATION) {
                         clearInterval(interval);
-                        return 0;
+                        return EXERCISE_DURATION;
                     }
-                    return prevTimer - 1;
+                    return prevBreathCount + 1;
                 });
 
                 setCycleTimer((prevCycleTimer) => {
                     const newCycleTimer = (prevCycleTimer + 1) % TOTAL_CYCLE_DURATION;
 
                     if (newCycleTimer === 0) {
-                        setBreathPhase('inhale');
+                        setBreathingPhase('inhale');
                     } else if (newCycleTimer === INHALE_DURATION) {
-                        setBreathPhase('hold');
+                        setBreathingPhase('hold');
                     } else if (newCycleTimer === INHALE_DURATION + HOLD_DURATION) {
-                        setBreathPhase('exhale');
+                        setBreathingPhase('exhale');
                     }
 
                     return newCycleTimer;
@@ -62,7 +68,7 @@ const BreathingScreen: React.FC = () => {
             }, 1000);
         }
         return () => clearInterval(interval);
-    }, [stage, timer]);
+    }, [stage, breathCount]);
 
     useEffect(() => {
         const onFinishedPlayingSubscription = SoundPlayer.addEventListener('FinishedPlaying', ({ success }) => {
@@ -83,7 +89,7 @@ const BreathingScreen: React.FC = () => {
         }, [])
     );
     useEffect(() => {
-        if (stage === 'exercise') {
+        if (stage === 'breathing') {
             const captionTimer = setTimeout(() => {
                 setCaptionVisible(false);
             }, 20000);
@@ -103,7 +109,7 @@ const BreathingScreen: React.FC = () => {
     };
 
     const getPhaseTime = () => {
-        switch (breathPhase) {
+        switch (breathingPhase) {
             case 'inhale': return INHALE_DURATION;
             case 'hold': return HOLD_DURATION;
             case 'exhale': return EXHALE_DURATION;
@@ -111,43 +117,96 @@ const BreathingScreen: React.FC = () => {
     };
 
     const handleStart = () => {
-        setStage('exercise');
-        setTimer(EXERCISE_DURATION);
-        setShowFinishButton(false);
-        setBreathPhase('inhale');
+        setStage('breathing');
+        setBreathCount(0);
         setCaptionVisible(true);
         playBackgroundMusic();
     };
 
     const handleFinish = async () => {
+        setShowReflectionModal(false);
         setStage('finished');
-        stopBackgroundMusic();
+        animationRef.current?.play();
 
-        if (user) {
-            const userId = user.uid;
-            const userRef = database().ref(`users/${userId}`);
+        if (!user) {
+            console.error('No user found');
+            return;
+        }
 
-            try {
-                // Get the current user data
-                const userSnapshot = await userRef.once('value');
-                const userData = userSnapshot.val();
+        const userId = user.uid;
+        const userRef = database().ref(`users/${userId}`);
 
-                // Calculate the current level
-                const currentLevel = Math.floor(userData.completedChallenges / 7) + 1;
+        try {
+            // Initialize points structure if it doesn't exist
+            await initializePoints(userRef);
 
-                // Check if the mindfulness challenge for the current level is already completed
-                if (userData.challenges.mindfulness < currentLevel) {
-                    // Increment mindfulness count
-                    const newMindfulnessCount = userData.challenges.mindfulness + 1;
-                    await userRef.child('challenges/mindfulness').set(newMindfulnessCount);
+            const userSnapshot = await userRef.once('value');
+            const userData = userSnapshot.val();
 
-                    // Increment completed challenges count
-                    const newCompletedChallengesCount = userData.completedChallenges + 1;
-                    await userRef.child('completedChallenges').set(newCompletedChallengesCount);
-                }
-            } catch (error) {
-                console.error('Error updating mindfulness and completed challenges count:', error);
+            if (!userData) {
+                console.error('No user data found');
+                return;
             }
+
+            // Initialize challenges if they don't exist
+            if (!userData.challenges) {
+                await userRef.child('challenges').set({
+                    gratitude: 0,
+                    mindfulness: 0,
+                    breathing: 0,
+                    exercise: 0,
+                    sleep: 0,
+                    social: 0,
+                    journal: 0
+                });
+            }
+
+            // Initialize completedChallenges if it doesn't exist
+            if (typeof userData.completedChallenges !== 'number') {
+                await userRef.child('completedChallenges').set(0);
+            }
+
+            const currentLevel = Math.floor((userData.completedChallenges || 0) / 7) + 1;
+            const currentBreathingCount = userData.challenges?.breathing || 0;
+
+            if (currentBreathingCount < currentLevel) {
+                const points = userData.points || { total: 0, weekly: 0, lastReset: new Date().toISOString() };
+                
+                // Check if points need to be reset
+                const lastReset = new Date(points.lastReset);
+                const now = new Date();
+                const shouldReset = now.getTime() - lastReset.getTime() > 7 * 24 * 60 * 60 * 1000;
+                
+                if (shouldReset) {
+                    points.weekly = 0;
+                    points.lastReset = now.toISOString();
+                }
+
+                // Calculate new points
+                const basePoints = 100;
+                const levelBonus = currentLevel * 50;
+                const pointsToAdd = basePoints + levelBonus;
+
+                // Update points
+                await userRef.child('points').set({
+                    total: (points.total || 0) + pointsToAdd,
+                    weekly: (points.weekly || 0) + pointsToAdd,
+                    lastReset: points.lastReset
+                });
+
+                // Update challenge counts
+                await userRef.child('challenges/breathing').set(currentBreathingCount + 1);
+                await userRef.child('completedChallenges').set((userData.completedChallenges || 0) + 1);
+
+                // Set points earned for display
+                setPointsEarned({
+                    base: basePoints,
+                    levelBonus: levelBonus,
+                    total: pointsToAdd
+                });
+            }
+        } catch (error) {
+            console.error('Error updating breathing and completed challenges count:', error);
         }
     };
 
@@ -155,6 +214,21 @@ const BreathingScreen: React.FC = () => {
         const mins = Math.floor(seconds / 60);
         const secs = seconds % 60;
         return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+    };
+
+    const initializePoints = async (userRef: any) => {
+        try {
+            const pointsSnapshot = await userRef.child('points').once('value');
+            if (!pointsSnapshot.exists()) {
+                await userRef.child('points').set({
+                    total: 0,
+                    weekly: 0,
+                    lastReset: new Date().toISOString()
+                });
+            }
+        } catch (error) {
+            console.error('Error initializing points:', error);
+        }
     };
 
     const renderContent = () => {
@@ -168,28 +242,27 @@ const BreathingScreen: React.FC = () => {
                         </TouchableOpacity>
                     </>
                 );
-            case 'exercise':
+            case 'breathing':
                 return (
                     <>
-                        <Text style={[styles.timerText, { color: colors.text }]}>{formatTime(timer)}</Text>
+                        <Text style={[styles.timerText, { color: colors.text }]}>{formatTime(EXERCISE_DURATION - breathCount)}</Text>
                         <View style={styles.lottieContainer}>
                             <LottieView
                                 source={require('../../assets/lottie/breathing-animation.json')}
                                 autoPlay
                                 loop
                                 style={styles.lottieAnimation}
+                                ref={animationRef}
                             />
                             {captionVisible && (
                                 <View style={styles.breathTextContainer}>
-                                    <Text style={[styles.breathPhaseText, { color: colors.text }]}>{breathPhase.toUpperCase()}</Text>
+                                    <Text style={[styles.breathPhaseText, { color: colors.text }]}>{breathingPhase.toUpperCase()}</Text>
                                 </View>
                             )}
                         </View>
-                        {showFinishButton && (
-                            <TouchableOpacity style={[styles.finishButton, { backgroundColor: colors.primary }]} onPress={handleFinish}>
-                                <Text style={styles.buttonText}>Finish</Text>
-                            </TouchableOpacity>
-                        )}
+                        <TouchableOpacity style={[styles.finishButton, { backgroundColor: colors.primary }]} onPress={handleFinish}>
+                            <Text style={styles.buttonText}>Finish</Text>
+                        </TouchableOpacity>
                     </>
                 );
             case 'finished':

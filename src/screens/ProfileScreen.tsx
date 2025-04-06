@@ -32,6 +32,11 @@ interface UserData {
         expiryDate?: string;
         startDate?: string;
     };
+    points?: {
+        total: number;
+        weekly: number;
+        lastReset?: string;
+    };
 }
 
 const ProfileScreen = () => {
@@ -70,6 +75,7 @@ const ProfileScreen = () => {
                                 concerns: data.concerns,
                                 preferredTherapyType: data.preferredTherapyType,
                                 emoElevate: data.emoElevate,
+                                points: data.points || { total: 0, weekly: 0 },
                             });
                         }
                         setLoading(false);
@@ -130,6 +136,7 @@ const ProfileScreen = () => {
                         concerns: data.concerns,
                         preferredTherapyType: data.preferredTherapyType,
                         emoElevate: data.emoElevate,
+                        points: data.points || { total: 0, weekly: 0 },
                     });
                 }
                 setLoading(false);
@@ -282,16 +289,38 @@ const ProfileScreen = () => {
                     </View>
                 </View>
 
-                <View style={[styles.card, styles.badgesContainer, { backgroundColor: colors.secondaryBackground }]}>
-                    <View style={styles.badgesHeader}>
-                        <Text style={[styles.badgesText, { color: colors.text }]}>Badges</Text>
+                <View style={[styles.card, styles.highscoreContainer, { backgroundColor: colors.secondaryBackground }]}>
+                    <View style={styles.highscoreHeader}>
+                        <Text style={[styles.highscoreText, { color: colors.text }]}>Weekly Highscores</Text>
                         <Text style={[styles.viewAllText, { color: colors.primary }]}>View all</Text>
                     </View>
-                    <View style={styles.badgesRow}>
-                        {/* Placeholder for badges */}
-                        <View style={styles.badgeItem}>
-                            <Icon name="emoji-events" size={60} color={colors.primary} style={styles.badgeIcon} />
-                            <Text style={[styles.badgeLabel, { color: colors.text }]}>Placeholder Badge</Text>
+                    <View style={styles.highscoreList}>
+                        <View style={styles.highscoreItem}>
+                            <View style={styles.highscoreRank}>
+                                <Text style={[styles.rankText, { color: colors.text }]}>1</Text>
+                            </View>
+                            <View style={styles.highscoreInfo}>
+                                <Text style={[styles.highscoreName, { color: colors.text }]}>John Doe</Text>
+                                <Text style={[styles.highscorePoints, { color: colors.primary }]}>1,250 pts</Text>
+                            </View>
+                        </View>
+                        <View style={styles.highscoreItem}>
+                            <View style={styles.highscoreRank}>
+                                <Text style={[styles.rankText, { color: colors.text }]}>2</Text>
+                            </View>
+                            <View style={styles.highscoreInfo}>
+                                <Text style={[styles.highscoreName, { color: colors.text }]}>Jane Smith</Text>
+                                <Text style={[styles.highscorePoints, { color: colors.primary }]}>1,100 pts</Text>
+                            </View>
+                        </View>
+                        <View style={styles.highscoreItem}>
+                            <View style={styles.highscoreRank}>
+                                <Text style={[styles.rankText, { color: colors.text }]}>3</Text>
+                            </View>
+                            <View style={styles.highscoreInfo}>
+                                <Text style={[styles.highscoreName, { color: colors.text }]}>Mike Johnson</Text>
+                                <Text style={[styles.highscorePoints, { color: colors.primary }]}>950 pts</Text>
+                            </View>
                         </View>
                     </View>
                 </View>
@@ -415,33 +444,53 @@ const styles = StyleSheet.create({
         color: 'white',
         fontWeight: 'bold',
     },
-    badgesContainer: {},
-    badgesHeader: {
+    highscoreContainer: {
+        marginBottom: 16,
+    },
+    highscoreHeader: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 10,
+        marginBottom: 16,
     },
-    badgesText: {
+    highscoreText: {
         fontSize: 18,
+        fontWeight: 'bold',
+    },
+    highscoreList: {
+        gap: 12,
+    },
+    highscoreItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingVertical: 8,
+    },
+    highscoreRank: {
+        width: 24,
+        height: 24,
+        borderRadius: 12,
+        backgroundColor: 'rgba(0, 0, 0, 0.1)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 16,
+    },
+    rankText: {
+        fontSize: 14,
+        fontWeight: 'bold',
+    },
+    highscoreInfo: {
+        flex: 1,
+    },
+    highscoreName: {
+        fontSize: 16,
+        fontWeight: '500',
+    },
+    highscorePoints: {
+        fontSize: 14,
         fontWeight: 'bold',
     },
     viewAllText: {
         fontSize: 14,
-    },
-    badgesRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-around',
-    },
-    badgeItem: {
-        alignItems: 'center',
-    },
-    badgeIcon: {
-        marginBottom: 4,
-    },
-    badgeLabel: {
-        fontSize: 12,
-        textAlign: 'center',
     },
     challengesContainer: {},
     challengesTitle: {

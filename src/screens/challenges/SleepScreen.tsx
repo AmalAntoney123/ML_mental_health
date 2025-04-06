@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, Animated } from 'react-native';
 import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../utils/auth';
 import database from '@react-native-firebase/database';
 import MusicPlayer, { MusicPlayerRef } from '../../components/MusicPlayer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import LottieView from 'lottie-react-native';
 
 interface SleepMusic {
   id: string;
@@ -20,9 +21,17 @@ const SleepScreen: React.FC = () => {
   const [challengeCompleted, setChallengeCompleted] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [lastPlayedMusic, setLastPlayedMusic] = useState<SleepMusic | null>(null);
+  const [showReflectionModal, setShowReflectionModal] = useState(false);
+  const [pointsEarned, setPointsEarned] = useState<{
+    base: number;
+    levelBonus: number;
+    total: number;
+  } | null>(null);
   const { colors } = useTheme();
   const { user } = useAuth();
   const playerRef = useRef<MusicPlayerRef>(null);
+  const animationRef = useRef<LottieView>(null);
+  const fadeAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     fetchSleepMusic();
@@ -111,9 +120,106 @@ const SleepScreen: React.FC = () => {
     }
   };
 
-  const handleFinish = () => {
+  const handleFinish = async () => {
+    setShowReflectionModal(false);
     setStage('finished');
-    setIsPlaying(false);
+    animationRef.current?.play();
+
+    if (!user) {
+      console.error('No user found');
+      return;
+    }
+
+    const userId = user.uid;
+    const userRef = database().ref(`users/${userId}`);
+
+    try {
+      // Initialize points structure if it doesn't exist
+      await initializePoints(userRef);
+
+      const userSnapshot = await userRef.once('value');
+      const userData = userSnapshot.val();
+
+      if (!userData) {
+        console.error('No user data found');
+        return;
+      }
+
+      // Initialize challenges if they don't exist
+      if (!userData.challenges) {
+        await userRef.child('challenges').set({
+          gratitude: 0,
+          mindfulness: 0,
+          breathing: 0,
+          exercise: 0,
+          sleep: 0,
+          social: 0,
+          journal: 0
+        });
+      }
+
+      // Initialize completedChallenges if it doesn't exist
+      if (typeof userData.completedChallenges !== 'number') {
+        await userRef.child('completedChallenges').set(0);
+      }
+
+      const currentLevel = Math.floor((userData.completedChallenges || 0) / 7) + 1;
+      const currentSleepCount = userData.challenges?.sleep || 0;
+
+      if (currentSleepCount < currentLevel) {
+        const points = userData.points || { total: 0, weekly: 0, lastReset: new Date().toISOString() };
+        
+        // Check if points need to be reset
+        const lastReset = new Date(points.lastReset);
+        const now = new Date();
+        const shouldReset = now.getTime() - lastReset.getTime() > 7 * 24 * 60 * 60 * 1000;
+        
+        if (shouldReset) {
+          points.weekly = 0;
+          points.lastReset = now.toISOString();
+        }
+
+        // Calculate new points
+        const basePoints = 100;
+        const levelBonus = currentLevel * 50;
+        const pointsToAdd = basePoints + levelBonus;
+
+        // Update points
+        await userRef.child('points').set({
+          total: (points.total || 0) + pointsToAdd,
+          weekly: (points.weekly || 0) + pointsToAdd,
+          lastReset: points.lastReset
+        });
+
+        // Update challenge counts
+        await userRef.child('challenges/sleep').set(currentSleepCount + 1);
+        await userRef.child('completedChallenges').set((userData.completedChallenges || 0) + 1);
+
+        // Set points earned for display
+        setPointsEarned({
+          base: basePoints,
+          levelBonus: levelBonus,
+          total: pointsToAdd
+        });
+      }
+    } catch (error) {
+      console.error('Error updating sleep and completed challenges count:', error);
+    }
+  };
+
+  const initializePoints = async (userRef: any) => {
+    try {
+      const pointsSnapshot = await userRef.child('points').once('value');
+      if (!pointsSnapshot.exists()) {
+        await userRef.child('points').set({
+          total: 0,
+          weekly: 0,
+          lastReset: new Date().toISOString()
+        });
+      }
+    } catch (error) {
+      console.error('Error initializing points:', error);
+    }
   };
 
   const renderMusicItem = ({ item }: { item: SleepMusic }) => (

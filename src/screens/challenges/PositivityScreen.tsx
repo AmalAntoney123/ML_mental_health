@@ -16,6 +16,7 @@ const PositivityScreen: React.FC = () => {
     const animationRef = useRef<LottieView>(null);
     const navigation = useNavigation();
     const [fadeAnim] = useState(new Animated.Value(0));
+    const [showReflectionModal, setShowReflectionModal] = useState(false);
 
     const totalThoughts = 3;
     const instructions = `Take a moment to write ${totalThoughts} positive things about yourself. This exercise will help boost your positivity and promote a positive self-image.`;
@@ -110,11 +111,16 @@ const PositivityScreen: React.FC = () => {
     };
 
     const handleReflectionComplete = () => {
+        setShowReflectionModal(false);
         setStage('finished');
         animationRef.current?.play();
     };
 
     const handleFinish = async () => {
+        setShowReflectionModal(false);
+        setStage('finished');
+        animationRef.current?.play();
+
         if (user) {
             const userId = user.uid;
             const userRef = database().ref(`users/${userId}`);
@@ -125,29 +131,30 @@ const PositivityScreen: React.FC = () => {
 
                 const currentLevel = Math.floor(userData.completedChallenges / 7) + 1;
 
-                // Update challenges and completedChallenges
-                const updates: { [key: string]: any } = {};
-                
-                if (!userData.challenges || !userData.challenges.positivity || userData.challenges.positivity < currentLevel) {
-                    updates['challenges/positivity'] = (userData.challenges?.positivity || 0) + 1;
-                    updates['completedChallenges'] = (userData.completedChallenges || 0) + 1;
+                if (userData.challenges.positivity < currentLevel) {
+                    const newPositivityCount = userData.challenges.positivity + 1;
+                    await userRef.child('challenges/positivity').set(newPositivityCount);
+
+                    const newCompletedChallengesCount = userData.completedChallenges + 1;
+                    await userRef.child('completedChallenges').set(newCompletedChallengesCount);
+
+                    // Calculate points
+                    const basePoints = 100;
+                    const levelBonus = currentLevel * 50;
+                    const pointsToAdd = basePoints + levelBonus;
+
+                    // Update both total and weekly points
+                    const currentTotal = userData.points?.total || 0;
+                    const currentWeekly = userData.points?.weekly || 0;
+                    
+                    await userRef.child('points').update({
+                        total: currentTotal + pointsToAdd,
+                        weekly: currentWeekly + pointsToAdd,
+                        lastReset: userData.points?.lastReset || new Date().toISOString()
+                    });
                 }
-
-                // Add new positivity entry
-                const newPositivityEntryRef = userRef.child('positivityEntries').push();
-                updates[`positivityEntries/${newPositivityEntryRef.key}`] = {
-                    date: new Date().toISOString(),
-                    thoughts: positiveThoughts
-                };
-
-                // Perform all updates in a single transaction
-                await userRef.update(updates);
-
-                // Navigate back or to a success screen
-                navigation.goBack(); // or navigation.navigate('SuccessScreen');
             } catch (error) {
-                console.error('Error updating positivity challenge:', error);
-                Alert.alert('Error', 'Failed to save your progress. Please try again.');
+                console.error('Error updating positivity entry and completed challenges count:', error);
             }
         }
     };

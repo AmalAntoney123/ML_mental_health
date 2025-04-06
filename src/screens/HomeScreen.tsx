@@ -55,7 +55,6 @@ const Counter: React.FC<CounterProps> = ({
 
   useEffect(() => {
     if (showAnimation) {
-      // Scale up animation
       Animated.sequence([
         Animated.spring(scaleAnim, {
           toValue: 1.3,
@@ -71,7 +70,6 @@ const Counter: React.FC<CounterProps> = ({
     }
 
     if (isBreakingStreak) {
-      // Breaking streak animation
       Animated.sequence([
         Animated.timing(opacityAnim, {
           toValue: 0.2,
@@ -87,6 +85,31 @@ const Counter: React.FC<CounterProps> = ({
     }
   }, [showAnimation, isBreakingStreak]);
 
+  const renderContent = () => (
+    <Animated.View 
+      style={[
+        styles.counterContent,
+        { 
+          transform: [{ scale: scaleAnim }],
+          opacity: opacityAnim
+        }
+      ]} 
+    >
+      <Icon name={icon} size={20} color={color} />
+      <Text style={[styles.counterText, { color: colors.text }]}>
+        {count?.toLocaleString() || '0'}
+      </Text>
+      {isBreakingStreak && (
+        <View style={styles.brokenStreakIcon}>
+          <Icon name="flash-off" size={16} color={colors.error} />
+        </View>
+      )}
+      {isStreakCounter && (
+        <Icon name="chevron-right" size={16} color={colors.text} style={styles.streakArrow} />
+      )}
+    </Animated.View>
+  );
+
   if (onPress) {
     return (
       <TouchableOpacity 
@@ -97,26 +120,7 @@ const Counter: React.FC<CounterProps> = ({
         ]}
         testID={testID}
       >
-        <Animated.View 
-          style={[
-            styles.counterContent,
-            { 
-              transform: [{ scale: scaleAnim }],
-              opacity: opacityAnim
-            }
-          ]} 
-        >
-          <Icon name={icon} size={20} color={color} />
-          <Text style={{ ...styles.counterText, color: colors.text }}>{count}</Text>
-          {isBreakingStreak && (
-            <View style={styles.brokenStreakIcon}>
-              <Icon name="flash-off" size={16} color={colors.error} />
-            </View>
-          )}
-          {isStreakCounter && (
-            <Icon name="chevron-right" size={16} color={colors.text} style={styles.streakArrow} />
-          )}
-        </Animated.View>
+        {renderContent()}
       </TouchableOpacity>
     );
   }
@@ -129,26 +133,7 @@ const Counter: React.FC<CounterProps> = ({
       ]}
       testID={testID}
     >
-      <Animated.View 
-        style={[
-          styles.counterContent,
-          { 
-            transform: [{ scale: scaleAnim }],
-            opacity: opacityAnim
-          }
-        ]} 
-      >
-        <Icon name={icon} size={20} color={color} />
-        <Text style={{ ...styles.counterText, color: colors.text }}>{count}</Text>
-        {isBreakingStreak && (
-          <View style={styles.brokenStreakIcon}>
-            <Icon name="flash-off" size={16} color={colors.error} />
-          </View>
-        )}
-        {isStreakCounter && (
-          <Icon name="chevron-right" size={16} color={colors.text} style={styles.streakArrow} />
-        )}
-      </Animated.View>
+      {renderContent()}
     </View>
   );
 };
@@ -181,15 +166,76 @@ const Header: React.FC<{
 }> = ({ setShowStreakModal, setShowBreakStreakModal, setNewStreak, animateModal }) => {
   const { colors } = useTheme();
   const navigation = useNavigation<HomeScreenNavigationProp>();
-  const [isElevated, setIsElevated] = useState(false);
   const { user } = useAuth();
+  const [userData, setUserData] = useState<any>(null);
+  const [points, setPoints] = useState<number>(0);
+  const [isElevated, setIsElevated] = useState(false);
   const [streak, setStreak] = useState(0);
   const [showStreakAnimation, setShowStreakAnimation] = useState(false);
   const [showBreakingAnimation, setShowBreakingAnimation] = useState(false);
+  const [weeklyPoints, setWeeklyPoints] = useState<number>(0);
 
   const bounceAnim = useRef(new Animated.Value(1)).current;
   const modalScaleAnim = useRef(new Animated.Value(0)).current;
   const modalOpacityAnim = useRef(new Animated.Value(0)).current;
+
+  const checkAndResetWeeklyPoints = async (data: any) => {
+    if (!user) return 0;
+    
+    const userRef = database().ref(`users/${user.uid}`);
+    const now = new Date();
+    const lastReset = data.points?.lastReset ? new Date(data.points.lastReset) : null;
+    
+    // Check if we need to reset (it's a new week or first time)
+    const isResetNeeded = !lastReset || 
+        lastReset.getDay() > now.getDay() || // If we've passed Sunday (0)
+        (now.getTime() - lastReset.getTime()) > 7 * 24 * 60 * 60 * 1000; // Or if it's been more than a week
+
+    if (isResetNeeded) {
+        // Reset weekly points but keep total points
+        await userRef.child('points').update({
+            weekly: 0,
+            lastReset: now.toISOString()
+        });
+        return 0;
+    }
+    return data.points?.weekly || 0;
+  };
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      if (user) {
+        try {
+          const userRef = database().ref(`users/${user.uid}`);
+          const unsubscribe = userRef.on('value', async (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+              // Initialize points structure if it doesn't exist
+              if (!data.points) {
+                await userRef.child('points').set({
+                  total: 0,
+                  weekly: 0,
+                  lastReset: new Date().toISOString()
+                });
+                data.points = { total: 0, weekly: 0 };
+              }
+
+              const currentWeeklyPoints = await checkAndResetWeeklyPoints(data);
+              setUserData(data);
+              setPoints(data.points?.total || 0);
+              setWeeklyPoints(currentWeeklyPoints);
+            }
+          });
+
+          return () => userRef.off('value', unsubscribe);
+        } catch (error) {
+          console.error('Error fetching user data:', error);
+        }
+      }
+    };
+
+    fetchUserData();
+  }, [user]);
 
   useEffect(() => {
     const checkElevateStatus = async () => {
@@ -299,48 +345,56 @@ const Header: React.FC<{
   }, [user, setShowStreakModal, setShowBreakStreakModal, setNewStreak, animateModal]);
 
   const handleStreakPress = () => {
-    if (!user) return;
-    const userRef = database().ref(`users/${user.uid}`);
-    userRef.once('value').then((snapshot) => {
-      const userData = snapshot.val();
-      navigation.navigate('StreakInfo', { 
-        streak,
-        lastLoginTimestamp: userData?.lastLoginTimestamp || Date.now()
-      });
+    navigation.navigate('StreakInfo', {
+      streak: streak,
+      lastLoginTimestamp: userData?.lastLoginTimestamp || Date.now(),
     });
+  };
+
+  const handlePointsPress = () => {
+    navigation.navigate('WeeklyHighscores');
   };
 
   return (
     <View style={[styles.header, { backgroundColor: colors.surface }]} testID="header">
-      <TouchableOpacity 
-        onPress={() => navigation.navigate('EmoElevate')}
-        style={[styles.headerItem, styles.elevateButton]}
-        testID="elevate-icon"
-      >
-        <Animated.View style={{ transform: [{ scale: bounceAnim }] }}>
-          <Image
-            source={isElevated ? require('../assets/premium.png') : require('../assets/no-premium.png')}
-            style={styles.elevateImage}
-            resizeMode="contain"
-          />
-        </Animated.View>
-      </TouchableOpacity>
-      <View style={styles.counterContainer}>
-        <Counter 
-          icon="local-fire-department" 
-          count={streak} 
-          color={colors.primary} 
-          testID="streak-counter"
-          showAnimation={showStreakAnimation}
-          isBreakingStreak={showBreakingAnimation}
+      <View style={styles.headerLeft}>
+        <Counter
+          icon="local-fire-department"
+          count={userData?.streak || 0}
+          color={colors.primary}
           onPress={handleStreakPress}
           isStreakCounter
         />
-        <Counter icon="money" count={100} color={colors.secondary} testID="money-counter" />
+        <Counter
+          icon="emoji-events"
+          count={weeklyPoints}
+          color={colors.secondary}
+          testID="points-counter"
+          onPress={handlePointsPress}
+        />
       </View>
-      <TouchableOpacity onPress={() => navigation.navigate('Profile')} style={styles.headerItem} testID="profile-icon">
-        <Icon name="person" size={24} color={colors.onSurface} />
-      </TouchableOpacity>
+      <View style={styles.headerRight}>
+        <TouchableOpacity 
+          onPress={() => navigation.navigate('EmoElevate')}
+          style={styles.headerItem}
+          testID="elevate-icon"
+        >
+          <Animated.View style={{ transform: [{ scale: bounceAnim }] }}>
+            <Image
+              source={isElevated ? require('../assets/premium.png') : require('../assets/no-premium.png')}
+              style={styles.elevateImage}
+              resizeMode="contain"
+            />
+          </Animated.View>
+        </TouchableOpacity>
+        <TouchableOpacity 
+          onPress={() => navigation.navigate('Profile')} 
+          style={styles.headerItem} 
+          testID="profile-icon"
+        >
+          <Icon name="person" size={24} color={colors.onSurface} />
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -520,31 +574,51 @@ const TabNavigator: React.FC<{
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 0, // Reduce top padding
+    paddingTop: 10,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 8, // Reduce padding
-    height: 50, // Set a fixed height for the header
+    padding: 16,
+    height: 60,
+    backgroundColor: 'transparent',
+  },
+  headerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+  },
+  headerRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
   },
   headerItem: {
-    width: 24, // Match the width of the profile icon
-  },
-  counterContainer: {
-    flexDirection: 'row',
+    width: 32,
+    height: 32,
     justifyContent: 'center',
-    flex: 1,
+    alignItems: 'center',
   },
   counter: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginHorizontal: 8,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
+  counterContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
   },
   counterText: {
     marginLeft: 4,
     fontWeight: 'bold',
+    fontSize: 16,
+  },
+  elevateImage: {
+    width: 24,
+    height: 24,
   },
   content: {
     flex: 1,
@@ -604,10 +678,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  elevateImage: {
-    width: 24,
-    height: 24,
-  },
   brokenStreakIcon: {
     position: 'absolute',
     top: -8,
@@ -621,10 +691,6 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     borderRadius: 16,
     backgroundColor: 'rgba(0, 0, 0, 0.05)',
-  },
-  counterContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
   },
   streakArrow: {
     marginLeft: 4,

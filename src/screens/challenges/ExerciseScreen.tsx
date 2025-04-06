@@ -22,6 +22,11 @@ const ExerciseScreen: React.FC = () => {
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [showReflectionModal, setShowReflectionModal] = useState(false);
   const [showCompleteButton, setShowCompleteButton] = useState(false);
+  const [pointsEarned, setPointsEarned] = useState<{
+    base: number;
+    levelBonus: number;
+    total: number;
+  } | null>(null);
 
   const { colors } = useTheme();
   const { user } = useAuth();
@@ -30,6 +35,21 @@ const ExerciseScreen: React.FC = () => {
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
   const totalTime = yogaPoses.reduce((sum, pose) => sum + pose.duration, 0) + (yogaPoses.length - 1) * 5;
+
+  const initializePoints = async (userRef: any) => {
+    try {
+      const pointsSnapshot = await userRef.child('points').once('value');
+      if (!pointsSnapshot.exists()) {
+        await userRef.child('points').set({
+          total: 0,
+          weekly: 0,
+          lastReset: new Date().toISOString()
+        });
+      }
+    } catch (error) {
+      console.error('Error initializing points:', error);
+    }
+  };
 
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
@@ -84,27 +104,85 @@ const ExerciseScreen: React.FC = () => {
     setStage('finished');
     animationRef.current?.play();
 
-    if (user) {
-      const userId = user.uid;
-      const userRef = database().ref(`users/${userId}`);
+    if (!user) {
+      console.error('No user found');
+      return;
+    }
 
-      try {
-        const userSnapshot = await userRef.once('value');
-        const userData = userSnapshot.val();
+    const userId = user.uid;
+    const userRef = database().ref(`users/${userId}`);
 
-        const currentLevel = Math.floor(userData.completedChallenges / 7) + 1;
+    try {
+      // Initialize points structure if it doesn't exist
+      await initializePoints(userRef);
 
-        if (userData.challenges.exercise < currentLevel) {
-          const newYogaCount = userData.challenges.exercise + 1;
-          await userRef.child('challenges/exercise').set(newYogaCount);
+      const userSnapshot = await userRef.once('value');
+      const userData = userSnapshot.val();
 
-          const newCompletedChallengesCount = userData.completedChallenges + 1;
-          await userRef.child('completedChallenges').set(newCompletedChallengesCount);
+      if (!userData) {
+        console.error('No user data found');
+        return;
+      }
+
+      // Initialize challenges if they don't exist
+      if (!userData.challenges) {
+        await userRef.child('challenges').set({
+          gratitude: 0,
+          mindfulness: 0,
+          breathing: 0,
+          exercise: 0,
+          sleep: 0,
+          social: 0,
+          journal: 0
+        });
+      }
+
+      // Initialize completedChallenges if it doesn't exist
+      if (typeof userData.completedChallenges !== 'number') {
+        await userRef.child('completedChallenges').set(0);
+      }
+
+      const currentLevel = Math.floor((userData.completedChallenges || 0) / 7) + 1;
+      const currentExerciseCount = userData.challenges?.exercise || 0;
+
+      if (currentExerciseCount < currentLevel) {
+        const points = userData.points || { total: 0, weekly: 0, lastReset: new Date().toISOString() };
+        
+        // Check if points need to be reset
+        const lastReset = new Date(points.lastReset);
+        const now = new Date();
+        const shouldReset = now.getTime() - lastReset.getTime() > 7 * 24 * 60 * 60 * 1000;
+        
+        if (shouldReset) {
+          points.weekly = 0;
+          points.lastReset = now.toISOString();
         }
 
-      } catch (error) {
-        console.error('Error updating yoga entry and completed challenges count:', error);
+        // Calculate new points
+        const basePoints = 100;
+        const levelBonus = currentLevel * 50;
+        const pointsToAdd = basePoints + levelBonus;
+
+        // Update points
+        await userRef.child('points').set({
+          total: (points.total || 0) + pointsToAdd,
+          weekly: (points.weekly || 0) + pointsToAdd,
+          lastReset: points.lastReset
+        });
+
+        // Update challenge counts
+        await userRef.child('challenges/exercise').set(currentExerciseCount + 1);
+        await userRef.child('completedChallenges').set((userData.completedChallenges || 0) + 1);
+
+        // Set points earned for display
+        setPointsEarned({
+          base: basePoints,
+          levelBonus: levelBonus,
+          total: pointsToAdd
+        });
       }
+    } catch (error) {
+      console.error('Error updating exercise and completed challenges count:', error);
     }
   };
 
