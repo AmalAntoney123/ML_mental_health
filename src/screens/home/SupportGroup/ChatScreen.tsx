@@ -331,17 +331,18 @@ const MessageItem: React.FC<MessageItemProps> = ({
 
 const ChatScreen: React.FC = () => {
     const route = useRoute<ChatScreenRouteProp>();
-  const { group, fromSocialChallenge = false } = route.params;
-  const [socialChallengeCompleted, setSocialChallengeCompleted] = useState(false);
-  const [isJoined, setIsJoined] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [newMessage, setNewMessage] = useState('');
-  const [replyingTo, setReplyingTo] = useState<Message | null>(null);
-  const [users, setUsers] = useState<User[]>([]);
-  const [typingUsers, setTypingUsers] = useState<string[]>([]);
-  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
-  const { colors } = useTheme();
-  const swipeableRefs = useRef<{ [key: string]: Swipeable | null }>({});
+    const { group, fromSocialChallenge = false } = route.params;
+    const [socialChallengeCompleted, setSocialChallengeCompleted] = useState(false);
+    const [isJoined, setIsJoined] = useState(false);
+    const [isGroupDeleted, setIsGroupDeleted] = useState(false);
+    const [messages, setMessages] = useState<Message[]>([]);
+    const [newMessage, setNewMessage] = useState('');
+    const [replyingTo, setReplyingTo] = useState<Message | null>(null);
+    const [users, setUsers] = useState<User[]>([]);
+    const [typingUsers, setTypingUsers] = useState<string[]>([]);
+    const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+    const { colors } = useTheme();
+    const swipeableRefs = useRef<{ [key: string]: Swipeable | null }>({});
 
     useEffect(() => {
         const currentUser = auth().currentUser;
@@ -354,6 +355,15 @@ const ChatScreen: React.FC = () => {
         };
 
         checkMembership();
+
+        // Check if group is deleted
+        const groupRef = database().ref(`supportGroups/${group.id}`);
+        groupRef.on('value', (snapshot) => {
+            const groupData = snapshot.val();
+            if (groupData) {
+                setIsGroupDeleted(groupData.isDeleted === true);
+            }
+        });
 
         if (isJoined) {
             const messagesRef = database().ref(`supportGroups/${group.id}/messages`);
@@ -431,7 +441,7 @@ const ChatScreen: React.FC = () => {
     };
 
     const handleSendMessage = async () => {
-        if (!newMessage.trim() || !isJoined) return;
+        if (!newMessage.trim() || !isJoined || isGroupDeleted) return;
     
         const currentUser = auth().currentUser;
         if (!currentUser) return;
@@ -506,6 +516,56 @@ const ChatScreen: React.FC = () => {
         database().ref(`supportGroups/${group.id}/typing/${currentUser.uid}`).set(isTyping);
     };
 
+    const handleLeaveGroup = async () => {
+        try {
+            const currentUser = auth().currentUser;
+            if (!currentUser) return;
+
+            // Get user name before removing from group
+            const userRef = database().ref(`users/${currentUser.uid}`);
+            const userSnapshot = await userRef.once('value');
+            const userName = userSnapshot.val()?.name || 'Unknown';
+
+            // Add system message about user leaving
+            const messagesRef = database().ref(`supportGroups/${group.id}/messages`);
+            await messagesRef.push({
+                text: `${userName} has left the group`,
+                userId: 'system',
+                userName: 'System',
+                timestamp: database.ServerValue.TIMESTAMP,
+                isSystemMessage: true,
+                readBy: { [currentUser.uid]: true },
+            });
+
+            // Remove user from group
+            await database()
+                .ref(`supportGroups/${group.id}/members/${currentUser.uid}`)
+                .remove();
+            
+            await database()
+                .ref(`supportGroups/${group.id}/typing/${currentUser.uid}`)
+                .remove();
+
+            Toast.show({
+                type: 'success',
+                text1: 'Left group successfully',
+                text2: 'You can join other support groups',
+                position: 'bottom',
+                visibilityTime: 3000,
+            });
+
+            navigation.goBack();
+        } catch (error) {
+            console.error('Failed to leave group:', error);
+            Toast.show({
+                type: 'error',
+                text1: 'Failed to leave group',
+                text2: 'Please try again',
+                position: 'bottom',
+                visibilityTime: 3000,
+            });
+        }
+    };
 
     const renderMessage = useCallback(({ item }: { item: Message }) => {
         const isCurrentUser = item.userId === auth().currentUser?.uid;
@@ -524,6 +584,18 @@ const ChatScreen: React.FC = () => {
     return (
         <SafeAreaView style={styles.safeArea} edges={['top']}>
             <View style={[styles.container, { backgroundColor: colors.background }]}>
+                {isGroupDeleted && (
+                    <View style={[styles.deletedBanner, { backgroundColor: colors.error }]}>
+                        <Icon name="error" size={20} color="white" style={styles.deletedIcon} />
+                        <Text style={styles.deletedText}>This group has been deleted</Text>
+                        <TouchableOpacity 
+                            style={[styles.leaveButton, { backgroundColor: 'rgba(255,255,255,0.2)' }]}
+                            onPress={handleLeaveGroup}
+                        >
+                            <Text style={styles.leaveButtonText}>Leave Group</Text>
+                        </TouchableOpacity>
+                    </View>
+                )}
                 <View style={[styles.header, { backgroundColor: colors.background }]}>
                     <TouchableOpacity onPress={() => navigation.goBack()}>
                         <Icon name="arrow-back" size={24} color={colors.text} />
@@ -539,16 +611,18 @@ const ChatScreen: React.FC = () => {
                     </TouchableOpacity>
                 </View>
 
-                <FlatList
-                    data={messages}
-                    renderItem={renderMessage}
-                    keyExtractor={(item) => item.id}
-                    inverted
-                    contentContainerStyle={[styles.listContainer, { backgroundColor: colors.background }]}
-                />
+                {!isGroupDeleted && (
+                    <FlatList
+                        data={messages}
+                        renderItem={renderMessage}
+                        keyExtractor={(item) => item.id}
+                        inverted
+                        contentContainerStyle={[styles.listContainer, { backgroundColor: colors.background }]}
+                    />
+                )}
 
                 {/* Reply Preview */}
-                {replyingTo && (
+                {replyingTo && !isGroupDeleted && (
                     <View style={[styles.replyPreview, { backgroundColor: colors.surface }]}>
                         <View style={styles.replyPreviewContent}>
                             <View style={styles.replyPreviewLeft}>
@@ -573,25 +647,27 @@ const ChatScreen: React.FC = () => {
                 )}
 
                 {/* Input Container */}
-                <View style={[styles.inputContainer, { backgroundColor: colors.surface }]}>
-                    <TextInput
-                        style={[styles.input, { 
-                            color: colors.text,
-                            backgroundColor: colors.background
-                        }]}
-                        value={newMessage}
-                        onChangeText={setNewMessage}
-                        placeholder="Type here..."
-                        placeholderTextColor={colors.gray}
-                        multiline
-                    />
-                    <TouchableOpacity
-                        style={[styles.sendButton, { backgroundColor: colors.primary }]}
-                        onPress={handleSendMessage}
-                    >
-                        <Icon name="send" size={20} color={colors.onPrimary} />
-                    </TouchableOpacity>
-                </View>
+                {!isGroupDeleted && (
+                    <View style={[styles.inputContainer, { backgroundColor: colors.surface }]}>
+                        <TextInput
+                            style={[styles.input, { 
+                                color: colors.text,
+                                backgroundColor: colors.background
+                            }]}
+                            value={newMessage}
+                            onChangeText={setNewMessage}
+                            placeholder="Type here..."
+                            placeholderTextColor={colors.gray}
+                            multiline
+                        />
+                        <TouchableOpacity
+                            style={[styles.sendButton, { backgroundColor: colors.primary }]}
+                            onPress={handleSendMessage}
+                        >
+                            <Icon name="send" size={20} color={colors.onPrimary} />
+                        </TouchableOpacity>
+                    </View>
+                )}
             </View>
         </SafeAreaView>
     );
@@ -899,6 +975,33 @@ const styles = StyleSheet.create({
     actionSeparator: {
         height: StyleSheet.hairlineWidth,
         width: '100%',
+    },
+    deletedBanner: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 12,
+        width: '100%',
+    },
+    deletedIcon: {
+        marginRight: 8,
+    },
+    deletedText: {
+        color: 'white',
+        fontSize: 14,
+        fontWeight: '600',
+        flex: 1,
+    },
+    leaveButton: {
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        borderRadius: 16,
+        marginLeft: 8,
+    },
+    leaveButtonText: {
+        color: 'white',
+        fontSize: 12,
+        fontWeight: '600',
     },
 });
 

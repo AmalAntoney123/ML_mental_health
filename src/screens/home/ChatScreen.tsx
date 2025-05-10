@@ -42,6 +42,15 @@ interface UserContextType {
 
 const UserContext = createContext<UserContextType>({ users: [], setUsers: () => { } });
 
+const DeletedGroupBanner: React.FC<{ colors: any }> = ({ colors }) => {
+    return (
+        <View style={[styles.deletedBanner, { backgroundColor: colors.error }]}>
+            <Icon name="warning" size={20} color="white" style={styles.deletedBannerIcon} />
+            <Text style={styles.deletedBannerText}>This group has been deleted</Text>
+        </View>
+    );
+};
+
 const TypingIndicator: React.FC<{ typingUsers: string[] }> = ({ typingUsers }) => {
     const { colors } = useTheme();
     const { users } = useContext(UserContext);
@@ -330,17 +339,18 @@ const MessageItem: React.FC<MessageItemProps> = ({
 
 const ChatScreen: React.FC = () => {
     const route = useRoute<ChatScreenRouteProp>();
-  const { group, fromSocialChallenge = false } = route.params;
-  const [socialChallengeCompleted, setSocialChallengeCompleted] = useState(false);
-  const [isJoined, setIsJoined] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [newMessage, setNewMessage] = useState('');
-  const [replyingTo, setReplyingTo] = useState<Message | null>(null);
-  const [users, setUsers] = useState<User[]>([]);
-  const [typingUsers, setTypingUsers] = useState<string[]>([]);
-  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
-  const { colors } = useTheme();
-  const swipeableRefs = useRef<{ [key: string]: Swipeable | null }>({});
+    const { group, fromSocialChallenge = false } = route.params;
+    const [socialChallengeCompleted, setSocialChallengeCompleted] = useState(false);
+    const [isJoined, setIsJoined] = useState(false);
+    const [messages, setMessages] = useState<Message[]>([]);
+    const [newMessage, setNewMessage] = useState('');
+    const [replyingTo, setReplyingTo] = useState<Message | null>(null);
+    const [users, setUsers] = useState<User[]>([]);
+    const [typingUsers, setTypingUsers] = useState<string[]>([]);
+    const [isGroupDeleted, setIsGroupDeleted] = useState(false);
+    const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+    const { colors } = useTheme();
+    const swipeableRefs = useRef<{ [key: string]: Swipeable | null }>({});
 
     useEffect(() => {
         const currentUser = auth().currentUser;
@@ -353,6 +363,15 @@ const ChatScreen: React.FC = () => {
         };
 
         checkMembership();
+
+        // Check if group is deleted
+        const groupRef = database().ref(`supportGroups/${group.id}`);
+        groupRef.on('value', (snapshot) => {
+            const groupData = snapshot.val();
+            if (groupData) {
+                setIsGroupDeleted(groupData.isDeleted === true);
+            }
+        });
 
         if (isJoined) {
             const messagesRef = database().ref(`supportGroups/${group.id}/messages`);
@@ -430,7 +449,7 @@ const ChatScreen: React.FC = () => {
     };
 
     const handleSendMessage = async () => {
-        if (!newMessage.trim() || !isJoined) return;
+        if (!newMessage.trim() || !isJoined || isGroupDeleted) return;
     
         const currentUser = auth().currentUser;
         if (!currentUser) return;
@@ -538,6 +557,8 @@ const ChatScreen: React.FC = () => {
                     </TouchableOpacity>
                 </View>
 
+                {isGroupDeleted && <DeletedGroupBanner colors={colors} />}
+
                 <FlatList
                     data={messages}
                     renderItem={renderMessage}
@@ -547,7 +568,7 @@ const ChatScreen: React.FC = () => {
                 />
 
                 {/* Reply Preview */}
-                {replyingTo && (
+                {replyingTo && !isGroupDeleted && (
                     <View style={[styles.replyPreview, { backgroundColor: colors.surface }]}>
                         <View style={styles.replyPreviewContent}>
                             <View style={styles.replyPreviewLeft}>
@@ -572,25 +593,27 @@ const ChatScreen: React.FC = () => {
                 )}
 
                 {/* Input Container */}
-                <View style={[styles.inputContainer, { backgroundColor: colors.surface }]}>
-                    <TextInput
-                        style={[styles.input, { 
-                            color: colors.text,
-                            backgroundColor: colors.background
-                        }]}
-                        value={newMessage}
-                        onChangeText={setNewMessage}
-                        placeholder="Type here..."
-                        placeholderTextColor={colors.gray}
-                        multiline
-                    />
-                    <TouchableOpacity
-                        style={[styles.sendButton, { backgroundColor: colors.primary }]}
-                        onPress={handleSendMessage}
-                    >
-                        <Icon name="send" size={20} color={colors.onPrimary} />
-                    </TouchableOpacity>
-                </View>
+                {!isGroupDeleted && (
+                    <View style={[styles.inputContainer, { backgroundColor: colors.surface }]}>
+                        <TextInput
+                            style={[styles.input, { 
+                                color: colors.text,
+                                backgroundColor: colors.background
+                            }]}
+                            value={newMessage}
+                            onChangeText={setNewMessage}
+                            placeholder="Type here..."
+                            placeholderTextColor={colors.gray}
+                            multiline
+                        />
+                        <TouchableOpacity
+                            style={[styles.sendButton, { backgroundColor: colors.primary }]}
+                            onPress={handleSendMessage}
+                        >
+                            <Icon name="send" size={20} color={colors.onPrimary} />
+                        </TouchableOpacity>
+                    </View>
+                )}
             </View>
         </SafeAreaView>
     );
@@ -898,6 +921,21 @@ const styles = StyleSheet.create({
     actionSeparator: {
         height: StyleSheet.hairlineWidth,
         width: '100%',
+    },
+    deletedBanner: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 12,
+        width: '100%',
+    },
+    deletedBannerIcon: {
+        marginRight: 8,
+    },
+    deletedBannerText: {
+        color: 'white',
+        fontSize: 14,
+        fontWeight: '600',
     },
 });
 

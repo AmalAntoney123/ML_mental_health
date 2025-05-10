@@ -17,6 +17,7 @@ interface SupportGroup {
   createdAt: number;
   createdBy: string;
   members: { [key: string]: boolean };
+  isDeleted?: boolean;
 }
 
 type FindGroupsScreenNavigationProp = StackNavigationProp<RootStackParamList, 'FindGroupsScreen'>;
@@ -49,8 +50,9 @@ const FindGroupsScreen: React.FC = () => {
             createdAt: data.createdAt,
             createdBy: data.createdBy,
             members: data.members || {},
+            isDeleted: data.isDeleted || false,
           }))
-          .filter(group => !group.members[currentUser.uid]);
+          .filter(group => !group.members[currentUser.uid] && !group.isDeleted);
 
         setAvailableGroups(groupsArray);
       }

@@ -184,6 +184,7 @@ const TherapyScreen: React.FC = () => {
       b => b.therapistId === therapist.id && b.userId === user?.uid
     );
     
+    // First check for active bookings (pending or confirmed)
     const activeBooking = existingBookings.find(
       b => b.status === 'pending' || b.status === 'confirmed'
     );
@@ -216,7 +217,26 @@ const TherapyScreen: React.FC = () => {
         </TouchableOpacity>
       );
     }
-
+  
+    // Then check for completed sessions with pending payments
+    const completedWithPendingPayment = existingBookings.find(
+      b => b.status === 'completed' && b.paymentStatus === 'pending'
+    );
+  
+    if (completedWithPendingPayment) {
+      return (
+        <TouchableOpacity 
+          style={[styles.bookButton, { backgroundColor: colors.primary }]}
+          onPress={() => handlePayment(completedWithPendingPayment)}
+        >
+          <Text style={[styles.bookButtonText, { color: colors.onPrimary }]}>
+            Complete Payment
+          </Text>
+        </TouchableOpacity>
+      );
+    }
+    
+    // Default: Book Session button
     return (
       <TouchableOpacity 
         style={[styles.bookButton, { backgroundColor: colors.primary }]}
@@ -427,6 +447,7 @@ const TherapyScreen: React.FC = () => {
     } else {
       return (list as BookingRequest[])
         .filter(session => 
+          session.status === 'completed' && // Add status filter
           session.therapistName.toLowerCase().includes(searchQuery.toLowerCase())
         )
         .sort((a, b) => {
@@ -442,6 +463,7 @@ const TherapyScreen: React.FC = () => {
 
   useEffect(() => {
     const therapistsRef = database().ref('therapists');
+    const bookingsListeners: BookingsListener = {};
     
     therapistsRef.on('value', snapshot => {
       const data = snapshot.val();
@@ -455,24 +477,34 @@ const TherapyScreen: React.FC = () => {
           availability: therapist.availability,
         }));
         setTherapists(therapistList);
-
+    
         // Fetch completed sessions for each therapist
         if (user) {
           const completedSessionsList: BookingRequest[] = [];
+          const allBookings: { [key: string]: BookingRequest } = {};
+          
           Object.entries(data).forEach(([therapistId, therapistData]: [string, any]) => {
             if (therapistData.bookings) {
               Object.entries(therapistData.bookings).forEach(([bookingId, booking]: [string, any]) => {
-                if (booking.userId === user.uid && booking.status === 'completed') {
-                  completedSessionsList.push({
+                // Add all bookings for this user to the therapistBookings state
+                if (booking.userId === user.uid) {
+                  const fullBooking = {
                     ...booking,
                     id: bookingId,
                     therapistId: therapistId
-                  });
+                  };
+                  
+                  allBookings[bookingId] = fullBooking;
+                  
+                  if (booking.status === 'completed') {
+                    completedSessionsList.push(fullBooking);
+                  }
                 }
               });
             }
           });
           setCompletedSessions(completedSessionsList);
+          setTherapistBookings(allBookings);
         }
       }
       setLoading(false);
@@ -480,6 +512,10 @@ const TherapyScreen: React.FC = () => {
 
     return () => {
       therapistsRef.off();
+      // Clean up any other listeners
+      Object.values(bookingsListeners).forEach(listener => {
+        listener.off();
+      });
     };
   }, [user]);
 
@@ -547,13 +583,14 @@ const TherapyScreen: React.FC = () => {
   );
 
   const renderItem = ({ item }: { item: ListItem }) => {
-    if ('specialization' in item) {
-      // This is a Therapist
+    if (activeTab === 'available' && 'specialization' in item) {
+      // This is a Therapist in the Available tab
       return renderTherapist({ item: item as Therapist });
-    } else {
-      // This is a BookingRequest
+    } else if (activeTab === 'previous' && !('specialization' in item)) {
+      // This is a BookingRequest in the Previous tab
       return renderCompletedSession({ item: item as BookingRequest });
     }
+    return null; // Should not happen, but just in case
   };
 
   if (loading) {
